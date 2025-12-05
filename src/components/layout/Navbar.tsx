@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, LogIn, UserPlus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -57,7 +57,7 @@ export function Navbar() {
               ))}
             </div>
 
-            {/* CTA Button & Auth */}
+            {/* CTA Button & Auth - Desktop */}
             <div className="hidden md:flex items-center gap-3">
               {!loading && (
                 <>
@@ -82,9 +82,20 @@ export function Navbar() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    <Button variant="glass" size="sm" asChild>
-                      <Link to="/auth">Sign In</Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="sm" className="gap-2" asChild>
+                        <Link to="/auth">
+                          <LogIn size={16} />
+                          Sign In
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm" className="gap-2 border-primary/50 text-primary hover:bg-primary/10" asChild>
+                        <Link to="/auth?signup=true">
+                          <UserPlus size={16} />
+                          Sign Up
+                        </Link>
+                      </Button>
+                    </div>
                   )}
                 </>
               )}
@@ -93,14 +104,39 @@ export function Navbar() {
               </Button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {/* Mobile Auth & Menu Button */}
+            <div className="flex md:hidden items-center gap-2">
+              {!loading && !user && (
+                <Button 
+                  variant="gradient" 
+                  size="sm" 
+                  className="gap-1.5 text-xs px-3"
+                  asChild
+                >
+                  <Link to="/auth">
+                    <LogIn size={14} />
+                    <span className="hidden xs:inline">Sign In</span>
+                  </Link>
+                </Button>
+              )}
+              {!loading && user && (
+                <Button 
+                  variant="glass" 
+                  size="sm" 
+                  className="gap-1.5 text-xs px-2"
+                  onClick={handleSignOut}
+                >
+                  <User size={14} />
+                </Button>
+              )}
+              <button
+                className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label="Toggle menu"
+              >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -123,28 +159,50 @@ export function Navbar() {
                 </Link>
               ))}
               
-              {/* Mobile Auth */}
+              {/* Mobile Auth Section */}
               {!loading && (
-                <div className="pt-2 border-t border-border/50">
+                <div className="pt-3 border-t border-border/50 space-y-2">
                   {user ? (
-                    <button
-                      onClick={() => {
-                        handleSignOut();
-                        setIsOpen(false);
-                      }}
-                      className="flex items-center gap-2 w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
-                    >
-                      <LogOut size={16} />
-                      Sign Out
-                    </button>
+                    <>
+                      <div className="px-4 py-2 text-sm text-muted-foreground">
+                        Signed in as <span className="text-foreground font-medium">{user.email}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleSignOut();
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <LogOut size={18} />
+                        Sign Out
+                      </button>
+                    </>
                   ) : (
-                    <Link
-                      to="/auth"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-4 py-3 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
-                    >
-                      Sign In / Sign Up
-                    </Link>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="w-full gap-2 border-border/50"
+                        onClick={() => setIsOpen(false)}
+                        asChild
+                      >
+                        <Link to="/auth">
+                          <LogIn size={16} />
+                          Sign In
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="gradient" 
+                        className="w-full gap-2"
+                        onClick={() => setIsOpen(false)}
+                        asChild
+                      >
+                        <Link to="/auth?signup=true">
+                          <UserPlus size={16} />
+                          Sign Up
+                        </Link>
+                      </Button>
+                    </div>
                   )}
                 </div>
               )}
