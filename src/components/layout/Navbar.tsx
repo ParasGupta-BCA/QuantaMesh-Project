@@ -29,24 +29,24 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
       <div className="glass-card border-t-0 rounded-t-none">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-18 lg:h-20">
             {/* Logo */}
             <Link 
               to="/" 
-              className="flex items-center gap-2 text-xl md:text-2xl font-bold"
+              className="flex items-center gap-1.5 sm:gap-2 text-lg sm:text-xl lg:text-2xl font-bold flex-shrink-0"
             >
               <span className="gradient-text">Quanta</span>
               <span className="text-foreground">Mesh</span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1 xl:gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  className={`px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                     location.pathname === link.path
                       ? "text-primary bg-primary/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -58,7 +58,7 @@ export function Navbar() {
             </div>
 
             {/* CTA Button & Auth - Desktop */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-3">
               {!loading && (
                 <>
                   {user ? (
@@ -66,7 +66,7 @@ export function Navbar() {
                       <DropdownMenuTrigger asChild>
                         <Button variant="glass" size="sm" className="gap-2">
                           <User size={16} />
-                          <span className="max-w-[120px] truncate">
+                          <span className="max-w-[100px] xl:max-w-[120px] truncate">
                             {user.email?.split('@')[0]}
                           </span>
                         </Button>
@@ -99,9 +99,55 @@ export function Navbar() {
                   )}
                 </>
               )}
-              <Button variant="gradient" asChild>
+              <Button variant="gradient" size="default" className="text-sm xl:text-base" asChild>
                 <Link to="/order">Publish My App</Link>
               </Button>
+            </div>
+
+            {/* Tablet Navigation (md to lg) */}
+            <div className="hidden md:flex lg:hidden items-center gap-2">
+              {!loading && (
+                <>
+                  {user ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="glass" size="sm" className="gap-1.5">
+                          <User size={14} />
+                          <span className="max-w-[80px] truncate text-xs">
+                            {user.email?.split('@')[0]}
+                          </span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="glass-card border-border/50">
+                        <DropdownMenuItem 
+                          onClick={handleSignOut}
+                          className="cursor-pointer text-destructive focus:text-destructive"
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Sign Out
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Button variant="ghost" size="sm" className="gap-1.5 text-xs" asChild>
+                      <Link to="/auth">
+                        <LogIn size={14} />
+                        Sign In
+                      </Link>
+                    </Button>
+                  )}
+                </>
+              )}
+              <Button variant="gradient" size="sm" className="text-xs" asChild>
+                <Link to="/order">Publish App</Link>
+              </Button>
+              <button
+                className="p-2 rounded-lg hover:bg-secondary transition-colors ml-1"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label="Toggle menu"
+              >
+                {isOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
             </div>
 
             {/* Mobile Auth & Menu Button */}
@@ -140,10 +186,10 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile & Tablet Navigation Menu */}
         {isOpen && (
-          <div className="md:hidden border-t border-border/50 animate-slide-up">
-            <div className="container mx-auto px-4 py-4 space-y-2">
+          <div className="lg:hidden border-t border-border/50 animate-slide-up">
+            <div className="container mx-auto px-4 sm:px-6 py-4 space-y-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
@@ -207,7 +253,7 @@ export function Navbar() {
                 </div>
               )}
               
-              <div className="pt-2">
+              <div className="pt-2 md:hidden">
                 <Button variant="gradient" className="w-full" asChild>
                   <Link to="/order" onClick={() => setIsOpen(false)}>
                     Publish My App
