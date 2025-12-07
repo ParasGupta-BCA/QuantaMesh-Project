@@ -1,12 +1,17 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Shield, Zap } from "lucide-react";
+import { Boxes } from "@/components/ui/background-boxes";
 
 export function Hero() {
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden px-4">
+      {/* Animated Background Boxes */}
+      <div className="absolute inset-0 w-full h-full bg-background z-0 [mask-image:radial-gradient(transparent,white)] pointer-events-none" />
+      <Boxes />
+
       {/* Background Effects */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none z-10">
         <div className="absolute top-1/4 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-primary/20 rounded-full blur-[100px] md:blur-[128px] animate-pulse-glow" />
         <div className="absolute bottom-1/4 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-[hsl(200,95%,55%)]/20 rounded-full blur-[100px] md:blur-[128px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
       </div>
