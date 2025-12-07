@@ -30,7 +30,7 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50">
       <div className="glass-card border-t-0 rounded-t-none">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between h-16 md:h-18">
+          <div className="relative flex items-center justify-between h-16 md:h-18">
             {/* Logo */}
             <Link 
               to="/" 
@@ -40,8 +40,8 @@ export function Navbar() {
               <span className="text-foreground">Mesh</span>
             </Link>
 
-            {/* Desktop Navigation - visible on md and above */}
-            <div className="hidden md:flex items-center gap-1 lg:gap-2">
+            {/* Desktop Navigation - Centered */}
+            <div className="hidden md:flex items-center gap-1 lg:gap-2 absolute left-1/2 -translate-x-1/2">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
