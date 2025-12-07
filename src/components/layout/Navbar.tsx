@@ -41,12 +41,12 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1 xl:gap-2">
+            <div className="hidden lg:flex items-center gap-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                     location.pathname === link.path
                       ? "text-primary bg-primary/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -58,15 +58,15 @@ export function Navbar() {
             </div>
 
             {/* CTA Button & Auth - Desktop */}
-            <div className="hidden lg:flex items-center gap-2 xl:gap-3">
+            <div className="hidden lg:flex items-center gap-3">
               {!loading && (
                 <>
                   {user ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="glass" size="sm" className="gap-2">
+                        <Button variant="ghost" size="sm" className="gap-2">
                           <User size={16} />
-                          <span className="max-w-[100px] xl:max-w-[120px] truncate">
+                          <span className="max-w-[120px] truncate">
                             {user.email?.split('@')[0]}
                           </span>
                         </Button>
@@ -82,7 +82,7 @@ export function Navbar() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    <div className="flex items-center gap-2">
+                    <>
                       <Button variant="ghost" size="sm" className="gap-2" asChild>
                         <Link to="/auth">
                           <LogIn size={16} />
@@ -95,11 +95,11 @@ export function Navbar() {
                           Sign Up
                         </Link>
                       </Button>
-                    </div>
+                    </>
                   )}
                 </>
               )}
-              <Button variant="gradient" size="default" className="text-sm xl:text-base" asChild>
+              <Button variant="gradient" size="default" asChild>
                 <Link to="/order">Publish My App</Link>
               </Button>
             </div>
