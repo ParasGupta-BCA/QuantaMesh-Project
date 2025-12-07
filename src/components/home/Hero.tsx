@@ -1,14 +1,26 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Shield, Zap } from "lucide-react";
-import { Boxes } from "@/components/ui/background-boxes";
+import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
 
 export function Hero() {
   return (
     <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden px-4">
-      {/* Animated Background Boxes */}
-      <div className="absolute inset-0 w-full h-full bg-background z-0 [mask-image:radial-gradient(transparent,white)] pointer-events-none" />
-      <Boxes />
+      {/* Animated Dotted Background */}
+      <DottedGlowBackground
+        className="pointer-events-none"
+        opacity={0.8}
+        gap={16}
+        radius={1.5}
+        darkColor="rgba(168, 85, 247, 0.7)"
+        darkGlowColor="rgba(168, 85, 247, 0.9)"
+        color="rgba(168, 85, 247, 0.5)"
+        glowColor="rgba(168, 85, 247, 0.85)"
+        backgroundOpacity={0}
+        speedMin={0.3}
+        speedMax={1.2}
+        speedScale={1}
+      />
 
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none z-10">
