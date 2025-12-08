@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User, LogIn, UserPlus } from "lucide-react";
+import { Menu, X, LogOut, User, LogIn, UserPlus, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -21,6 +23,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, signOut, loading } = useAuth();
+  const { isAdmin } = useAdmin();
 
   const handleSignOut = async () => {
     await signOut();
@@ -72,6 +75,17 @@ export function Navbar() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-card border-border z-50">
+                        {isAdmin && (
+                          <>
+                            <DropdownMenuItem asChild className="cursor-pointer">
+                              <Link to="/admin" className="flex items-center">
+                                <Shield className="mr-2 h-4 w-4" />
+                                Admin Panel
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                          </>
+                        )}
                         <DropdownMenuItem 
                           onClick={handleSignOut}
                           className="cursor-pointer text-destructive focus:text-destructive"
@@ -149,6 +163,16 @@ export function Navbar() {
                       <div className="px-4 py-2 text-sm text-muted-foreground">
                         Signed in as <span className="text-foreground font-medium">{user.email}</span>
                       </div>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                        >
+                          <Shield size={18} />
+                          Admin Panel
+                        </Link>
+                      )}
                       <button
                         onClick={() => {
                           handleSignOut();
