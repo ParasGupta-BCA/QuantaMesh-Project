@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Helmet } from "react-helmet-async";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Upload,
   CheckCircle,
@@ -37,6 +39,7 @@ const addOnOptions = [
 
 export default function Order() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -98,16 +101,39 @@ export default function Order() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      const { error } = await supabase.from('orders').insert({
+        user_id: user?.id || null,
+        app_name: formData.appName,
+        short_description: formData.shortDescription,
+        full_description: formData.fullDescription || null,
+        category: formData.category || null,
+        email: formData.email,
+        customer_name: formData.name,
+        privacy_policy_url: formData.privacyPolicyUrl || null,
+        support_url: formData.supportUrl || null,
+        add_ons: formData.addOns,
+        total_price: totalPrice,
+        status: 'pending'
+      });
 
-    toast({
-      title: "Order Submitted!",
-      description: "We'll contact you shortly with payment details.",
-    });
+      if (error) throw error;
 
-    setStep(3);
-    setIsSubmitting(false);
+      toast({
+        title: "Order Submitted!",
+        description: "We'll contact you shortly with payment details.",
+      });
+
+      setStep(3);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit order. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isStep1Valid = formData.appName && formData.shortDescription && formData.email && formData.name;

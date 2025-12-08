@@ -14,6 +14,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string
+          subject: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string
+          subject: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string
+          subject?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          add_ons: string[] | null
+          app_name: string
+          category: string | null
+          created_at: string
+          customer_name: string
+          email: string
+          full_description: string | null
+          id: string
+          privacy_policy_url: string | null
+          short_description: string
+          status: string
+          support_url: string | null
+          total_price: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          add_ons?: string[] | null
+          app_name: string
+          category?: string | null
+          created_at?: string
+          customer_name: string
+          email: string
+          full_description?: string | null
+          id?: string
+          privacy_policy_url?: string | null
+          short_description: string
+          status?: string
+          support_url?: string | null
+          total_price?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          add_ons?: string[] | null
+          app_name?: string
+          category?: string | null
+          created_at?: string
+          customer_name?: string
+          email?: string
+          full_description?: string | null
+          id?: string
+          privacy_policy_url?: string | null
+          short_description?: string
+          status?: string
+          support_url?: string | null
+          total_price?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
