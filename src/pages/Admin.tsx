@@ -31,7 +31,9 @@ import {
   Link as LinkIcon,
   ChevronDown,
   ChevronUp,
+  MessagesSquare,
 } from "lucide-react";
+import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 
 interface Order {
   id: string;
@@ -311,6 +313,10 @@ export default function Admin() {
               <TabsTrigger value="messages" className="gap-2">
                 <MessageSquare className="h-4 w-4" />
                 Messages ({messages.length})
+              </TabsTrigger>
+              <TabsTrigger value="chat" className="gap-2">
+                <MessagesSquare className="h-4 w-4" />
+                Chat
               </TabsTrigger>
             </TabsList>
 
@@ -600,6 +606,10 @@ export default function Admin() {
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            <TabsContent value="chat">
+              <AdminChatPanel />
             </TabsContent>
           </Tabs>
         </div>
