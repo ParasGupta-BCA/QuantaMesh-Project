@@ -134,7 +134,7 @@ export type Database = {
           support_url: string | null
           total_price: number
           updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           add_ons?: string[] | null
@@ -151,7 +151,7 @@ export type Database = {
           support_url?: string | null
           total_price?: number
           updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           add_ons?: string[] | null
@@ -168,7 +168,7 @@ export type Database = {
           support_url?: string | null
           total_price?: number
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

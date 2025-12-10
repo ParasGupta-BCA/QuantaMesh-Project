@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,8 @@ import {
   ArrowRight,
   Shield,
   Clock,
-  CreditCard
+  CreditCard,
+  LogIn
 } from "lucide-react";
 
 const orderSchema = z.object({
@@ -52,7 +54,7 @@ const addOnOptions = [
 
 export default function Order() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -144,7 +146,7 @@ export default function Order() {
     try {
       const validatedData = result.data;
       const { error } = await supabase.from('orders').insert({
-        user_id: user?.id || null,
+        user_id: user!.id,
         app_name: validatedData.appName,
         short_description: validatedData.shortDescription,
         full_description: validatedData.fullDescription || null,
@@ -179,6 +181,58 @@ export default function Order() {
 
   const isStep1Valid = formData.appName && formData.shortDescription && formData.email && formData.name;
   const isStep2Valid = files.apk && files.icon;
+
+  // Show login prompt if not authenticated
+  if (!loading && !user) {
+    return (
+      <Layout>
+        <Helmet>
+          <title>Order App Publishing - Quanta Mesh</title>
+          <meta name="description" content="Order your Android app publishing service. Sign in to get started." />
+        </Helmet>
+
+        <section className="pt-20 pb-16 md:pt-32 md:pb-24">
+          <div className="container mx-auto px-4">
+            <div className="max-w-md mx-auto">
+              <div className="glass-card rounded-2xl p-8 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+                  <LogIn size={32} className="text-primary" />
+                </div>
+                <h1 className="text-2xl font-bold mb-4">Sign In Required</h1>
+                <p className="text-muted-foreground mb-6">
+                  Please sign in or create an account to place an order. This helps us track your orders and provide better support.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button variant="gradient" asChild>
+                    <a href="/auth">Sign In</a>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <a href="/auth?signup=true">Create Account</a>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Layout>
+        <Helmet>
+          <title>Order App Publishing - Quanta Mesh</title>
+        </Helmet>
+        <section className="pt-20 pb-16 md:pt-32 md:pb-24">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
