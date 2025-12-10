@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { Message, Conversation } from './useChat';
 
 export interface ConversationWithUnread extends Conversation {
@@ -10,6 +11,7 @@ export interface ConversationWithUnread extends Conversation {
 
 export function useAdminChat() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [conversations, setConversations] = useState<ConversationWithUnread[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -89,7 +91,7 @@ export function useAdminChat() {
     }
   }, []);
 
-  // Send reply
+  // Send reply and email notification
   const sendReply = async (content: string) => {
     if (!user || !selectedConversation) return;
 
@@ -102,6 +104,25 @@ export function useAdminChat() {
       });
 
       if (error) throw error;
+
+      // Send email notification to the client
+      try {
+        await supabase.functions.invoke('send-chat-notification', {
+          body: {
+            recipientEmail: selectedConversation.user_email,
+            recipientName: selectedConversation.user_name,
+            messageContent: content,
+          },
+        });
+        console.log('Email notification sent to:', selectedConversation.user_email);
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError);
+        toast({
+          title: 'Note',
+          description: 'Message sent but email notification failed.',
+          variant: 'default',
+        });
+      }
     } catch (error) {
       console.error('Error sending reply:', error);
       throw error;
