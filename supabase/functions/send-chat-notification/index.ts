@@ -15,6 +15,18 @@ interface ChatNotificationRequest {
   messageContent: string;
 }
 
+// Escape HTML entities to prevent XSS in emails
+const escapeHtml = (text: string): string => {
+  const htmlEntities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return text.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
+};
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -23,6 +35,10 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { recipientEmail, recipientName, messageContent }: ChatNotificationRequest = await req.json();
+    
+    // Sanitize user-provided content
+    const safeMessageContent = escapeHtml(messageContent);
+    const safeRecipientName = recipientName ? escapeHtml(recipientName) : null;
 
     if (!RESEND_API_KEY) {
       throw new Error("RESEND_API_KEY is not configured");
@@ -54,7 +70,7 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
                 
                 <h2 style="color: #ffffff; margin: 0 0 16px 0; font-size: 20px;">
-                  Hi${recipientName ? ` ${recipientName}` : ''},
+                  Hi${safeRecipientName ? ` ${safeRecipientName}` : ''},
                 </h2>
                 
                 <p style="color: #a1a1aa; margin: 0 0 24px 0; line-height: 1.6;">
@@ -63,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <div style="background-color: #27272a; border-radius: 12px; padding: 20px; margin-bottom: 24px; border-left: 4px solid #a855f7;">
                   <p style="color: #ffffff; margin: 0; line-height: 1.6; white-space: pre-wrap;">
-                    ${messageContent}
+                    ${safeMessageContent}
                   </p>
                 </div>
                 
