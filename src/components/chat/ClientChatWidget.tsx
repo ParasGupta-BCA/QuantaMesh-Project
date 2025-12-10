@@ -19,7 +19,14 @@ export function ClientChatWidget() {
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Don't render if user is not logged in
+  // Auto-scroll to bottom when new messages arrive - MUST be before any conditional returns
+  useEffect(() => {
+    if (scrollRef.current && isOpen) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isOpen]);
+
+  // Don't render if user is not logged in - AFTER all hooks
   if (!user) return null;
 
   const handleOpen = () => {
@@ -55,13 +62,6 @@ export function ClientChatWidget() {
       handleSend();
     }
   };
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (scrollRef.current && isOpen) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isOpen]);
 
   return (
     <>
