@@ -251,7 +251,7 @@ export function AdminChatPanel() {
             </CardHeader>
 
             {/* Messages */}
-            <CardContent className="flex-1 p-0 overflow-hidden relative">
+            <CardContent className="flex-1 min-h-0 p-0 overflow-hidden relative">
               <div
                 className="h-full overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent"
                 ref={scrollRef}
