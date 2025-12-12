@@ -17,7 +17,7 @@ const navLinks = [
   { name: "Services", path: "/services" },
   { name: "Order", path: "/order" },
   { name: "Contact", path: "/contact" },
-  { name: "Chat", path: "/chat" },
+  { name: "Chat", path: "/chat", badge: "New" },
 ];
 
 export function Navbar() {
@@ -36,8 +36,8 @@ export function Navbar() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="relative flex items-center justify-between h-16 md:h-18">
             {/* Logo */}
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="flex items-center gap-1.5 text-xl font-bold flex-shrink-0"
             >
               <span className="gradient-text">Quanta</span>
@@ -50,13 +50,17 @@ export function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    location.pathname === link.path
+                  className={`relative px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${location.pathname === link.path
                       ? "text-primary bg-primary/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   {link.name}
+                  {link.badge && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground font-bold">
+                      {link.badge === "New" ? "N" : "!"}
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>
@@ -87,7 +91,7 @@ export function Navbar() {
                             <DropdownMenuSeparator />
                           </>
                         )}
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={handleSignOut}
                           className="cursor-pointer text-destructive focus:text-destructive"
                         >
@@ -104,10 +108,10 @@ export function Navbar() {
                           Sign In
                         </Link>
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="gap-1.5 border-primary/50 text-primary hover:bg-primary/10" 
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 border-primary/50 text-primary hover:bg-primary/10"
                         asChild
                       >
                         <Link to="/auth?signup=true">
@@ -146,16 +150,20 @@ export function Navbar() {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    location.pathname === link.path
+                  className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${location.pathname === link.path
                       ? "text-primary bg-primary/10"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   {link.name}
+                  {link.badge && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] uppercase font-bold tracking-wider">
+                      {link.badge}
+                    </span>
+                  )}
                 </Link>
               ))}
-              
+
               {/* Mobile Auth Section */}
               {!loading && (
                 <div className="pt-3 border-t border-border/50 space-y-3">
@@ -187,8 +195,8 @@ export function Navbar() {
                     </>
                   ) : (
                     <div className="grid grid-cols-2 gap-3">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full gap-2"
                         onClick={() => setIsOpen(false)}
                         asChild
@@ -198,8 +206,8 @@ export function Navbar() {
                           Sign In
                         </Link>
                       </Button>
-                      <Button 
-                        variant="gradient" 
+                      <Button
+                        variant="gradient"
                         className="w-full gap-2"
                         onClick={() => setIsOpen(false)}
                         asChild
@@ -213,7 +221,7 @@ export function Navbar() {
                   )}
                 </div>
               )}
-              
+
               <div className="pt-2">
                 <Button variant="gradient" className="w-full" asChild>
                   <Link to="/order" onClick={() => setIsOpen(false)}>
