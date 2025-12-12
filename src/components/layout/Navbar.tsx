@@ -1,7 +1,8 @@
+```javascript
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, LogIn, UserPlus, Shield, Home, Briefcase, ShoppingBag, Phone, MessageSquare } from "lucide-react";
+import { Menu, X, LogOut, User, LogIn, UserPlus, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import {
@@ -11,14 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sidebar, MobileSidebar, SidebarLink } from "@/components/ui/sidebar";
 
 const navLinks = [
-  { name: "Home", path: "/", icon: <Home className="h-4 w-4 shrink-0" /> },
-  { name: "Services", path: "/services", icon: <Briefcase className="h-4 w-4 shrink-0" /> },
-  { name: "Order", path: "/order", icon: <ShoppingBag className="h-4 w-4 shrink-0" /> },
-  { name: "Contact", path: "/contact", icon: <Phone className="h-4 w-4 shrink-0" /> },
-  { name: "Chat", path: "/chat", badge: "New", icon: <MessageSquare className="h-4 w-4 shrink-0" /> },
+  { name: "Home", path: "/" },
+  { name: "Services", path: "/services" },
+  { name: "Order", path: "/order" },
+  { name: "Contact", path: "/contact" },
+  { name: "Chat", path: "/chat", badge: "New" },
 ];
 
 export function Navbar() {
@@ -29,7 +29,6 @@ export function Navbar() {
 
   const handleSignOut = async () => {
     await signOut();
-    setIsOpen(false);
   };
 
   return (
@@ -52,10 +51,11 @@ export function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${location.pathname === link.path
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                    }`}
+                  className={`relative px - 3 lg: px - 4 py - 2 rounded - lg text - sm font - medium transition - all duration - 300 ${
+  location.pathname === link.path
+  ? "text-primary bg-primary/10"
+  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+} `}
                 >
                   {link.name}
                   {link.badge && (
@@ -130,117 +130,113 @@ export function Navbar() {
               </Button>
             </div>
 
-            {/* Mobile Sidebar Trigger & Content */}
-            <div className="md:hidden">
-              <Sidebar open={isOpen} setOpen={setIsOpen}>
-                <MobileSidebar>
-                  <div className="flex flex-col h-full">
-                    <div className="flex-1 space-y-4 pt-10">
-                      {/* Logo Section in Sidebar */}
-                      <div className="mb-8 px-2">
-                        <Link
-                          to="/"
-                          onClick={() => setIsOpen(false)}
-                          className="flex items-center gap-1.5 text-2xl font-bold"
-                        >
-                          <span className="gradient-text">Quanta</span>
-                          <span className="text-foreground">Mesh</span>
-                        </Link>
-                      </div>
-
-                      {/* Navigation Links */}
-                      <div className="flex flex-col gap-2">
-                        {navLinks.map((link, idx) => (
-                          <Link to={link.path} key={idx} onClick={() => setIsOpen(false)}>
-                            <SidebarLink
-                              link={{
-                                label: link.name,
-                                href: link.path,
-                                icon: link.icon,
-                              }}
-                              className={location.pathname === link.path ? "text-primary font-semibold" : "text-muted-foreground"}
-                            />
-                          </Link>
-                        ))}
-                      </div>
-
-                      {/* Auth Section */}
-                      <div className="pt-6 border-t border-border mt-auto">
-                        {!loading && (
-                          <div className="flex flex-col gap-2">
-                            {user ? (
-                              <>
-                                <div className="px-2 py-2 text-sm text-muted-foreground break-all">
-                                  Signed in as <span className="text-foreground font-medium block">{user.email}</span>
-                                </div>
-                                {isAdmin && (
-                                  <Link to="/admin" onClick={() => setIsOpen(false)}>
-                                    <SidebarLink
-                                      link={{
-                                        label: "Admin Panel",
-                                        href: "/admin",
-                                        icon: <Shield className="h-4 w-4 shrink-0 text-orange-500" />,
-                                      }}
-                                    />
-                                  </Link>
-                                )}
-                                <div onClick={handleSignOut} className="cursor-pointer">
-                                  <SidebarLink
-                                    link={{
-                                      label: "Sign Out",
-                                      href: "#",
-                                      icon: <LogOut className="h-4 w-4 shrink-0 text-destructive" />,
-                                    }}
-                                    className="text-destructive hover:text-destructive"
-                                  />
-                                </div>
-                              </>
-                            ) : (
-                              <div className="space-y-3 px-1">
-                                <Button
-                                  variant="outline"
-                                  className="w-full gap-2 justify-start"
-                                  onClick={() => setIsOpen(false)}
-                                  asChild
-                                >
-                                  <Link to="/auth">
-                                    <LogIn size={16} />
-                                    Sign In
-                                  </Link>
-                                </Button>
-                                <Button
-                                  variant="gradient"
-                                  className="w-full gap-2 justify-start"
-                                  onClick={() => setIsOpen(false)}
-                                  asChild
-                                >
-                                  <Link to="/auth?signup=true">
-                                    <UserPlus size={16} />
-                                    Sign Up
-                                  </Link>
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Footer / CTA */}
-                    <div className="pt-6">
-                      <Button variant="gradient" className="w-full" asChild>
-                        <Link to="/order" onClick={() => setIsOpen(false)}>
-                          Publish My App
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </MobileSidebar>
-              </Sidebar>
+            {/* Mobile Menu Button */}
+            <div className="flex md:hidden items-center gap-2">
+              <button
+                className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label="Toggle menu"
+              >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isOpen && (
+          <div className="md:hidden border-t border-border/50 animate-slide-up">
+            <div className="container mx-auto px-4 py-4 space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items - center justify - between px - 4 py - 3 rounded - lg text - sm font - medium transition - all duration - 300 ${
+  location.pathname === link.path
+  ? "text-primary bg-primary/10"
+  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+} `}
+                >
+                  {link.name}
+                  {link.badge && (
+                    <span className="flex h-5 items-center justify-center rounded-full bg-primary/20 backdrop-blur-md border border-primary/20 px-2 text-[10px] text-primary font-bold shadow-sm">
+                      {link.badge}
+                    </span>
+                  )}
+                </Link>
+              ))}
+
+              {/* Mobile Auth Section */}
+              {!loading && (
+                <div className="pt-3 border-t border-border/50 space-y-3">
+                  {user ? (
+                    <>
+                      <div className="px-4 py-2 text-sm text-muted-foreground">
+                        Signed in as <span className="text-foreground font-medium">{user.email}</span>
+                      </div>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+                        >
+                          <Shield size={18} />
+                          Admin Panel
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          handleSignOut();
+                          setIsOpen(false);
+                        }}
+                        className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                      >
+                        <LogOut size={18} />
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2"
+                        onClick={() => setIsOpen(false)}
+                        asChild
+                      >
+                        <Link to="/auth">
+                          <LogIn size={16} />
+                          Sign In
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="gradient"
+                        className="w-full gap-2"
+                        onClick={() => setIsOpen(false)}
+                        asChild
+                      >
+                        <Link to="/auth?signup=true">
+                          <UserPlus size={16} />
+                          Sign Up
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="pt-2">
+                <Button variant="gradient" className="w-full" asChild>
+                  <Link to="/order" onClick={() => setIsOpen(false)}>
+                    Publish My App
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
 }
+```
