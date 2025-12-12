@@ -112,6 +112,38 @@ export default function Chat() {
     );
   }
 
+  // Handle mobile keyboard resizing
+  const [viewportHeight, setViewportHeight] = useState('100dvh');
+
+  useEffect(() => {
+    // Only run this logic on mobile devices where the keyboard shrinks the viewport
+    // and we want exact control. For desktop, standard CSS is fine.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    if (!isMobile || !window.visualViewport) return;
+
+    const handleResize = () => {
+      // visualViewport.height is the height of the visible area
+      // We subtract just a tiny bit if needed, but usually exact height is best
+      if (window.visualViewport) {
+        setViewportHeight(`${window.visualViewport.height}px`);
+      }
+    };
+
+    window.visualViewport.addEventListener('resize', handleResize);
+    window.visualViewport.addEventListener('scroll', handleResize); // Sometimes needed
+
+    // Initial set
+    handleResize();
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+        window.visualViewport.removeEventListener('scroll', handleResize);
+      }
+    };
+  }, []);
+
   return (
     <Layout hideFooter={true} showChatWidget={false}>
       <Helmet>
@@ -120,7 +152,10 @@ export default function Chat() {
       </Helmet>
 
       {/* Main Container - Full height minus navbar on mobile, centered with padding on desktop */}
-      <div className="relative flex flex-col h-[calc(100dvh-4rem)] md:h-[calc(100vh-5rem)] md:container md:mx-auto md:px-4 md:py-6">
+      <div
+        className="relative flex flex-col md:h-[calc(100vh-5rem)] md:container md:mx-auto md:px-4 md:py-6"
+        style={{ height: `calc(${viewportHeight} - 4rem)` }}
+      >
 
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="md:hidden flex items-center p-4 bg-background/80 backdrop-blur-md border-b sticky top-0 z-10">
@@ -136,7 +171,7 @@ export default function Chat() {
         </div>
 
         {/* Chat Interface Container */}
-        <div className="flex-1 flex flex-col md:glass-card md:rounded-3xl md:border md:border-border/50 md:shadow-2xl md:overflow-hidden bg-background/50 md:bg-secondary/5">
+        <div className="flex-1 flex flex-col md:glass-card md:rounded-3xl md:border md:border-border/50 md:shadow-2xl md:overflow-hidden bg-background/50 md:bg-secondary/5 h-full">
 
           {/* Messages Area - Flex 1 to take available space */}
           <ScrollArea className="flex-1 p-4 md:p-6" ref={scrollRef}>
@@ -187,7 +222,7 @@ export default function Chat() {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-4 bg-background/80 backdrop-blur-lg border-t md:bg-secondary/30 md:border-t-0">
+          <div className="p-4 bg-background/80 backdrop-blur-lg border-t md:bg-secondary/30 md:border-t-0 shrink-0">
             {conversation?.status === 'closed' ? (
               <div className="p-4 rounded-xl bg-secondary/50 border border-border/50 text-center">
                 <p className="text-muted-foreground text-sm">This conversation is closed. Start a new one to continue.</p>
