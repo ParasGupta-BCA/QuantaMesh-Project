@@ -107,7 +107,7 @@ export function AdminChatPanel() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-14rem)] min-h-[500px]">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100dvh-12rem)] min-h-[500px]">
       {/* Conversations List */}
       <Card
         className={`glass-card lg:col-span-1 flex flex-col h-full ${selectedConversation ? 'hidden lg:flex' : 'flex'
@@ -228,14 +228,17 @@ export function AdminChatPanel() {
             </CardHeader>
 
             {/* Messages */}
-            <CardContent className="flex-1 p-0 overflow-hidden">
-              <ScrollArea className="h-full p-4" ref={scrollRef}>
+            <CardContent className="flex-1 p-0 overflow-hidden relative">
+              <div
+                className="h-full overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent"
+                ref={scrollRef}
+              >
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-muted-foreground">
                     No messages in this conversation
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-4 pb-2">
                     {messages.map((message) => (
                       <div
                         key={message.id}
@@ -243,28 +246,28 @@ export function AdminChatPanel() {
                           }`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-2xl px-4 py-2 ${message.sender_type === 'admin'
-                            ? 'bg-primary text-primary-foreground rounded-br-md'
-                            : 'bg-secondary text-secondary-foreground rounded-bl-md'
+                          className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2 ${message.sender_type === 'admin'
+                            ? 'bg-primary text-primary-foreground rounded-br-md shadow-md'
+                            : 'bg-secondary/80 backdrop-blur-sm text-secondary-foreground rounded-bl-md border border-white/5'
                             }`}
                         >
-                          <p className="text-sm whitespace-pre-wrap break-words">
+                          <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
                             {message.content}
                           </p>
                           <p
-                            className={`text-xs mt-1 ${message.sender_type === 'admin'
+                            className={`text-[10px] mt-1 text-right ${message.sender_type === 'admin'
                               ? 'text-primary-foreground/70'
                               : 'text-muted-foreground'
                               }`}
                           >
-                            {format(new Date(message.created_at), 'MMM d, HH:mm')}
+                            {format(new Date(message.created_at), 'HH:mm')}
                           </p>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
-              </ScrollArea>
+              </div>
             </CardContent>
 
             {/* Input */}
