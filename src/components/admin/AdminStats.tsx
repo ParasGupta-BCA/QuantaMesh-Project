@@ -14,7 +14,7 @@ export function AdminStats({ orders, messages }: AdminStatsProps) {
     const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 animate-slide-up">
             {/* Total Orders */}
             <Card className="glass-card glass-card-hover animate-fade-in" style={{ animationDelay: "0ms" }}>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">

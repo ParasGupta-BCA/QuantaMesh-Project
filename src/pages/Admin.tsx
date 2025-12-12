@@ -145,9 +145,9 @@ export default function Admin() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <section className="py-24 md:py-32 min-h-screen bg-background text-foreground">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 animate-fade-in">
+      <div className="flex-1 w-full bg-background text-foreground py-8 md:py-12">
+        <div className="container mx-auto px-4 max-w-7xl space-y-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-fade-in">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
                 Admin Dashboard
@@ -156,13 +156,12 @@ export default function Admin() {
                 Manage orders, messages, and support inquiries
               </p>
             </div>
-            {/* Future: Add meaningful action buttons here if needed */}
           </div>
 
           <AdminStats orders={orders} messages={messages} />
 
           <Tabs defaultValue="orders" className="space-y-6">
-            <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
               <TabsList className="bg-secondary/50 p-1 rounded-xl h-auto flex-nowrap w-max md:w-auto inline-flex">
                 <TabsTrigger value="orders" className="gap-2 rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
                   <Package className="h-4 w-4" />
@@ -179,7 +178,7 @@ export default function Admin() {
               </TabsList>
             </div>
 
-            <TabsContent value="orders" className="outline-none">
+            <TabsContent value="orders" className="outline-none focus:ring-0">
               <AdminOrders
                 orders={orders}
                 updateOrderStatus={updateOrderStatus}
@@ -187,7 +186,7 @@ export default function Admin() {
               />
             </TabsContent>
 
-            <TabsContent value="messages" className="outline-none">
+            <TabsContent value="messages" className="outline-none focus:ring-0">
               <AdminMessages
                 messages={messages}
                 updateMessageStatus={updateMessageStatus}
@@ -195,12 +194,12 @@ export default function Admin() {
               />
             </TabsContent>
 
-            <TabsContent value="chat" className="outline-none">
+            <TabsContent value="chat" className="outline-none focus:ring-0">
               <AdminChatPanel />
             </TabsContent>
           </Tabs>
         </div>
-      </section>
+      </div>
     </Layout>
   );
 }
