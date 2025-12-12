@@ -10,6 +10,8 @@ import {
   Check,
   RefreshCw,
   ArrowLeft,
+  Search,
+  MoreVertical
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdminChat, ConversationWithUnread } from '@/hooks/useAdminChat';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export function AdminChatPanel() {
   const {
@@ -34,6 +38,7 @@ export function AdminChatPanel() {
   const { toast } = useToast();
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleSend = async () => {
@@ -93,245 +98,288 @@ export function AdminChatPanel() {
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      // Slight smooth scroll delay for better UX
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo({
+            top: scrollRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
     }
-  }, [messages]);
+  }, [messages, selectedConversation]);
 
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 
-  if (loading) {
+  const filteredConversations = conversations.filter(c =>
+    (c.user_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (c.user_email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+  );
+
+  if (loading && conversations.length === 0) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center py-20 h-[500px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary opacity-50" />
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-25rem)] min-h-[400px] max-h-[800px]">
-      {/* Conversations List */}
-      <Card
-        className={`glass-card lg:col-span-1 flex flex-col h-full ${selectedConversation ? 'hidden lg:flex' : 'flex'
-          }`}
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-180px)] min-h-[500px] max-h-[800px] rounded-2xl overflow-hidden glass-card border-border/40 gap-0 shadow-xl bg-background/40 backdrop-blur-xl animate-fade-in">
+      {/* Conversations List Sidebar */}
+      <div
+        className={`w-full lg:w-[350px] lg:border-r border-border/40 flex flex-col bg-secondary/10 lg:bg-transparent ${selectedConversation ? 'hidden lg:flex' : 'flex'}`}
       >
-        <CardHeader className="pb-3 border-b border-white/5">
+        <div className="p-4 border-b border-border/30 space-y-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              Conversations
+            <h3 className="font-semibold text-base flex items-center gap-2">
+              <MessageCircle className="h-4 w-4 text-primary" />
+              Inbox
               {totalUnread > 0 && (
-                <Badge variant="destructive" className="ml-2">
+                <Badge variant="default" className="bg-primary/90 text-[10px] px-1.5 h-5">
                   {totalUnread}
                 </Badge>
               )}
-            </CardTitle>
-            <Button variant="ghost" size="icon" onClick={refetch}>
-              <RefreshCw className="h-4 w-4" />
+            </h3>
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-secondary/50 rounded-full" onClick={refetch}>
+              <RefreshCw className="h-3.5 w-3.5" />
             </Button>
           </div>
-        </CardHeader>
-        <CardContent className="flex-1 p-0 overflow-hidden">
-          <ScrollArea className="h-full">
-            {conversations.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground">
-                No conversations yet
-              </div>
-            ) : (
-              <div className="space-y-1 p-2">
-                {conversations.map((conv) => {
-                  const initial = (conv.user_name || conv.user_email || "?").charAt(0).toUpperCase();
-                  const isSelected = selectedConversation?.id === conv.id;
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground/60" />
+            <Input
+              placeholder="Search chat..."
+              className="pl-9 h-9 bg-background/50 border-border/40 focus-visible:ring-primary/20 transition-all rounded-xl"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
 
-                  return (
-                    <button
-                      key={conv.id}
-                      onClick={() => selectConversation(conv)}
-                      className={`w-full text-left p-4 rounded-xl transition-all duration-300 group border ${isSelected
-                        ? 'bg-primary/20 border-primary/40 shadow-[0_0_15px_rgba(139,92,246,0.15)]'
-                        : 'bg-white/5 border-transparent hover:bg-white/10 hover:border-white/10'
-                        }`}
-                    >
-                      <div className="flex items-start gap-4">
-                        {/* Avatar */}
-                        <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center shrink-0 transition-colors ${isSelected
-                          ? 'bg-primary text-primary-foreground shadow-inner'
-                          : 'bg-secondary text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary'
-                          }`}>
-                          <span className="font-bold text-sm sm:text-base">{initial}</span>
+        <ScrollArea className="flex-1">
+          {filteredConversations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground p-4 text-center">
+              <MessageCircle className="h-8 w-8 mb-2 opacity-20" />
+              <p className="text-sm">No conversations found</p>
+            </div>
+          ) : (
+            <div className="flex flex-col p-2 gap-1">
+              {filteredConversations.map((conv) => {
+                const initial = (conv.user_name || conv.user_email || "?").charAt(0).toUpperCase();
+                const isSelected = selectedConversation?.id === conv.id;
+
+                return (
+                  <button
+                    key={conv.id}
+                    onClick={() => selectConversation(conv)}
+                    className={`w-full text-left p-3 rounded-xl transition-all duration-200 group border relative overflow-hidden ${isSelected
+                      ? 'bg-primary/10 border-primary/20 shadow-sm'
+                      : 'border-transparent hover:bg-secondary/40 hover:border-border/30'
+                      }`}
+                  >
+                    {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />}
+
+                    <div className="flex items-start gap-3">
+                      <div className="relative">
+                        <Avatar className={`h-10 w-10 border border-border/20 ${isSelected ? 'ring-2 ring-background' : ''}`}>
+                          <AvatarFallback className={`${isSelected ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}`}>
+                            {initial}
+                          </AvatarFallback>
+                        </Avatar>
+                        {conv.unread_count > 0 && (
+                          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-background">
+                            {conv.unread_count}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0 space-y-0.5">
+                        <div className="flex items-center justify-between">
+                          <span className={`font-medium text-sm truncate ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                            {conv.user_name || conv.user_email}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground/70 shrink-0">
+                            {format(new Date(conv.last_message_at || conv.created_at), 'MMM d')}
+                          </span>
                         </div>
 
-                        {/* Content */}
-                        <div className="flex-1 min-w-0 space-y-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className={`font-semibold text-sm sm:text-base truncate transition-colors ${isSelected ? 'text-primary-foreground' : 'text-foreground group-hover:text-primary/90'
-                              }`}>
-                              {conv.user_name || conv.user_email}
-                            </span>
-                            {format(new Date(conv.last_message_at || conv.created_at), 'HH:mm') && (
-                              <span className={`text-[10px] sm:text-xs shrink-0 ${isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                                }`}>
-                                {format(new Date(conv.last_message_at || conv.created_at), 'MMM d, HH:mm')}
-                              </span>
-                            )}
-                          </div>
+                        <p className={`text-xs truncate ${conv.unread_count > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'}`}>
+                          {conv.last_message || 'No messages yet'}
+                        </p>
 
-                          <p className={`text-xs sm:text-sm truncate line-clamp-1 ${isSelected ? 'text-primary-foreground/80' : 'text-muted-foreground group-hover:text-muted-foreground/80'
-                            }`}>
-                            {conv.last_message || 'No messages yet'}
-                          </p>
-
-                          <div className="flex items-center gap-2 pt-1">
-                            {conv.status === 'closed' && (
-                              <Badge variant="outline" className={`text-[10px] h-5 px-1.5 border-none bg-black/20 ${isSelected ? 'text-primary-foreground/70' : ''}`}>
-                                Closed
-                              </Badge>
-                            )}
-                            {conv.unread_count > 0 && (
-                              <Badge variant="default" className="text-[10px] h-5 min-w-[1.25rem] px-1 bg-red-500 hover:bg-red-600 border-none shadow-sm animate-pulse">
-                                {conv.unread_count}
-                              </Badge>
-                            )}
-                          </div>
+                        <div className="flex items-center gap-2 pt-1">
+                          {conv.status === 'closed' && (
+                            <Badge variant="outline" className="text-[9px] h-4 px-1 rounded-sm border-border/40 bg-secondary/30 text-muted-foreground">
+                              Closed
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
 
-      {/* Chat Window */}
-      <Card
-        className={`glass-card lg:col-span-2 flex flex-col h-full ${!selectedConversation ? 'hidden lg:flex' : 'flex'
-          }`}
-      >
+      {/* Chat Area */}
+      <div className={`flex-1 flex flex-col bg-background/30 relative ${!selectedConversation ? 'hidden lg:flex' : 'flex'}`}>
         {selectedConversation ? (
           <>
-            {/* Header */}
-            <CardHeader className="pb-3 border-b border-white/5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="lg:hidden"
-                    onClick={() => selectConversation(null)}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <User className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm">
-                      {selectedConversation.user_name || 'Anonymous'}
-                    </h3>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Mail className="h-3 w-3" />
-                      {selectedConversation.user_email}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {selectedConversation.status === 'open' ? (
-                    <Button variant="outline" size="sm" onClick={handleClose}>
-                      <X className="h-4 w-4 mr-1" />
-                      Close
-                    </Button>
-                  ) : (
-                    <Button variant="outline" size="sm" onClick={handleReopen}>
-                      <Check className="h-4 w-4 mr-1" />
-                      Reopen
-                    </Button>
-                  )}
+            {/* Chat Header */}
+            <div className="h-16 px-4 border-b border-border/30 flex items-center justify-between bg-background/40 backdrop-blur-md sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden h-8 w-8 -ml-2 rounded-full"
+                  onClick={() => selectConversation(null)}
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+
+                <Avatar className="h-9 w-9 border border-border/20">
+                  <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                    {(selectedConversation.user_name || selectedConversation.user_email || "?").charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex flex-col">
+                  <span className="font-semibold text-sm leading-none">{selectedConversation.user_name || 'Anonymous'}</span>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5 max-w-[150px] sm:max-w-none truncate">
+                    {selectedConversation.user_email}
+                  </span>
                 </div>
               </div>
-            </CardHeader>
 
-            {/* Messages */}
-            <CardContent className="flex-1 min-h-0 p-0 overflow-hidden relative">
-              <div
-                className="h-full overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent"
-                ref={scrollRef}
-              >
+              <div className="flex items-center gap-1">
+                {selectedConversation.status === 'open' ? (
+                  <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-medium hover:bg-destructive/10 hover:text-destructive" onClick={handleClose}>
+                    <X className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Close Ticket</span>
+                  </Button>
+                ) : (
+                  <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs font-medium hover:bg-green-500/10 hover:text-green-600" onClick={handleReopen}>
+                    <Check className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Reopen Ticket</span>
+                  </Button>
+                )}
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                      <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => window.open(`mailto:${selectedConversation.user_email}`, "_blank")}>
+                      <Mail className="h-4 w-4 mr-2" /> Email User
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            {/* Messages Scroll Area */}
+            <div className="flex-1 overflow-hidden relative">
+              <div className="absolute inset-0 overflow-y-auto p-4 space-y-6 scrollbar-thin hover:scrollbar-thumb-primary/20" ref={scrollRef}>
                 {messages.length === 0 ? (
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    No messages in this conversation
+                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center opacity-60">
+                    <div className="bg-secondary/50 p-6 rounded-full mb-4">
+                      <MessageCircle className="h-10 w-10" />
+                    </div>
+                    <p className="text-sm font-medium">No messages yet</p>
+                    <p className="text-xs mt-1">Start the conversation by sending a message below.</p>
                   </div>
                 ) : (
-                  <div className="space-y-4 pb-2">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.sender_type === 'admin' ? 'justify-end' : 'justify-start'
-                          }`}
-                      >
-                        <div
-                          className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2 ${message.sender_type === 'admin'
-                            ? 'bg-primary text-primary-foreground rounded-br-md shadow-md'
-                            : 'bg-secondary/80 backdrop-blur-sm text-secondary-foreground rounded-bl-md border border-white/5'
-                            }`}
-                        >
-                          <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                            {message.content}
-                          </p>
-                          <p
-                            className={`text-[10px] mt-1 text-right ${message.sender_type === 'admin'
-                              ? 'text-primary-foreground/70'
-                              : 'text-muted-foreground'
-                              }`}
-                          >
-                            {format(new Date(message.created_at), 'HH:mm')}
-                          </p>
+                  messages.map((message, index) => {
+                    const isAdmin = message.sender_type === 'admin';
+                    const showAvatar = index === 0 || messages[index - 1].sender_type !== message.sender_type;
+
+                    return (
+                      <div key={message.id} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} group animate-in slide-in-from-bottom-2 fade-in duration-300`}>
+                        <div className={`flex gap-3 max-w-[85%] sm:max-w-[75%] ${isAdmin ? 'flex-row-reverse' : 'flex-row'}`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isAdmin ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'} ${showAvatar ? 'opacity-100' : 'opacity-0'}`}>
+                            {isAdmin ? <User className="h-4 w-4" /> : <User className="h-4 w-4" />}
+                          </div>
+
+                          <div className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}>
+                            <div
+                              className={`px-4 py-2.5 rounded-2xl shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${isAdmin
+                                  ? 'bg-primary text-primary-foreground rounded-tr-none'
+                                  : 'bg-secondary/80 backdrop-blur-sm text-foreground rounded-tl-none border border-border/10'
+                                }`}
+                            >
+                              {message.content}
+                            </div>
+                            <span className={`text-[10px] text-muted-foreground mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
+                              {format(new Date(message.created_at), 'hh:mm a')}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })
                 )}
               </div>
-            </CardContent>
+            </div>
 
-            {/* Input */}
-            <div className="p-4 border-t border-white/5">
-              <div className="flex gap-2">
+            {/* Input Area */}
+            <div className="p-4 bg-background/60 backdrop-blur-md border-t border-border/30">
+              <div className="relative flex gap-2 items-end bg-secondary/30 p-1.5 rounded-2xl border border-border/20 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 transition-all">
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type a reply..."
-                  className="flex-1"
+                  placeholder={`Reply to ${selectedConversation.user_name || 'user'}...`}
+                  className="flex-1 bg-transparent border-none focus-visible:ring-0 shadow-none min-h-[44px] max-h-[120px] py-3 text-sm"
                   disabled={sending || selectedConversation.status === 'closed'}
+                  autoComplete="off"
                 />
                 <Button
                   onClick={handleSend}
                   disabled={!inputValue.trim() || sending || selectedConversation.status === 'closed'}
                   size="icon"
+                  className="h-10 w-10 shrink-0 rounded-xl mb-0.5 mr-0.5 transition-all active:scale-95"
                 >
                   {sending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    <Send className="h-4 w-4" />
+                    <Send className="h-5 w-5 ml-0.5" />
                   )}
                 </Button>
               </div>
+
               {selectedConversation.status === 'closed' && (
-                <p className="text-xs text-muted-foreground mt-2 text-center">
-                  Reopen the conversation to send messages
-                </p>
+                <div className="mt-2 flex justify-center">
+                  <span className="text-xs text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full border border-border/20 flex items-center gap-1.5">
+                    <X className="h-3 w-3" />
+                    Conversation is closed. Reopen to reply.
+                  </span>
+                </div>
               )}
             </div>
           </>
         ) : (
-          <CardContent className="flex-1 flex items-center justify-center">
-            <div className="text-center text-muted-foreground">
-              <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Select a conversation to view messages</p>
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-secondary/5">
+            <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-purple-500/10 rounded-3xl flex items-center justify-center mb-6 shadow-xl border border-white/5 rotate-3">
+              <MessageCircle className="h-10 w-10 text-primary opacity-80" />
             </div>
-          </CardContent>
+            <h3 className="text-xl font-bold tracking-tight mb-2">Admin Support Console</h3>
+            <p className="text-muted-foreground max-w-sm mb-8 text-sm leading-relaxed">
+              Select a conversation from the sidebar to view message history and send replies to your users.
+            </p>
+            <div className="hidden lg:flex items-center gap-6 opacity-40 grayscale">
+              <div className="h-12 w-20 bg-background rounded-lg border border-border/50 shadow-sm" />
+              <div className="h-20 w-32 bg-background rounded-lg border border-border/50 shadow-sm scale-110" />
+              <div className="h-12 w-20 bg-background rounded-lg border border-border/50 shadow-sm" />
+            </div>
+          </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

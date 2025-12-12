@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Package, MessageSquare, MessagesSquare } from "lucide-react";
+import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard } from "lucide-react";
 import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminOrders } from "@/components/admin/AdminOrders";
@@ -145,40 +145,53 @@ export default function Admin() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="flex-1 w-full bg-background text-foreground py-8 md:py-12">
+      <div className="flex-1 w-full bg-background text-foreground py-6 md:py-10 pb-20">
         <div className="container mx-auto px-4 max-w-7xl space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 animate-fade-in">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                Admin Dashboard
-              </h1>
-              <p className="text-muted-foreground">
-                Manage orders, messages, and support inquiries
-              </p>
+          
+          {/* Header Section */}
+          <div className="flex flex-col gap-2 animate-fade-in relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 w-fit text-primary font-medium text-xs mb-2">
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>Admin Control Center</span>
             </div>
+            <h1 className="text-3xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-foreground/70">
+              Dashboard
+            </h1>
+            <p className="text-muted-foreground text-sm md:text-base max-w-2xl">
+              Overview of your application's performance, orders, and customer messages.
+            </p>
           </div>
 
           <AdminStats orders={orders} messages={messages} />
 
           <Tabs defaultValue="orders" className="space-y-6">
-            <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-              <TabsList className="bg-secondary/50 p-1 rounded-xl h-auto flex-nowrap w-max md:w-auto inline-flex">
-                <TabsTrigger value="orders" className="gap-2 rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+            <div className="sticky top-[60px] z-30 bg-background/80 backdrop-blur-xl py-4 -mx-4 px-4 md:mx-0 md:px-0 border-b border-border/50 md:border-none md:static md:bg-transparent md:backdrop-blur-none transition-all">
+              <TabsList className="bg-secondary/40 p-1 rounded-2xl h-auto flex-nowrap w-full md:w-fit overflow-x-auto scrollbar-hide justify-start">
+                <TabsTrigger 
+                  value="orders" 
+                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
+                >
                   <Package className="h-4 w-4" />
-                  Orders <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none">{orders.length}</Badge>
+                  Orders <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{orders.length}</Badge>
                 </TabsTrigger>
-                <TabsTrigger value="messages" className="gap-2 rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                <TabsTrigger 
+                  value="messages" 
+                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
+                >
                   <MessageSquare className="h-4 w-4" />
-                  Messages <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none">{messages.length}</Badge>
+                  Messages <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{messages.length}</Badge>
                 </TabsTrigger>
-                <TabsTrigger value="chat" className="gap-2 rounded-lg px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+                <TabsTrigger 
+                  value="chat" 
+                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
+                >
                   <MessagesSquare className="h-4 w-4" />
                   Live Chat
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value="orders" className="outline-none focus:ring-0">
+            <TabsContent value="orders" className="outline-none focus:ring-0 animate-slide-up">
               <AdminOrders
                 orders={orders}
                 updateOrderStatus={updateOrderStatus}
@@ -186,7 +199,7 @@ export default function Admin() {
               />
             </TabsContent>
 
-            <TabsContent value="messages" className="outline-none focus:ring-0">
+            <TabsContent value="messages" className="outline-none focus:ring-0 animate-slide-up">
               <AdminMessages
                 messages={messages}
                 updateMessageStatus={updateMessageStatus}
@@ -194,7 +207,7 @@ export default function Admin() {
               />
             </TabsContent>
 
-            <TabsContent value="chat" className="outline-none focus:ring-0">
+            <TabsContent value="chat" className="outline-none focus:ring-0 animate-slide-up">
               <AdminChatPanel />
             </TabsContent>
           </Tabs>

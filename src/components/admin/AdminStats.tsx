@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, MessageSquare, DollarSign } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Package, MessageSquare, DollarSign, TrendingUp } from "lucide-react";
 import { Order, ContactMessage } from "@/types/admin";
 
 interface AdminStatsProps {
@@ -13,79 +13,73 @@ export function AdminStats({ orders, messages }: AdminStatsProps) {
     const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total_price), 0);
     const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
 
+    const stats = [
+        {
+            title: "Total Revenue",
+            value: `$${totalRevenue.toFixed(2)}`,
+            subtext: "Lifetime earnings",
+            icon: DollarSign,
+            color: "text-green-500",
+            bg: "bg-green-500/10",
+            border: "border-green-500/20",
+        },
+        {
+            title: "Total Orders",
+            value: orders.length,
+            subtext: `${pendingOrders} pending orders`,
+            subtextClass: pendingOrders > 0 ? "text-orange-400 font-medium" : "",
+            icon: Package,
+            color: "text-blue-500",
+            bg: "bg-blue-500/10",
+            border: "border-blue-500/20",
+        },
+        {
+            title: "Messages",
+            value: messages.length,
+            subtext: `${unreadMessages} unread messages`,
+            subtextClass: unreadMessages > 0 ? "text-red-400 font-medium" : "",
+            icon: MessageSquare,
+            color: "text-purple-500",
+            bg: "bg-purple-500/10",
+            border: "border-purple-500/20",
+        },
+        {
+            title: "Avg Order Value",
+            value: `$${avgOrderValue.toFixed(2)}`,
+            subtext: "Per order average",
+            icon: TrendingUp,
+            color: "text-amber-500",
+            bg: "bg-amber-500/10",
+            border: "border-amber-500/20",
+        },
+    ];
+
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 animate-slide-up">
-            {/* Total Orders */}
-            <Card className="glass-card glass-card-hover animate-fade-in" style={{ animationDelay: "0ms" }}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
-                    <div className="p-2 rounded-full bg-primary/10">
-                        <Package className="h-4 w-4 text-primary" />
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold gradient-text">{orders.length}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        <span className={pendingOrders > 0 ? "text-orange-400 font-medium" : ""}>
-                            {pendingOrders} pending
-                        </span>
-                    </p>
-                </CardContent>
-            </Card>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
+            {stats.map((stat, index) => (
+                <Card
+                    key={index}
+                    className="glass-card overflow-hidden border-border/50 hover:border-border transition-all duration-300 group"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                >
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className={`p-3 rounded-xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
+                                <stat.icon className="h-5 w-5" />
+                            </div>
+                            {index === 0 && <div className="text-xs font-mono px-2 py-1 rounded bg-secondary text-secondary-foreground">+12%</div>}
+                        </div>
 
-            {/* Messages */}
-            <Card className="glass-card glass-card-hover animate-fade-in" style={{ animationDelay: "100ms" }}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Messages</CardTitle>
-                    <div className="p-2 rounded-full bg-blue-500/10">
-                        <MessageSquare className="h-4 w-4 text-blue-500" />
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold gradient-text">{messages.length}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        <span className={unreadMessages > 0 ? "text-red-400 font-medium" : ""}>
-                            {unreadMessages} unread
-                        </span>
-                    </p>
-                </CardContent>
-            </Card>
-
-            {/* Total Revenue */}
-            <Card className="glass-card glass-card-hover animate-fade-in" style={{ animationDelay: "200ms" }}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-                    <div className="p-2 rounded-full bg-green-500/10">
-                        <DollarSign className="h-4 w-4 text-green-500" />
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold gradient-text">
-                        ${totalRevenue.toFixed(2)}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Lifetime earnings
-                    </p>
-                </CardContent>
-            </Card>
-
-            {/* Avg Order Value */}
-            <Card className="glass-card glass-card-hover animate-fade-in" style={{ animationDelay: "300ms" }}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Avg Order Value</CardTitle>
-                    <div className="p-2 rounded-full bg-purple-500/10">
-                        <DollarSign className="h-4 w-4 text-purple-500" />
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold gradient-text">
-                        ${avgOrderValue.toFixed(2)}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Per order
-                    </p>
-                </CardContent>
-            </Card>
+                        <div className="space-y-1">
+                            <h3 className="text-sm font-medium text-muted-foreground tracking-wide">{stat.title}</h3>
+                            <div className="text-2xl font-bold tracking-tight">{stat.value}</div>
+                            <p className={`text-xs text-muted-foreground ${stat.subtextClass}`}>
+                                {stat.subtext}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
         </div>
     );
 }
