@@ -2,12 +2,12 @@ import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { 
-  Check, 
-  ArrowRight, 
-  FileText, 
-  Image, 
-  Zap, 
+import {
+  Check,
+  ArrowRight,
+  FileText,
+  Image,
+  Zap,
   Shield,
   Clock,
   RefreshCw,
@@ -81,21 +81,39 @@ export default function Services() {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16 md:pt-32 md:pb-24">
+      <section className="pt-20 pb-16 md:pt-32 md:pb-24 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              The Complete <span className="gradient-text">$25 Package</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Everything you need to get your Android app published on Google Play Store, professionally handled from start to finish.
-            </p>
-            <Button variant="hero" size="xl" asChild>
-              <Link to="/order" className="group">
-                Order Now
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                The Complete <span className="gradient-text">$25 Package</span>
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0">
+                Everything you need to get your Android app published on Google Play Store, professionally handled from start to finish.
+              </p>
+              <Button variant="hero" size="xl" asChild>
+                <Link to="/order" className="group">
+                  Order Now
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="relative animate-fade-in mx-auto w-full max-w-md lg:max-w-full">
+              <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-border/50 bg-card/50 backdrop-blur-sm transform hover:scale-[1.02] transition-transform duration-500">
+                <img
+                  src="/Service 1.png"
+                  alt="App Publishing Service Overview"
+                  className="w-full h-auto object-cover"
+                />
+                {/* Overlay gradient for better blending */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-transparent pointer-events-none"></div>
+              </div>
+
+              {/* Decorative Elements */}
+              <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/20 rounded-full blur-3xl opacity-50 animate-pulse-glow pointer-events-none"></div>
+              <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl opacity-50 animate-pulse-glow pointer-events-none"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -131,7 +149,7 @@ export default function Services() {
                 </div>
                 <p className="text-muted-foreground mt-2">No hidden fees</p>
               </div>
-              
+
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3 text-sm">
                   <Clock size={18} className="text-primary" />
