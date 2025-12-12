@@ -113,14 +113,14 @@ export default function Chat() {
   }
 
   return (
-    <Layout>
+    <Layout hideFooter={true} showChatWidget={false}>
       <Helmet>
         <title>Chat Support - QuantaMesh</title>
         <meta name="description" content="Chat with our support team for help with your app publishing needs." />
       </Helmet>
 
       {/* Main Container - Full height minus navbar on mobile, centered with padding on desktop */}
-      <div className="relative flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] md:container md:mx-auto md:px-4 md:py-6">
+      <div className="relative flex flex-col h-[calc(100dvh-4rem)] md:h-[calc(100vh-5rem)] md:container md:mx-auto md:px-4 md:py-6">
 
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="md:hidden flex items-center p-4 bg-background/80 backdrop-blur-md border-b sticky top-0 z-10">
@@ -169,8 +169,8 @@ export default function Chat() {
                       <div className={`flex flex-col gap-1 max-w-[85%] md:max-w-[70%] ${isClient ? 'items-end' : 'items-start'}`}>
                         <div
                           className={`rounded-2xl px-5 py-3 shadow-sm text-[15px] leading-relaxed relative group ${isClient
-                              ? 'bg-primary text-primary-foreground rounded-br-sm'
-                              : 'bg-card border border-border/50 text-card-foreground rounded-bl-sm'
+                            ? 'bg-primary text-primary-foreground rounded-br-sm'
+                            : 'bg-card border border-border/50 text-card-foreground rounded-bl-sm'
                             }`}
                         >
                           {message.content}
