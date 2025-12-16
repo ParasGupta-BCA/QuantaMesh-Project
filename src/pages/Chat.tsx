@@ -63,7 +63,7 @@ export default function Chat() {
     return (
       <Layout>
         <Helmet>
-          <title>Chat Support - QuantaMesh</title>
+          <title>Chat - QuantaMesh</title>
         </Helmet>
         <section className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -77,8 +77,8 @@ export default function Chat() {
     return (
       <Layout>
         <Helmet>
-          <title>Chat Support - QuantaMesh</title>
-          <meta name="description" content="Chat with our support team for help with your app publishing needs." />
+          <title>Chat - QuantaMesh</title>
+          <meta name="description" content="Chat with us for help with your app publishing needs." />
         </Helmet>
 
         <section className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
@@ -89,7 +89,7 @@ export default function Chat() {
               </div>
               <h1 className="text-3xl font-bold mb-3 tracking-tight">Sign In Required</h1>
               <p className="text-muted-foreground mb-8 text-lg">
-                Please sign in or create an account to start chatting with our support team.
+                Please sign in or create an account to start chatting.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="default" size="lg" className="rounded-xl font-medium shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all" asChild>
@@ -147,8 +147,8 @@ export default function Chat() {
   return (
     <Layout hideFooter={true} showChatWidget={false}>
       <Helmet>
-        <title>Chat Support - QuantaMesh</title>
-        <meta name="description" content="Chat with our support team for help with your app publishing needs." />
+        <title>Chat - QuantaMesh</title>
+        <meta name="description" content="Chat with us for help with your app publishing needs." />
       </Helmet>
 
       {/* Main Container - Full height minus navbar on mobile, centered with padding on desktop */}
@@ -159,13 +159,13 @@ export default function Chat() {
 
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="md:hidden flex items-center p-4 bg-background/80 backdrop-blur-md border-b sticky top-0 z-10">
-          <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Support Chat</h1>
+          <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Chat</h1>
         </div>
 
         {/* Desktop Header Description (Hidden on Mobile) */}
         <div className="hidden md:block mb-6 text-center">
           <h1 className="text-4xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">Support Center</span>
+            <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">Chat</span>
           </h1>
           <p className="text-muted-foreground">We're here to help you around the clock.</p>
         </div>

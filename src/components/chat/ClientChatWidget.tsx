@@ -117,7 +117,7 @@ export function ClientChatWidget() {
                   <MessageCircle className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm">QuantaMesh Support</h3>
+                  <h3 className="font-semibold text-sm">Chat</h3>
                   <p className="text-xs text-muted-foreground">We typically reply quickly</p>
                 </div>
               </div>
@@ -157,8 +157,8 @@ export function ClientChatWidget() {
                     >
                       <div
                         className={`max-w-[80%] rounded-2xl px-4 py-2 ${message.sender_type === 'client'
-                            ? 'bg-primary text-primary-foreground rounded-br-md'
-                            : 'bg-secondary text-secondary-foreground rounded-bl-md'
+                          ? 'bg-primary text-primary-foreground rounded-br-md'
+                          : 'bg-secondary text-secondary-foreground rounded-bl-md'
                           }`}
                       >
                         <p className="text-sm whitespace-pre-wrap break-words">
@@ -166,8 +166,8 @@ export function ClientChatWidget() {
                         </p>
                         <p
                           className={`text-xs mt-1 ${message.sender_type === 'client'
-                              ? 'text-primary-foreground/70'
-                              : 'text-muted-foreground'
+                            ? 'text-primary-foreground/70'
+                            : 'text-muted-foreground'
                             }`}
                         >
                           {format(new Date(message.created_at), 'HH:mm')}
