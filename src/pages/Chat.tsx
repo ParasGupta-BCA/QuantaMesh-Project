@@ -159,13 +159,13 @@ export default function Chat() {
 
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="md:hidden flex items-center p-4 bg-background/80 backdrop-blur-md border-b sticky top-0 z-10">
-          <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">Chat</h1>
+          <h1 className="text-lg font-semibold text-foreground">Chat</h1>
         </div>
 
         {/* Desktop Header Description (Hidden on Mobile) */}
         <div className="hidden md:block mb-6 text-center">
-          <h1 className="text-4xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">Chat</span>
+          <h1 className="text-4xl font-bold mb-2 text-foreground">
+            Chat
           </h1>
           <p className="text-muted-foreground">We're here to help you around the clock.</p>
         </div>
