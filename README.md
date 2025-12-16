@@ -7,8 +7,7 @@ This project is designed for performance, scalability, and ease of customization
 
 ## 🔗 Live Project
 
-**Project URL:**  
-https://www.quantamesh.store/
+**Project URL:**  https://www.quantamesh.store
 
 ---
 
