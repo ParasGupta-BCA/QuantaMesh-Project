@@ -324,25 +324,25 @@ export default function Order() {
               </div>
 
               <TabsContent value="new" className="space-y-8 animate-in fade-in-50 duration-500">
-                <div className="glass-card rounded-xl p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 border-primary/20 bg-primary/5">
-                  <div className="flex items-center gap-6">
-                    <div className="relative w-24 h-24 shrink-0">
+                <div className="glass-card rounded-xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 border-primary/20 bg-primary/5">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0">
                       <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
                       <img
-                        src="/chat-mascot.png"
+                        src="/chat-mascot-avatar.png"
                         alt="Chat with us"
-                        className="w-full h-full object-contain relative z-10 animate-bounce duration-1000"
+                        className="w-full h-full object-cover rounded-full relative z-10 animate-bounce duration-1000 shadow-xl border-2 border-primary/30"
                         style={{ animationDuration: '3s' }}
                       />
                     </div>
-                    <div className="text-center sm:text-left">
+                    <div>
                       <h3 className="font-semibold text-lg">Prefer to chat with us directly?</h3>
-                      <p className="text-muted-foreground text-sm max-w-md">
+                      <p className="text-muted-foreground text-sm max-w-md mx-auto sm:mx-0">
                         Skip the forms! Talk to our admin team to discuss your app publishing needs and get a custom quote.
                       </p>
                     </div>
                   </div>
-                  <Button asChild variant="outline" className="shrink-0 border-primary/50 hover:bg-primary/10 gap-2">
+                  <Button asChild variant="outline" className="w-full sm:w-auto shrink-0 border-primary/50 hover:bg-primary/10 gap-2">
                     <Link to="/chat">
                       <MessageCircle size={16} />
                       Chat with Us
