@@ -228,18 +228,24 @@ export default function Order() {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'published':
-      case 'completed':
-      case 'paid':
-        return 'bg-green-500/20 text-green-500 border-green-500/20 hover:bg-green-500/30';
-      case 'pending':
-        return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/30';
+        return 'bg-green-500/10 text-green-400 border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)] backdrop-blur-md border border-green-500/20';
+      case 'submitted':
+        return 'bg-purple-500/10 text-purple-400 border-purple-500/20 shadow-[0_0_10px_rgba(168,85,247,0.1)] backdrop-blur-md border border-purple-500/20';
+      case 'in progress':
       case 'processing':
-        return 'bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30';
+        return 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)] backdrop-blur-md border border-blue-500/20';
+      case 'pending':
+        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20 shadow-[0_0_10px_rgba(234,179,8,0.1)] backdrop-blur-md border border-yellow-500/20';
+      case 'rejected':
       case 'cancelled':
       case 'failed':
-        return 'bg-red-500/20 text-red-500 border-red-500/20 hover:bg-red-500/30';
+        return 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)] backdrop-blur-md border border-red-500/20';
+      case 'completed':
+        return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20 shadow-[0_0_10px_rgba(113,113,122,0.1)] backdrop-blur-md border border-zinc-500/20';
+      case 'paid':
+        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)] backdrop-blur-md border border-emerald-500/20';
       default:
-        return 'bg-secondary text-secondary-foreground';
+        return 'bg-secondary/50 text-secondary-foreground border-border/20 backdrop-blur-md border';
     }
   };
 
