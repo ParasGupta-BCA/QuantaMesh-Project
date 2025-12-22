@@ -330,8 +330,8 @@ export default function Order() {
                       <img
                         src="/chat-mascot.png"
                         alt="Chat with us"
-                        className="w-full h-full object-contain relative z-10 animate-bounce duration-1000"
-                        style={{ animationDuration: '3s' }}
+                        className="w-full h-full object-contain relative z-10 animate-float"
+                        style={{ animationDuration: '6s' }}
                       />
                     </div>
                     <div>
