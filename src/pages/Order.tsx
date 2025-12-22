@@ -226,14 +226,17 @@ export default function Order() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
+      case 'published':
       case 'completed':
       case 'paid':
-        return 'bg-success/20 text-success hover:bg-success/30';
+        return 'bg-green-500/20 text-green-500 border-green-500/20 hover:bg-green-500/30';
       case 'pending':
-        return 'bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30';
+        return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/20 hover:bg-yellow-500/30';
+      case 'processing':
+        return 'bg-blue-500/20 text-blue-500 border-blue-500/20 hover:bg-blue-500/30';
       case 'cancelled':
       case 'failed':
-        return 'bg-destructive/20 text-destructive hover:bg-destructive/30';
+        return 'bg-red-500/20 text-red-500 border-red-500/20 hover:bg-red-500/30';
       default:
         return 'bg-secondary text-secondary-foreground';
     }
@@ -325,8 +328,8 @@ export default function Order() {
                   {[1, 2, 3].map((s) => (
                     <div key={s} className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${step >= s
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-muted-foreground"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-muted-foreground"
                         }`}>
                         {step > s ? <CheckCircle size={20} /> : s}
                       </div>
@@ -616,8 +619,8 @@ export default function Order() {
                               <div
                                 key={addon.id}
                                 className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${formData.addOns.includes(addon.id)
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border hover:border-primary/50"
+                                  ? "border-primary bg-primary/10"
+                                  : "border-border hover:border-primary/50"
                                   }`}
                                 onClick={() => handleAddOnToggle(addon.id)}
                               >
@@ -713,9 +716,9 @@ export default function Order() {
                 ) : (
                   <div className="grid gap-4">
                     {orders.map((order) => (
-                      <Card key={order.id} className="overflow-hidden border-border/50 bg-secondary/20 backdrop-blur-sm">
+                      <Card key={order.id} className="overflow-hidden border-white/10 bg-white/5 backdrop-blur-md shadow-lg hover:bg-white/10 transition-colors duration-200">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <CardTitle className="text-lg font-bold">
+                          <CardTitle className="text-lg font-bold text-white">
                             {order.app_name}
                           </CardTitle>
                           <Badge className={getStatusColor(order.status)}>
@@ -724,15 +727,15 @@ export default function Order() {
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mt-2">
-                            <div className="flex items-center gap-2 text-muted-foreground">
+                            <div className="flex items-center gap-2 text-gray-300">
                               <Calendar size={14} />
                               <span>{new Date(order.created_at).toLocaleDateString()}</span>
                             </div>
-                            <div className="flex items-center gap-2 text-muted-foreground">
+                            <div className="flex items-center gap-2 text-gray-300">
                               <DollarSign size={14} />
                               <span>${order.total_price}</span>
                             </div>
-                            <div className="text-xs text-muted-foreground font-mono truncate">
+                            <div className="text-xs text-gray-400 font-mono truncate">
                               ID: {order.id}
                             </div>
                           </div>
