@@ -340,7 +340,7 @@ export default function Order() {
                   <Button asChild variant="outline" className="shrink-0 border-primary/50 hover:bg-primary/10 gap-2">
                     <Link to="/chat">
                       <MessageCircle size={16} />
-                      Chat with Admin
+                      Chat with Us
                     </Link>
                   </Button>
                 </div>
