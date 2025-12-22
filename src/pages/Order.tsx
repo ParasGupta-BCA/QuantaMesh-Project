@@ -38,7 +38,7 @@ const orderSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
   privacyPolicyUrl: z.string().trim().max(500, "URL too long").refine(val => !val || /^https?:\/\/.+/.test(val), "Please enter a valid URL starting with http:// or https://").optional().or(z.literal("")),
   supportUrl: z.string().trim().max(500, "URL too long").refine(val => !val || /^https?:\/\/.+/.test(val), "Please enter a valid URL starting with http:// or https://").optional().or(z.literal("")),
-  addOns: z.array(z.string())
+
 });
 
 interface FormData {
@@ -50,7 +50,7 @@ interface FormData {
   name: string;
   privacyPolicyUrl: string;
   supportUrl: string;
-  addOns: string[];
+
 }
 
 interface OrderItem {
@@ -61,11 +61,11 @@ interface OrderItem {
   total_price: number;
 }
 
-const addOnOptions = [
-  { id: "feature-graphic", label: "Feature Graphic Design (+$15)", price: 15 },
-  { id: "copywriting", label: "Store Listing Copywriting (+$20)", price: 20 },
-  { id: "expedited", label: "Expedited Delivery (+$10)", price: 10 },
-  { id: "screenshots", label: "Screenshot Enhancement (+$25)", price: 25 }
+const includedFeatures = [
+  "Professional Feature Graphic Design",
+  "SEO-Optimized Store Listing Copywriting",
+  "High-Quality Screenshot Enhancement",
+  "Expedited Delivery (24-48 hours)"
 ];
 
 export default function Order() {
@@ -85,7 +85,7 @@ export default function Order() {
     name: "",
     privacyPolicyUrl: "",
     supportUrl: "",
-    addOns: []
+
   });
   const [files, setFiles] = useState<{
     apk: File | null;
@@ -100,11 +100,7 @@ export default function Order() {
   });
 
   const basePrice = 25;
-  const addOnsTotal = formData.addOns.reduce((sum, id) => {
-    const addon = addOnOptions.find(a => a.id === id);
-    return sum + (addon?.price || 0);
-  }, 0);
-  const totalPrice = basePrice + addOnsTotal;
+  const totalPrice = basePrice;
 
   useEffect(() => {
     if (user) {
@@ -139,14 +135,7 @@ export default function Order() {
     }
   };
 
-  const handleAddOnToggle = (addonId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      addOns: prev.addOns.includes(addonId)
-        ? prev.addOns.filter(id => id !== addonId)
-        : [...prev.addOns, addonId]
-    }));
-  };
+
 
   const handleFileChange = (type: 'apk' | 'icon' | 'featureGraphic', e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -198,7 +187,7 @@ export default function Order() {
         customer_name: validatedData.name,
         privacy_policy_url: validatedData.privacyPolicyUrl || null,
         support_url: validatedData.supportUrl || null,
-        add_ons: validatedData.addOns,
+        add_ons: [],
         total_price: totalPrice,
         status: 'pending'
       });
@@ -642,25 +631,19 @@ export default function Order() {
                           </div>
                         </div>
 
-                        {/* Add-ons */}
+                        {/* Included Features */}
                         <div className="space-y-4">
-                          <Label>Optional Add-ons</Label>
+                          <Label>What's Included in the Package</Label>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {addOnOptions.map((addon) => (
+                            {includedFeatures.map((feature, index) => (
                               <div
-                                key={addon.id}
-                                className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${formData.addOns.includes(addon.id)
-                                  ? "border-primary bg-primary/10"
-                                  : "border-border hover:border-primary/50"
-                                  }`}
-                                onClick={() => handleAddOnToggle(addon.id)}
+                                key={index}
+                                className="flex items-center gap-3 p-4 rounded-xl border border-primary/20 bg-primary/5 cursor-default"
                               >
-                                <Checkbox
-                                  checked={formData.addOns.includes(addon.id)}
-                                  onCheckedChange={() => { }}
-                                  className="pointer-events-none"
-                                />
-                                <span className="text-sm">{addon.label}</span>
+                                <div className="h-4 w-4 shrink-0 rounded-full bg-primary flex items-center justify-center">
+                                  <CheckCircle className="h-3 w-3 text-primary-foreground" />
+                                </div>
+                                <span className="text-sm font-medium">{feature}</span>
                               </div>
                             ))}
                           </div>
@@ -674,15 +657,9 @@ export default function Order() {
                               <span className="text-muted-foreground">Base Package</span>
                               <span>$25.00</span>
                             </div>
-                            {formData.addOns.map((id) => {
-                              const addon = addOnOptions.find(a => a.id === id);
-                              return addon ? (
-                                <div key={id} className="flex justify-between">
-                                  <span className="text-muted-foreground">{addon.label.split(' (+')[0]}</span>
-                                  <span>${addon.price}.00</span>
-                                </div>
-                              ) : null;
-                            })}
+                            <div className="text-xs text-primary mt-2">
+                              + All premium features included
+                            </div>
                             <div className="border-t border-border pt-2 mt-2 flex justify-between font-bold text-lg">
                               <span>Total</span>
                               <span className="gradient-text">${totalPrice}.00</span>
