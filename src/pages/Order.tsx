@@ -22,7 +22,8 @@ import {
   Package,
   Calendar,
   DollarSign,
-  MessageCircle
+  MessageCircle,
+  RotateCcw
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -604,10 +605,11 @@ export default function Order() {
                           </div>
                         </div>
 
-                        <div className="flex justify-between pt-4">
+                        <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-6">
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button type="button" variant="ghost" className="text-muted-foreground hover:text-destructive">
+                              <Button type="button" variant="ghost" className="w-full sm:w-auto text-muted-foreground hover:text-destructive gap-2">
+                                <RotateCcw size={16} />
                                 Reset Form
                               </Button>
                             </AlertDialogTrigger>
@@ -632,6 +634,7 @@ export default function Order() {
                             variant="gradient"
                             onClick={() => setStep(2)}
                             disabled={!isStep1Valid}
+                            className="w-full sm:w-auto"
                           >
                             Continue
                             <ArrowRight className="ml-2" size={18} />
@@ -817,12 +820,12 @@ export default function Order() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <div className="flex flex-col-reverse sm:flex-row gap-4 pt-4">
                           <Button
                             type="button"
                             variant="outline"
                             onClick={() => setStep(1)}
-                            className="flex-1"
+                            className="flex-1 w-full sm:w-auto"
                           >
                             Back
                           </Button>
