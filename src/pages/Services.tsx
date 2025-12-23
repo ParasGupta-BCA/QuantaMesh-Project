@@ -120,6 +120,102 @@ export default function Services() {
         </div>
       </section>
 
+      {/* CGI Ads Service Section - NEW */}
+      <section className="py-16 md:py-24 bg-zinc-950 text-white overflow-hidden relative">
+        {/* Background Effects */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px] opacity-30"></div>
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-pink-600/20 rounded-full blur-[100px] opacity-30"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Text Content */}
+            <div className="order-2 lg:order-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-sm font-medium mb-6">
+                <Zap size={16} />
+                <span>New Service</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+                CGI <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Video Ads</span>
+              </h2>
+              <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+                Capture attention instantly with hyper-realistic 3D visual effects. Our CGI ads blend the real world with the extraordinary, creating viral-ready content for social media campaigns.
+              </p>
+
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <Shield className="text-purple-400" size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Premium Quality</h3>
+                    <p className="text-sm text-gray-400">Cinema-grade visual effects and compositing</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <Zap className="text-pink-400" size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Viral Potential</h3>
+                    <p className="text-sm text-gray-400">Designed to stop the scroll and drive engagement</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="default" size="lg" className="bg-white text-black hover:bg-gray-200" asChild>
+                  <Link to="/order?service=cgi">
+                    Get a Quote
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10" asChild>
+                  <Link to="/chat">
+                    Chat with Expert
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
+            {/* Visual Content */}
+            <div className="order-1 lg:order-2 relative">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 aspect-video group">
+                <video
+                  src="/CGI Ads/1.mp4"
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                <div className="absolute bottom-4 left-4 right-4 p-4">
+                  <p className="text-white font-medium text-sm">Example: Cosmetic Product CGI</p>
+                </div>
+              </div>
+
+              {/* Floating Badge */}
+              <div className="absolute -bottom-6 -right-6 bg-zinc-900 border border-white/10 p-4 rounded-xl shadow-xl hidden md:block animate-float">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-purple-500 border-2 border-zinc-900"></div>
+                    <div className="w-8 h-8 rounded-full bg-pink-500 border-2 border-zinc-900"></div>
+                    <div className="w-8 h-8 rounded-full bg-blue-500 border-2 border-zinc-900"></div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Trusted by</p>
+                    <p className="text-sm font-bold text-white">50+ Brands</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
       {/* What's Included */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">

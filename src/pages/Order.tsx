@@ -25,7 +25,8 @@ import {
   MessageCircle,
   AlertTriangle,
   XCircle,
-  RefreshCw
+  RefreshCw,
+  Zap
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,14 @@ const orderSchema = z.object({
   privacyPolicyUrl: z.string().trim().max(500, "URL too long").refine(val => !val || /^https?:\/\/.+/.test(val), "Please enter a valid URL starting with http:// or https://").optional().or(z.literal("")),
   supportUrl: z.string().trim().max(500, "URL too long").refine(val => !val || /^https?:\/\/.+/.test(val), "Please enter a valid URL starting with http:// or https://").optional().or(z.literal("")),
 
+});
+
+const cgiOrderSchema = z.object({
+  appName: z.string().trim().min(1, "Product/Brand name is required").max(100, "Name must be less than 100 characters"),
+  shortDescription: z.string().trim().min(1, "Brief concept is required").max(200, "Concept must be 200 characters or less"),
+  fullDescription: z.string().trim().max(4000, "Description must be less than 4000 characters").optional().or(z.literal("")),
+  email: z.string().trim().email("Please enter a valid email address").max(255, "Email must be less than 255 characters"),
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
 });
 
 interface FormData {
@@ -88,6 +97,7 @@ export default function Order() {
   const { user, loading } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("new");
+  const [serviceType, setServiceType] = useState<"publishing" | "cgi">("publishing");
   const [showFailedView, setShowFailedView] = useState(false);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -145,6 +155,10 @@ export default function Order() {
       // Ensure we are on the new order tab to show the message
       setActiveTab("new");
       sessionStorage.removeItem("pendingPayment"); // Clear flag so it doesn't persist
+    }
+
+    if (searchParams.get("service") === "cgi") {
+      setServiceType("cgi");
     }
   }, [searchParams, user]);
 
@@ -230,7 +244,9 @@ export default function Order() {
     setErrors({});
 
     // Validate form data
-    const result = orderSchema.safeParse(formData);
+    const schema = serviceType === 'publishing' ? orderSchema : cgiOrderSchema;
+    const result = schema.safeParse(formData);
+
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach(err => {
@@ -255,14 +271,15 @@ export default function Order() {
         user_id: user!.id,
         app_name: validatedData.appName,
         short_description: validatedData.shortDescription,
-        full_description: validatedData.fullDescription || null,
-        category: validatedData.category || null,
+        // For CGI, use full description or empty if optional
+        full_description: 'fullDescription' in validatedData ? validatedData.fullDescription || null : null,
+        category: serviceType === 'publishing' ? (validatedData as any).category || null : 'CGI Ads',
         email: validatedData.email,
         customer_name: validatedData.name,
-        privacy_policy_url: validatedData.privacyPolicyUrl || null,
-        support_url: validatedData.supportUrl || null,
+        privacy_policy_url: 'privacyPolicyUrl' in validatedData ? validatedData.privacyPolicyUrl || null : null,
+        support_url: 'supportUrl' in validatedData ? validatedData.supportUrl || null : null,
         add_ons: [],
-        total_price: totalPrice,
+        total_price: serviceType === 'publishing' ? totalPrice : 0,
         status: 'pending'
       });
 
@@ -270,22 +287,32 @@ export default function Order() {
 
       localStorage.removeItem("orderFormData");
 
-      toast({
-        title: "Order Submitted!",
-        description: "Redirecting to payment...",
-      });
+      if (serviceType === 'publishing') {
+        toast({
+          title: "Order Submitted!",
+          description: "Redirecting to payment...",
+        });
 
-      // Redirect with tab query param and cancel url
-      const baseUrl = "https://www.quantamesh.store/order";
-      const successUrl = `${baseUrl}?tab=history`;
-      const cancelUrl = `${baseUrl}?payment=failed`;
+        // Redirect with tab query param and cancel url
+        const baseUrl = "https://www.quantamesh.store/order";
+        const successUrl = `${baseUrl}?tab=history`;
+        const cancelUrl = `${baseUrl}?payment=failed`;
 
-      const dodoUrl = `https://checkout.dodopayments.com/buy/pdt_0NUdtw0Ao78qIokxKSFMF?quantity=1&redirect_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+        const dodoUrl = `https://checkout.dodopayments.com/buy/pdt_0NUdtw0Ao78qIokxKSFMF?quantity=1&redirect_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
 
-      // Set session flag to detect "Back" button usage
-      sessionStorage.setItem("pendingPayment", "true");
+        // Set session flag to detect "Back" button usage
+        sessionStorage.setItem("pendingPayment", "true");
 
-      window.location.href = dodoUrl;
+        window.location.href = dodoUrl;
+      } else {
+        // CGI Flow - No Payment
+        toast({
+          title: "Quote Request Sent!",
+          description: "We will contact you shortly.",
+        });
+        setStep(3); // Show success view
+      }
+
     } catch (error: any) {
       toast({
         title: "Error",
@@ -417,10 +444,16 @@ export default function Order() {
             {/* Header */}
             <div className="text-center mb-8">
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                Publish Your <span className="gradient-text">App</span>
+                {serviceType === 'publishing' ? (
+                  <>Publish Your <span className="gradient-text">App</span></>
+                ) : (
+                  <>CGI Video <span className="gradient-text">Ads</span></>
+                )}
               </h1>
               <p className="text-muted-foreground">
-                Manage your orders and publish new apps
+                {serviceType === 'publishing'
+                  ? "Manage your orders and publish new apps"
+                  : "Request a quote for premium 3D visual effects"}
               </p>
             </div>
 
@@ -446,7 +479,7 @@ export default function Order() {
                     <div>
                       <h3 className="font-semibold text-lg">Prefer to chat with us directly?</h3>
                       <p className="text-muted-foreground text-sm max-w-md mx-auto sm:mx-0">
-                        Skip the forms! Talk to our admin team to discuss your app publishing needs and get a custom quote.
+                        Skip the forms! Talk to our admin team to discuss your {serviceType === 'publishing' ? 'app publishing' : 'visual effect'} needs and get a custom quote.
                       </p>
                     </div>
                   </div>
@@ -456,6 +489,30 @@ export default function Order() {
                       Chat with Us
                     </Link>
                   </Button>
+                </div>
+
+                {/* Service Type Switcher */}
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div
+                    onClick={() => setServiceType('publishing')}
+                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'publishing'
+                      ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]'
+                      : 'bg-card/50 border-white/10 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                  >
+                    <Package size={24} className={serviceType === 'publishing' ? 'text-primary' : 'text-muted-foreground'} />
+                    <span className={`font-semibold ${serviceType === 'publishing' ? 'text-foreground' : 'text-muted-foreground'}`}>App Publishing</span>
+                  </div>
+                  <div
+                    onClick={() => setServiceType('cgi')}
+                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'cgi'
+                      ? 'bg-purple-500/10 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+                      : 'bg-card/50 border-white/10 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                  >
+                    <Zap size={24} className={serviceType === 'cgi' ? 'text-purple-400' : 'text-muted-foreground'} />
+                    <span className={`font-semibold ${serviceType === 'cgi' ? 'text-foreground' : 'text-muted-foreground'}`}>CGI Video Ads</span>
+                  </div>
                 </div>
                 {/* Progress Steps */}
                 <div className="flex items-center justify-center gap-4 mb-8">
@@ -522,24 +579,27 @@ export default function Order() {
                     <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-6">
                       <CheckCircle size={40} className="text-success" />
                     </div>
-                    <h2 className="text-2xl font-bold mb-4">Order Received!</h2>
+                    <h2 className="text-2xl font-bold mb-4">{serviceType === 'publishing' ? 'Order Received!' : 'Quote Request Received!'}</h2>
                     <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                      Thank you for your order! We've received your submission and will contact you at <strong>{formData.email}</strong> within 2-4 hours with payment instructions.
+                      {serviceType === 'publishing'
+                        ? <>Thank you for your order! We've received your submission and will contact you at <strong>{formData.email}</strong> within 2-4 hours with payment instructions.</>
+                        : <>Thank you for your interest! We've received your details. Our team will review your request and contact you at <strong>{formData.email}</strong> shortly to discuss pricing and next steps.</>
+                      }
                     </p>
                     <div className="glass-card rounded-xl p-6 text-left mb-8">
                       <h3 className="font-semibold mb-4">What happens next?</h3>
                       <ol className="space-y-3 text-sm text-muted-foreground">
                         <li className="flex items-start gap-3">
                           <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary text-xs font-bold">1</span>
-                          <span>We'll review your submission and send a payment link</span>
+                          <span>{serviceType === 'publishing' ? "We'll review your submission and send a payment link" : "We'll review your concept and assets"}</span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary text-xs font-bold">2</span>
-                          <span>After payment, we'll process your app within 24-48 hours</span>
+                          <span>{serviceType === 'publishing' ? "After payment, we'll process your app within 24-48 hours" : "We'll schedule a chat to discuss the vision and pricing"}</span>
                         </li>
                         <li className="flex items-start gap-3">
                           <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 text-primary text-xs font-bold">3</span>
-                          <span>You'll receive confirmation once submitted to Google Play</span>
+                          <span>{serviceType === 'publishing' ? "You'll receive confirmation once submitted to Google Play" : "Once approved, production begins immediately"}</span>
                         </li>
                       </ol>
                     </div>
@@ -609,13 +669,13 @@ export default function Order() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="appName">App Name *</Label>
+                          <Label htmlFor="appName">{serviceType === 'publishing' ? 'App Name *' : 'Product / Project Name *'}</Label>
                           <Input
                             id="appName"
                             name="appName"
                             value={formData.appName}
                             onChange={handleInputChange}
-                            placeholder="My Awesome App"
+                            placeholder={serviceType === 'publishing' ? "My Awesome App" : "Brand or Product Name"}
                             maxLength={50}
                             required
                           />
@@ -623,13 +683,13 @@ export default function Order() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="shortDescription">Short Description * (max 80 chars)</Label>
+                          <Label htmlFor="shortDescription">{serviceType === 'publishing' ? 'Short Description * (max 80 chars)' : 'Concept Summary * (max 80 chars)'}</Label>
                           <Input
                             id="shortDescription"
                             name="shortDescription"
                             value={formData.shortDescription}
                             onChange={handleInputChange}
-                            placeholder="A brief description of your app"
+                            placeholder={serviceType === 'publishing' ? "A brief description of your app" : "Brief idea or tagline"}
                             maxLength={80}
                             required
                           />
@@ -638,53 +698,57 @@ export default function Order() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="fullDescription">Full Description</Label>
+                          <Label htmlFor="fullDescription">{serviceType === 'publishing' ? 'Full Description' : 'Detailed Vision / Script'}</Label>
                           <Textarea
                             id="fullDescription"
                             name="fullDescription"
                             value={formData.fullDescription}
                             onChange={handleInputChange}
-                            placeholder="Detailed description of your app features..."
+                            placeholder={serviceType === 'publishing' ? "Detailed description of your app features..." : "Describe the scene, mood, and reference links..."}
                             rows={5}
                             maxLength={4000}
                           />
                           {errors.fullDescription && <p className="text-xs text-destructive">{errors.fullDescription}</p>}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                            <Label htmlFor="category">Category</Label>
-                            <select
-                              id="category"
-                              name="category"
-                              value={formData.category}
-                              onChange={handleInputChange}
-                              className="w-full h-10 px-3 rounded-lg bg-secondary border border-border text-foreground"
-                            >
-                              <option value="">Select a category</option>
-                              <option value="games">Games</option>
-                              <option value="business">Business</option>
-                              <option value="education">Education</option>
-                              <option value="entertainment">Entertainment</option>
-                              <option value="lifestyle">Lifestyle</option>
-                              <option value="productivity">Productivity</option>
-                              <option value="tools">Tools</option>
-                              <option value="other">Other</option>
-                            </select>
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="privacyPolicyUrl">Privacy Policy URL</Label>
-                            <Input
-                              id="privacyPolicyUrl"
-                              name="privacyPolicyUrl"
-                              value={formData.privacyPolicyUrl}
-                              onChange={handleInputChange}
-                              placeholder="https://yoursite.com/privacy"
-                              maxLength={500}
-                            />
-                            {errors.privacyPolicyUrl && <p className="text-xs text-destructive">{errors.privacyPolicyUrl}</p>}
-                          </div>
-                        </div>
+                        {serviceType === 'publishing' && (
+                          <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-2">
+                                <Label htmlFor="category">Category</Label>
+                                <select
+                                  id="category"
+                                  name="category"
+                                  value={formData.category}
+                                  onChange={handleInputChange}
+                                  className="w-full h-10 px-3 rounded-lg bg-secondary border border-border text-foreground"
+                                >
+                                  <option value="">Select a category</option>
+                                  <option value="games">Games</option>
+                                  <option value="business">Business</option>
+                                  <option value="education">Education</option>
+                                  <option value="entertainment">Entertainment</option>
+                                  <option value="lifestyle">Lifestyle</option>
+                                  <option value="productivity">Productivity</option>
+                                  <option value="tools">Tools</option>
+                                  <option value="other">Other</option>
+                                </select>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="privacyPolicyUrl">Privacy Policy URL</Label>
+                                <Input
+                                  id="privacyPolicyUrl"
+                                  name="privacyPolicyUrl"
+                                  value={formData.privacyPolicyUrl}
+                                  onChange={handleInputChange}
+                                  placeholder="https://yoursite.com/privacy"
+                                  maxLength={500}
+                                />
+                                {errors.privacyPolicyUrl && <p className="text-xs text-destructive">{errors.privacyPolicyUrl}</p>}
+                              </div>
+                            </div>
+                          </>
+                        )}
 
                         <div className="flex justify-between pt-4">
                           <AlertDialog>
@@ -746,32 +810,34 @@ export default function Order() {
 
                         {/* File Uploads */}
                         <div className="space-y-6">
-                          <div className="space-y-2">
-                            <Label>App File (APK/AAB) *</Label>
-                            <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${files.apk ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                              }`}>
-                              <input
-                                type="file"
-                                accept=".apk,.aab"
-                                onChange={(e) => handleFileChange('apk', e)}
-                                className="hidden"
-                                id="apk-upload"
-                              />
-                              <label htmlFor="apk-upload" className="cursor-pointer">
-                                {files.apk ? (
-                                  <div className="flex items-center justify-center gap-2 text-primary">
-                                    <CheckCircle size={20} />
-                                    <span>{files.apk.name}</span>
-                                  </div>
-                                ) : (
-                                  <div className="text-muted-foreground">
-                                    <Upload size={32} className="mx-auto mb-2" />
-                                    <p>Click to upload APK or AAB</p>
-                                  </div>
-                                )}
-                              </label>
+                          {serviceType === 'publishing' ? (
+                            <div className="space-y-2">
+                              <Label>App File (APK/AAB) *</Label>
+                              <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${files.apk ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                                }`}>
+                                <input
+                                  type="file"
+                                  accept=".apk,.aab"
+                                  onChange={(e) => handleFileChange('apk', e)}
+                                  className="hidden"
+                                  id="apk-upload"
+                                />
+                                <label htmlFor="apk-upload" className="cursor-pointer">
+                                  {files.apk ? (
+                                    <div className="flex items-center justify-center gap-2 text-primary">
+                                      <CheckCircle size={20} />
+                                      <span>{files.apk.name}</span>
+                                    </div>
+                                  ) : (
+                                    <div className="text-muted-foreground">
+                                      <Upload size={32} className="mx-auto mb-2" />
+                                      <p>Click to upload APK or AAB</p>
+                                    </div>
+                                  )}
+                                </label>
+                              </div>
                             </div>
-                          </div>
+                          ) : null}
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">

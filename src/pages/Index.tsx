@@ -4,6 +4,7 @@ import { Benefits } from "@/components/home/Benefits";
 import { Testimonials } from "@/components/home/Testimonials";
 import { FAQ } from "@/components/home/FAQ";
 import { CTA } from "@/components/home/CTA";
+import { CgiShowcase } from "@/components/home/CgiShowcase";
 import { Helmet } from "react-helmet-async";
 
 const Index = () => {
@@ -85,6 +86,7 @@ const Index = () => {
 
       <Hero />
       <Benefits />
+      <CgiShowcase />
       <Testimonials />
       <FAQ />
       <CTA />
