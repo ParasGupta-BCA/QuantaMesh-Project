@@ -405,8 +405,9 @@ export default function Order() {
   return (
     <Layout>
       <Helmet>
-        <title>Order App Publishing - Quanta Mesh</title>
-        <meta name="description" content="Order your Android app publishing service. Complete the form, upload your assets, and we'll have your app on Google Play within 24-48 hours." />
+        <title>Order App Publishing - Start Your Launch Today | Quanta Mesh</title>
+        <meta name="description" content="Ready to publish? Submit your Android app for $25. Secure payment, fast processing, and money-back guarantee. No Google Play Console account required." />
+        <meta name="keywords" content="buy app publishing, order play store upload, pay for app submission, android app publishing cost" />
       </Helmet>
 
       <section className="pt-20 pb-16 md:pt-32 md:pb-24">

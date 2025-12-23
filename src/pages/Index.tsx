@@ -10,9 +10,9 @@ const Index = () => {
   return (
     <Layout>
       <Helmet>
-        <title>Quanta Mesh - Publish Your Android App to Google Play | $25</title>
-        <meta name="description" content="Professional Android app publishing service. We publish your app to Google Play Console for just $25. Fast submission, metadata optimization, and policy compliance included." />
-        <meta name="keywords" content="android app publishing, google play console, app store submission, publish android app, app publishing service, deploy android app, google play developer account" />
+        <title>Publish Android App to Google Play | $25 Service | Quanta Mesh</title>
+        <meta name="description" content="Publish your Android app to Google Play Store without a developer account. For just $25, we handle metadata, screenshots, and policy compliance. 100% Secure & Fast." />
+        <meta name="keywords" content="publish android app, google play store upload, no developer account needed, cheap app publishing, play store submission service, android app launch" />
         <link rel="canonical" href="https://quantamesh.com" />
         <script type="application/ld+json">
           {`
@@ -25,66 +25,57 @@ const Index = () => {
                   "url": "https://quantamesh.com",
                   "logo": "https://quantamesh.com/android-chrome-512x512.png",
                   "image": "https://quantamesh.com/Service%201.png",
-                  "description": "Professional Android app publishing service for Google Play Store.",
+                  "description": "Professional Android app publishing service for Google Play Store. We help developers publish apps without a console account.",
                   "priceRange": "$25",
                   "currenciesAccepted": "USD",
                   "openingHoursSpecification": {
                     "@type": "OpeningHoursSpecification",
-                    "dayOfWeek": [
-                      "Monday",
-                      "Tuesday",
-                      "Wednesday",
-                      "Thursday",
-                      "Friday",
-                      "Saturday",
-                      "Sunday"
-                    ],
+                    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
                     "opens": "00:00",
                     "closes": "23:59"
-                  }
-                },
-                {
-                  "@type": "Product",
-                  "name": "Android App Publishing Service",
-                  "description": "Complete Android app publishing service to Google Play Console. Includes metadata optimization, graphic assets review, and policy compliance check.",
-                  "image": "https://quantamesh.com/Service%201.png",
-                  "brand": {
-                    "@type": "Brand",
-                    "name": "Quanta Mesh"
-                  },
-                  "offers": {
-                    "@type": "Offer",
-                    "url": "https://quantamesh.com/order",
-                    "priceCurrency": "USD",
-                    "price": "25.00",
-                    "availability": "https://schema.org/InStock",
-                    "priceValidUntil": "2025-12-31",
-                    "shippingDetails": {
-                      "@type": "OfferShippingDetails",
-                      "shippingRate": {
-                        "@type": "MonetaryAmount",
-                        "value": 0,
-                        "currency": "USD"
-                      },
-                      "shippingDestination": {
-                        "@type": "DefinedRegion",
-                        "addressCountry": "US"
-                      }
-                    },
-                    "hasMerchantReturnPolicy": {
-                      "@type": "MerchantReturnPolicy",
-                      "applicableCountry": "US",
-                      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-                      "merchantReturnDays": 7,
-                      "returnMethod": "https://schema.org/ReturnByMail",
-                      "returnFees": "https://schema.org/FreeReturn"
-                    }
                   },
                   "aggregateRating": {
                     "@type": "AggregateRating",
                     "ratingValue": "4.9",
                     "reviewCount": "120"
                   }
+                },
+                {
+                  "@type": "FAQPage",
+                  "mainEntity": [
+                    {
+                      "@type": "Question",
+                      "name": "Can I publish my app without a Google Play Console account?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! With Quanta Mesh, you don't need to pay $25 for a console account. We publish your app using our professional developer account for a one-time fee of $25."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "How long does it take to get my app published?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "We typically submit your app within 24-48 hours after receiving all required assets. Google's review process usually takes an additional 1-3 days."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "What happens if my app gets rejected?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "If the rejection is due to metadata or fixable policy issues, we will fix it and re-submit for FREE. If the app violates core policies (violance, malware), we cannot publish it."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "Is this service safe for my app code?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Absolutely. We only use your APK/AAB file for upload purposes. We do not modify your source code, and all data is deleted from our servers after 30 days."
+                      }
+                    }
+                  ]
                 }
               ]
             }

@@ -76,8 +76,9 @@ export default function Services() {
   return (
     <Layout>
       <Helmet>
-        <title>Android App Publishing Service | Google Play Console | $25 Package</title>
+        <title>Android App Publishing Services - Fast & Secure | Quanta Mesh</title>
         <meta name="description" content="Get your Android app published on Google Play Store for just $25. Complete service includes metadata optimization, icon setup, and policy compliance. 24-48h delivery." />
+        <meta name="keywords" content="android app publishing services, play store upload service, google play console help, app launch service" />
         <link rel="canonical" href="https://quantamesh.com/services" />
       </Helmet>
 
