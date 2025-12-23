@@ -29,7 +29,7 @@ export function CgiShowcase() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           {items.map((item) => (
             <VideoCard key={item.id} src={item.src} />
           ))}
@@ -77,7 +77,7 @@ function VideoCard({ src }: { src: string }) {
         muted={isMuted}
         playsInline
       />
-      
+
       {/* Overlay - Always visible initially, fades out on play */}
       <div className={cn(
         "absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300",
