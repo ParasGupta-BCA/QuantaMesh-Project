@@ -466,30 +466,32 @@ export default function Order() {
               </div>
 
               <TabsContent value="new" className="space-y-8 animate-in fade-in-50 duration-500">
-                <div className="glass-card rounded-xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 border-primary/20 bg-primary/5">
-                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
-                    <div className="relative w-24 h-24 shrink-0">
-                      <img
-                        src="/chat-mascot.png"
-                        alt="Chat with us"
-                        className="w-full h-full object-contain relative z-10 animate-float"
-                        style={{ animationDuration: '6s' }}
-                      />
+                {serviceType === 'publishing' && (
+                  <div className="glass-card rounded-xl p-4 sm:p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 border-primary/20 bg-primary/5">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
+                      <div className="relative w-24 h-24 shrink-0">
+                        <img
+                          src="/chat-mascot.png"
+                          alt="Chat with us"
+                          className="w-full h-full object-contain relative z-10 animate-float"
+                          style={{ animationDuration: '6s' }}
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg">Prefer to chat with us directly?</h3>
+                        <p className="text-muted-foreground text-sm max-w-md mx-auto sm:mx-0">
+                          Skip the forms! Talk to our admin team to discuss your app publishing needs and get a custom quote.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">Prefer to chat with us directly?</h3>
-                      <p className="text-muted-foreground text-sm max-w-md mx-auto sm:mx-0">
-                        Skip the forms! Talk to our admin team to discuss your {serviceType === 'publishing' ? 'app publishing' : 'visual effect'} needs and get a custom quote.
-                      </p>
-                    </div>
+                    <Button asChild variant="outline" className="w-full sm:w-auto shrink-0 border-primary/50 hover:bg-primary/10 gap-2">
+                      <Link to="/chat">
+                        <MessageCircle size={16} />
+                        Chat with Us
+                      </Link>
+                    </Button>
                   </div>
-                  <Button asChild variant="outline" className="w-full sm:w-auto shrink-0 border-primary/50 hover:bg-primary/10 gap-2">
-                    <Link to="/chat">
-                      <MessageCircle size={16} />
-                      Chat with Us
-                    </Link>
-                  </Button>
-                </div>
+                )}
 
                 {/* Service Type Switcher */}
                 <div className="grid grid-cols-2 gap-4 mb-8">
@@ -517,17 +519,17 @@ export default function Order() {
 
                 {serviceType === 'cgi' ? (
                   /* CGI Custom Flow */
-                  <div className="glass-card rounded-2xl p-8 text-center animate-fade-in border-purple-500/20 bg-purple-500/5">
-                    <div className="w-20 h-20 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-6">
-                      <MessageCircle size={40} className="text-purple-400" />
+                  <div className="glass-card rounded-2xl p-6 sm:p-8 text-center animate-fade-in border-purple-500/20 bg-purple-500/5">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                      <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" />
                     </div>
-                    <h2 className="text-2xl font-bold mb-4">Let's Talk About Your Vision</h2>
-                    <p className="text-muted-foreground mb-8 text-lg max-w-xl mx-auto">
+                    <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Let's Talk About Your Vision</h2>
+                    <p className="text-muted-foreground mb-6 sm:mb-8 text-base sm:text-lg max-w-xl mx-auto">
                       Pricing for CGI Video Ads varies based on your specific requirements and complexity.
                       Please chat with us to discuss the details and place your order directly.
                     </p>
 
-                    <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all duration-300 gap-2">
+                    <Button asChild size="lg" className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all duration-300 gap-2">
                       <Link to="/chat">
                         <MessageCircle size={20} />
                         Chat with Us for Details
