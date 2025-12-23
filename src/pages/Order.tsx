@@ -408,6 +408,7 @@ export default function Order() {
         <title>Order App Publishing - Start Your Launch Today | Quanta Mesh</title>
         <meta name="description" content="Ready to publish? Submit your Android app for $25. Secure payment, fast processing, and money-back guarantee. No Google Play Console account required." />
         <meta name="keywords" content="buy app publishing, order play store upload, pay for app submission, android app publishing cost" />
+        <link rel="canonical" href="https://www.quantamesh.store/order" />
       </Helmet>
 
       <section className="pt-20 pb-16 md:pt-32 md:pb-24">

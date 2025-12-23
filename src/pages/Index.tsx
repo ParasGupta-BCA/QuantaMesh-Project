@@ -13,7 +13,7 @@ const Index = () => {
         <title>Publish Android App to Google Play | $25 Service | Quanta Mesh</title>
         <meta name="description" content="Publish your Android app to Google Play Store without a developer account. For just $25, we handle metadata, screenshots, and policy compliance. 100% Secure & Fast." />
         <meta name="keywords" content="publish android app, google play store upload, no developer account needed, cheap app publishing, play store submission service, android app launch" />
-        <link rel="canonical" href="https://quantamesh.com" />
+        <link rel="canonical" href="https://www.quantamesh.store" />
         <script type="application/ld+json">
           {`
             {
@@ -22,9 +22,9 @@ const Index = () => {
                 {
                   "@type": "ProfessionalService",
                   "name": "Quanta Mesh",
-                  "url": "https://quantamesh.com",
-                  "logo": "https://quantamesh.com/android-chrome-512x512.png",
-                  "image": "https://quantamesh.com/Service%201.png",
+                  "url": "https://www.quantamesh.store",
+                  "logo": "https://www.quantamesh.store/android-chrome-512x512.png",
+                  "image": "https://www.quantamesh.store/Service%201.png",
                   "description": "Professional Android app publishing service for Google Play Store. We help developers publish apps without a console account.",
                   "priceRange": "$25",
                   "currenciesAccepted": "USD",
