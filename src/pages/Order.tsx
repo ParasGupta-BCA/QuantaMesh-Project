@@ -612,7 +612,7 @@ export default function Order() {
                                 Reset Form
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent className="glass-card border-red-500/20 bg-zinc-950/90 backdrop-blur-xl">
+                            <AlertDialogContent className="border border-white/10 bg-zinc-950/95 backdrop-blur-xl shadow-2xl">
                               <AlertDialogHeader className="flex flex-col items-center text-center">
                                 <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-2">
                                   <AlertTriangle className="h-6 w-6 text-red-500" />
