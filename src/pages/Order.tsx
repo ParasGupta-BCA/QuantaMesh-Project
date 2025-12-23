@@ -23,7 +23,9 @@ import {
   Calendar,
   DollarSign,
   MessageCircle,
-  AlertTriangle
+  AlertTriangle,
+  XCircle,
+  RefreshCw
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -86,6 +88,7 @@ export default function Order() {
   const { user, loading } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("new");
+  const [showFailedView, setShowFailedView] = useState(false);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orders, setOrders] = useState<OrderItem[]>([]);
@@ -126,9 +129,17 @@ export default function Order() {
   // Check for tab parameter in URL
   useEffect(() => {
     const tabParam = searchParams.get("tab");
+    const paymentParam = searchParams.get("payment");
+
     if (tabParam === "history") {
       setActiveTab("history");
       if (user) fetchOrders();
+    }
+
+    if (paymentParam === "failed") {
+      setShowFailedView(true);
+      // Ensure we are on the new order tab to show the message
+      setActiveTab("new");
     }
   }, [searchParams, user]);
 
@@ -259,8 +270,14 @@ export default function Order() {
         description: "Redirecting to payment...",
       });
 
-      // Redirect with tab query param
-      window.location.href = "https://checkout.dodopayments.com/buy/pdt_0NUdtw0Ao78qIokxKSFMF?quantity=1&redirect_url=https://www.quantamesh.store%2Forder%3Ftab%3Dhistory";
+      // Redirect with tab query param and cancel url
+      const baseUrl = "https://www.quantamesh.store/order";
+      const successUrl = `${baseUrl}?tab=history`;
+      const cancelUrl = `${baseUrl}?payment=failed`;
+
+      const dodoUrl = `https://checkout.dodopayments.com/buy/pdt_0NUdtw0Ao78qIokxKSFMF?quantity=1&redirect_url=${encodeURIComponent(successUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+
+      window.location.href = dodoUrl;
     } catch (error: any) {
       toast({
         title: "Error",
@@ -447,7 +464,43 @@ export default function Order() {
 
                 {/* Progress Steps */}
 
-                {step === 3 ? (
+                {showFailedView ? (
+                  /* Payment Failed View */
+                  <div className="glass-card rounded-2xl p-8 text-center animate-in fade-in zoom-in duration-300 border-red-500/20 bg-red-500/5">
+                    <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-6">
+                      <XCircle size={40} className="text-red-500" />
+                    </div>
+                    <h2 className="text-2xl font-bold mb-4 text-red-500">Payment Failed</h2>
+                    <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                      It looks like you didn't complete your payment. Don't worry, if you submitted the order, it's saved as "Pending" in your order history.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setShowFailedView(false);
+                          // Optional: Restore form data if needed, or just let them start over/retry
+                          window.location.href = "https://checkout.dodopayments.com/buy/pdt_0NUdtw0Ao78qIokxKSFMF?quantity=1&redirect_url=https://www.quantamesh.store%2Forder%3Ftab%3Dhistory";
+                        }}
+                        className="gap-2"
+                      >
+                        <RefreshCw size={16} />
+                        Retry Payment
+                      </Button>
+                      <Button
+                        variant="default"
+                        onClick={() => {
+                          setShowFailedView(false);
+                          setActiveTab("history");
+                          fetchOrders();
+                        }}
+                      >
+                        Go to My Orders
+                      </Button>
+                    </div>
+                  </div>
+                ) : step === 3 ? (
                   /* Confirmation */
                   <div className="glass-card rounded-2xl p-8 text-center">
                     <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-6">
