@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { X, Sparkles, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,62 @@ interface AnnouncementBarProps {
 
 export function AnnouncementBar({ onDismiss }: AnnouncementBarProps) {
     const [isVisible, setIsVisible] = useState(true);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = window.innerWidth;
+        canvas.height = canvas.offsetHeight;
+
+        const particles: { x: number; y: number; radius: number; speed: number; opacity: number }[] = [];
+        const particleCount = 50;
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 1,
+                speed: Math.random() * 1 + 0.5,
+                opacity: Math.random() * 0.5 + 0.3
+            });
+        }
+
+        function animate() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                ctx.fill();
+
+                p.y += p.speed;
+                p.x += Math.sin(p.y * 0.05) * 0.5; // Slight sway
+
+                if (p.y > canvas.height) {
+                    p.y = -5;
+                    p.x = Math.random() * canvas.width;
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        const handleResize = () => {
+            canvas.width = window.innerWidth;
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleDismiss = () => {
         setIsVisible(false);
@@ -23,9 +79,10 @@ export function AnnouncementBar({ onDismiss }: AnnouncementBarProps) {
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="relative w-full bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white overflow-hidden z-[60]"
+                    className="relative w-full bg-violet-600/30 backdrop-blur-xl border-b border-white/10 shadow-lg text-white overflow-hidden z-[60]"
                 >
-                    <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay"></div>
+                    <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none opacity-60" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-violet-600/40 via-purple-600/40 to-indigo-600/40 pointer-events-none"></div>
 
                     <div className="container mx-auto px-4 h-10 md:h-12 flex items-center justify-between relative z-10">
                         <div className="flex-1 flex items-center justify-center gap-2 md:gap-3 text-[11px] md:text-sm font-medium tracking-wide">
