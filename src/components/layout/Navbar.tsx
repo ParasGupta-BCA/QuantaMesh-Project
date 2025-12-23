@@ -20,7 +20,11 @@ const navLinks = [
   { name: "Chat", path: "/chat", badge: "New" },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  isBannerVisible?: boolean;
+}
+
+export function Navbar({ isBannerVisible = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, signOut, loading } = useAuth();
@@ -32,7 +36,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
+    <nav className={`fixed left-0 right-0 z-50 transition-all duration-300 ${isBannerVisible ? "top-10 md:top-12" : "top-0"}`}>
       <div className="glass-card border-t-0 rounded-t-none">
         <div className="container mx-auto px-4 md:px-6">
           <div className="relative flex items-center justify-between h-16 md:h-18">
