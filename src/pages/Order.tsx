@@ -61,35 +61,11 @@ interface OrderItem {
   total_price: number;
 }
 
-const availableAddOns = [
-  {
-    id: 'feature-graphic',
-    name: 'Feature Graphic Design',
-    price: 15,
-    description: 'Professional 1024x500 feature graphic design',
-    icon: <Package className="w-5 h-5" />
-  },
-  {
-    id: 'copywriting',
-    name: 'Store Listing Copywriting',
-    price: 20,
-    description: 'SEO-optimized app descriptions written by professionals',
-    icon: <MessageCircle className="w-5 h-5" />
-  },
-  {
-    id: 'expedited',
-    name: 'Expedited Delivery',
-    price: 10,
-    description: 'Priority processing - submission within 12 hours',
-    icon: <Clock className="w-5 h-5" />
-  },
-  {
-    id: 'screenshots',
-    name: 'Screenshot Enhancement',
-    price: 25,
-    description: 'Professional mockups and frames for all your screenshots',
-    icon: <Upload className="w-5 h-5" />
-  }
+const includedFeatures = [
+  "Professional Feature Graphic Design",
+  "SEO-Optimized Store Listing Copywriting",
+  "High-Quality Screenshot Enhancement",
+  "Expedited Delivery (24-48 hours)"
 ];
 
 export default function Order() {
@@ -99,7 +75,6 @@ export default function Order() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
-  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<FormData>({
     appName: "",
@@ -125,19 +100,7 @@ export default function Order() {
   });
 
   const basePrice = 25;
-  const addOnsTotal = selectedAddOns.reduce((sum, id) => {
-    const addOn = availableAddOns.find(a => a.id === id);
-    return sum + (addOn?.price || 0);
-  }, 0);
-  const totalPrice = basePrice + addOnsTotal;
-
-  const toggleAddOn = (id: string) => {
-    setSelectedAddOns(prev =>
-      prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
-    );
-  };
+  const totalPrice = basePrice;
 
   useEffect(() => {
     if (user) {
@@ -224,7 +187,7 @@ export default function Order() {
         customer_name: validatedData.name,
         privacy_policy_url: validatedData.privacyPolicyUrl || null,
         support_url: validatedData.supportUrl || null,
-        add_ons: selectedAddOns,
+        add_ons: [],
         total_price: totalPrice,
         status: 'pending'
       });
@@ -668,47 +631,21 @@ export default function Order() {
                           </div>
                         </div>
 
-                        {/* Optional Add-ons */}
-                        <div className="space-y-6">
-                          <div className="text-center">
-                            <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                              Optional <span className="text-primary">Add-ons</span>
-                            </h3>
-                            <p className="text-muted-foreground mt-2">
-                              Enhance your listing with these premium services.
-                            </p>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {availableAddOns.map((addon) => {
-                              const isSelected = selectedAddOns.includes(addon.id);
-                              return (
-                                <div
-                                  key={addon.id}
-                                  onClick={() => toggleAddOn(addon.id)}
-                                  className={`relative group cursor-pointer p-5 rounded-2xl border transition-all duration-300 ${isSelected
-                                      ? "border-primary/50 bg-primary/10 shadow-[0_0_20px_rgba(139,92,246,0.1)]"
-                                      : "border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10"
-                                    }`}
-                                >
-                                  <div className="flex items-start gap-4">
-                                    <div className={`mt-1 p-2 rounded-xl transition-colors ${isSelected ? "bg-primary text-white" : "bg-white/5 text-muted-foreground group-hover:bg-white/10"
-                                      }`}>
-                                      {isSelected ? <CheckCircle size={20} /> : <div className="w-5 h-5 flex items-center justify-center">+</div>}
-                                    </div>
-                                    <div className="flex-1 space-y-1">
-                                      <div className="flex items-center justify-between">
-                                        <h4 className="font-semibold text-white">{addon.name}</h4>
-                                        <span className="font-bold text-primary">${addon.price}</span>
-                                      </div>
-                                      <p className="text-sm text-muted-foreground leading-relaxed">
-                                        {addon.description}
-                                      </p>
-                                    </div>
-                                  </div>
+                        {/* Included Features */}
+                        <div className="space-y-4">
+                          <Label>What's Included in the Package</Label>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {includedFeatures.map((feature, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center gap-3 p-4 rounded-xl border border-primary/20 bg-primary/5 cursor-default"
+                              >
+                                <div className="h-4 w-4 shrink-0 rounded-full bg-primary flex items-center justify-center">
+                                  <CheckCircle className="h-3 w-3 text-primary-foreground" />
                                 </div>
-                              );
-                            })}
+                                <span className="text-sm font-medium">{feature}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
 
