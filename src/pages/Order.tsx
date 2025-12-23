@@ -22,7 +22,8 @@ import {
   Package,
   Calendar,
   DollarSign,
-  MessageCircle
+  MessageCircle,
+  AlertTriangle
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -611,17 +612,23 @@ export default function Order() {
                                 Reset Form
                               </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Reset Form?</AlertDialogTitle>
-                                <AlertDialogDescription>
+                            <AlertDialogContent className="glass-card border-red-500/20 bg-zinc-950/90 backdrop-blur-xl">
+                              <AlertDialogHeader className="flex flex-col items-center text-center">
+                                <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-2">
+                                  <AlertTriangle className="h-6 w-6 text-red-500" />
+                                </div>
+                                <AlertDialogTitle className="text-xl">Reset Form?</AlertDialogTitle>
+                                <AlertDialogDescription className="text-center">
                                   This will clear all your entries. Auto-saved data will also be deleted. This action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleReset} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                  Reset
+                              <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 mt-4 w-full">
+                                <AlertDialogCancel className="w-full sm:w-auto bg-secondary/50 hover:bg-secondary/80 border-0">Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={handleReset}
+                                  className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border-0"
+                                >
+                                  Reset Everything
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
