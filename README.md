@@ -15,7 +15,7 @@
 
 ---
 
-## 🚀 Why Quanta-Mesh?
+## 🚀 Why Quanta Mesh?
 
 > *"Communication should be seamless, not regulated."*
 
