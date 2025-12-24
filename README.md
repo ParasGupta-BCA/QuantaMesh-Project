@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/apple-touch-icon.png" alt="Quanta-Mesh Logo" width="120" height="120">
+  <img src="public/apple-touch-icon.png" alt="Quanta-Mesh Logo" width="110" height="110">
 
   # Quanta Mesh
 
