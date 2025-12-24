@@ -1,7 +1,7 @@
 <div align="center">
   <img src="public/apple-touch-icon.png" alt="Quanta-Mesh Logo" width="120" height="120">
 
-  # 🌐 Quanta-Mesh
+  # Quanta Mesh
 
   ### *A Next-Generation Freelancing & Communication Hub*
 
