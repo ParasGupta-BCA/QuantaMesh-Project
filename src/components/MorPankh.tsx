@@ -28,7 +28,7 @@ export const MorPankh = ({ className = "", style = {} }: { className?: string, s
       }}
     >
       <img
-        src="/mor_pankh.png"
+        src="/mor_pankh_new.png"
         alt="Krishna Mor Pankh"
         className="w-full h-full object-contain drop-shadow-2xl"
       />
