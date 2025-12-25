@@ -7,20 +7,20 @@ export const MorPankh = ({ className = "", style = {} }: { className?: string, s
     <motion.div
       className={`relative ${className}`}
       style={style}
-      initial={{ rotate: -5, opacity: 0.8 }}
+      initial={{ rotate: -2, opacity: 0.9 }}
       animate={{
-        rotate: 5,
-        opacity: [0.8, 1, 0.8]
+        rotate: [0, 8, 0], // Gentle sway from wind
+        x: [0, 2, 0], // Slight horizontal push
       }}
       transition={{
         rotate: {
-          duration: 4,
+          duration: 8, // Much slower
           repeat: Infinity,
           repeatType: "reverse",
           ease: "easeInOut"
         },
-        opacity: {
-          duration: 3,
+        x: {
+          duration: 8,
           repeat: Infinity,
           repeatType: "reverse",
           ease: "easeInOut"
