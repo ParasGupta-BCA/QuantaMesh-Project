@@ -6,12 +6,10 @@ import { FAQ } from "@/components/home/FAQ";
 import { CTA } from "@/components/home/CTA";
 import { CgiShowcase } from "@/components/home/CgiShowcase";
 import { Helmet } from "react-helmet-async";
-import { KrishnaTheme } from "@/components/KrishnaTheme";
 
 const Index = () => {
   return (
     <Layout>
-      <KrishnaTheme />
       <Helmet>
         <title>Publish Android App to Google Play | $25 Service | Quanta Mesh</title>
         <meta name="description" content="Publish your Android app to Google Play Store without a developer account. For just $25, we handle metadata, screenshots, and policy compliance. 100% Secure & Fast." />

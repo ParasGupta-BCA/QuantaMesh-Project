@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Shield, Zap } from "lucide-react";
 import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
+import { MorPankh } from "@/components/MorPankh";
 
 export function Hero() {
   return (
@@ -26,6 +27,19 @@ export function Hero() {
       <div className="absolute inset-0 pointer-events-none z-10">
         <div className="absolute top-1/4 left-1/4 w-64 md:w-96 h-64 md:h-96 bg-primary/20 rounded-full blur-[100px] md:blur-[128px] animate-pulse-glow" />
         <div className="absolute bottom-1/4 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-[hsl(200,95%,55%)]/20 rounded-full blur-[100px] md:blur-[128px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
+      </div>
+
+      {/* Decorative Elements */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Large Decorative Feather - Right Side */}
+        <div className="absolute top-0 -right-20 md:-right-10 w-[300px] md:w-[500px] h-[600px] md:h-[800px] opacity-40 rotate-[15deg] mix-blend-screen animate-float-slow">
+          <MorPankh className="w-full h-full" />
+        </div>
+
+        {/* Smaller Decorative Feather - Bottom Left (Optional Balance) */}
+        <div className="absolute -bottom-20 -left-20 w-[200px] md:w-[300px] h-[400px] md:h-[500px] opacity-20 -rotate-[15deg] blur-[2px]">
+          <MorPankh className="w-full h-full" />
+        </div>
       </div>
 
       <div className="container mx-auto py-12 sm:py-16 md:py-20 relative z-10">
