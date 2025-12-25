@@ -35,7 +35,7 @@ export function Hero() {
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <div className="relative inline-block mb-6 sm:mb-8 animate-fade-in group">
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-24 h-24 -rotate-12 pointer-events-none transition-transform duration-700 ease-in-out group-hover:rotate-0">
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 ml-6 w-24 h-24 -rotate-12 pointer-events-none transition-transform duration-700 ease-in-out group-hover:rotate-0">
               <MorPankh className="w-full h-full drop-shadow-lg opacity-90" />
             </div>
 
