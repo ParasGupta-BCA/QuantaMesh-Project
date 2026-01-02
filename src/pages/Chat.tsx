@@ -8,16 +8,18 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { Send, Loader2, MessageCircle, LogIn, UserPlus } from 'lucide-react';
+import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, Download, FileIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Chat() {
   const { user, loading: authLoading } = useAuth();
-  const { conversation, messages, loading, sendMessage, markAsRead } = useChat();
+  const { conversation, messages, loading, sendMessage, markAsRead, uploading } = useChat();
   const { toast } = useToast();
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mark messages as read when page loads
   useEffect(() => {
@@ -34,12 +36,13 @@ export default function Chat() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!inputValue.trim() || sending) return;
+    if ((!inputValue.trim() && !selectedFile) || sending) return;
 
     setSending(true);
     try {
-      await sendMessage(inputValue.trim());
+      await sendMessage(inputValue.trim() || (selectedFile ? `Sent a file: ${selectedFile.name}` : ''), selectedFile || undefined);
       setInputValue('');
+      setSelectedFile(null);
     } catch (error) {
       toast({
         title: 'Error',
@@ -49,6 +52,25 @@ export default function Chat() {
     } finally {
       setSending(false);
     }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 50 * 1024 * 1024) {
+        toast({
+          title: 'File too large',
+          description: 'Maximum file size is 50MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const isImageFile = (fileType: string | null) => {
+    return fileType?.startsWith('image/');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -208,7 +230,32 @@ export default function Chat() {
                             : 'bg-card border border-border/50 text-card-foreground rounded-bl-sm'
                             }`}
                         >
-                          {message.content}
+                          {message.file_url && (
+                            <div className="mb-2">
+                              {isImageFile(message.file_type) ? (
+                                <img
+                                  src={message.file_url}
+                                  alt={message.file_name || 'Attachment'}
+                                  className="max-w-full rounded-lg max-h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                  onClick={() => window.open(message.file_url!, '_blank')}
+                                />
+                              ) : (
+                                <a
+                                  href={message.file_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
+                                    isClient ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' : 'bg-secondary hover:bg-secondary/80'
+                                  }`}
+                                >
+                                  <FileIcon className="h-5 w-5 shrink-0" />
+                                  <span className="text-sm truncate flex-1">{message.file_name}</span>
+                                  <Download className="h-4 w-4 shrink-0" />
+                                </a>
+                              )}
+                            </div>
+                          )}
+                          {message.content && !message.content.startsWith('Sent a file:') && message.content}
                         </div>
                         <span className="text-[11px] text-muted-foreground/60 px-1 select-none">
                           {format(new Date(message.created_at), 'h:mm a')}
@@ -228,29 +275,71 @@ export default function Chat() {
                 <p className="text-muted-foreground text-sm">This conversation is closed. Start a new one to continue.</p>
               </div>
             ) : (
-              <div className="relative flex items-center gap-3 max-w-4xl mx-auto">
-                <div className="relative flex-1">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    className="h-12 pl-4 pr-12 rounded-full border-border/50 bg-background/50 hover:bg-background focus:bg-background transition-colors shadow-sm focus-visible:ring-primary/20"
-                    disabled={sending}
+              <div className="space-y-3 max-w-4xl mx-auto">
+                {selectedFile && (
+                  <div className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg">
+                    {selectedFile.type.startsWith('image/') ? (
+                      <img
+                        src={URL.createObjectURL(selectedFile)}
+                        alt="Preview"
+                        className="h-12 w-12 object-cover rounded"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 bg-secondary rounded flex items-center justify-center">
+                        <FileIcon className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    <span className="text-sm truncate flex-1">{selectedFile.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() => setSelectedFile(null)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <div className="relative flex items-center gap-3">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*,.pdf,.doc,.docx,.zip,.rar,.txt"
                   />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-12 w-12 rounded-full shrink-0"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={sending || uploading}
+                  >
+                    <Paperclip className="h-5 w-5" />
+                  </Button>
+                  <div className="relative flex-1">
+                    <Input
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Type your message..."
+                      className="h-12 pl-4 pr-4 rounded-full border-border/50 bg-background/50 hover:bg-background focus:bg-background transition-colors shadow-sm focus-visible:ring-primary/20"
+                      disabled={sending}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSend}
+                    disabled={(!inputValue.trim() && !selectedFile) || sending || uploading}
+                    size="icon"
+                    className="h-12 w-12 rounded-full shrink-0 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-br from-primary to-purple-600 border-0"
+                  >
+                    {sending || uploading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send className="h-5 w-5 ml-0.5" />
+                    )}
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleSend}
-                  disabled={!inputValue.trim() || sending}
-                  size="icon"
-                  className="h-12 w-12 rounded-full shrink-0 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-br from-primary to-purple-600 border-0"
-                >
-                  {sending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <Send className="h-5 w-5 ml-0.5" />
-                  )}
-                </Button>
               </div>
             )}
           </div>
