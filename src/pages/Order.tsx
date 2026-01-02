@@ -267,11 +267,10 @@ export default function Order() {
 
     try {
       const validatedData = result.data;
-      const { error } = await supabase.from('orders').insert({
+      const { error } = await supabase.from('orders').insert([{
         user_id: user!.id,
         app_name: validatedData.appName,
         short_description: validatedData.shortDescription,
-        // For CGI, use full description or empty if optional
         full_description: 'fullDescription' in validatedData ? validatedData.fullDescription || null : null,
         category: serviceType === 'publishing' ? (validatedData as any).category || null : 'CGI Ads',
         email: validatedData.email,
@@ -281,7 +280,7 @@ export default function Order() {
         add_ons: [],
         total_price: serviceType === 'publishing' ? totalPrice : 0,
         status: 'pending'
-      });
+      }] as any);
 
       if (error) throw error;
 
