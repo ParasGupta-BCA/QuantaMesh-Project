@@ -10,6 +10,10 @@ export interface Message {
   content: string;
   is_read: boolean;
   created_at: string;
+  file_url?: string | null;
+  file_name?: string | null;
+  file_type?: string | null;
+  file_size?: number | null;
 }
 
 export interface Conversation {
@@ -29,6 +33,7 @@ export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch or create conversation for client
   const fetchOrCreateConversation = useCallback(async () => {
@@ -78,11 +83,18 @@ export function useChat() {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages((data as Message[]) || []);
+      
+      // Cast the data to Message[] properly
+      const typedMessages = (data || []).map((m: any) => ({
+        ...m,
+        sender_type: m.sender_type as 'client' | 'admin'
+      })) as Message[];
+      
+      setMessages(typedMessages);
       
       // Count unread messages from admin
-      const unread = (data || []).filter(
-        (m: Message) => m.sender_type === 'admin' && !m.is_read
+      const unread = typedMessages.filter(
+        (m) => m.sender_type === 'admin' && !m.is_read
       ).length;
       setUnreadCount(unread);
     } catch (error) {
@@ -90,16 +102,55 @@ export function useChat() {
     }
   }, []);
 
-  // Send message
-  const sendMessage = async (content: string) => {
+  // Send message with optional file
+  const sendMessage = async (content: string, file?: File) => {
     if (!user || !conversation) return;
+
+    let fileData: { file_url: string; file_name: string; file_type: string; file_size: number } | null = null;
+
+    // Upload file if provided
+    if (file) {
+      setUploading(true);
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('chat-attachments')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('chat-attachments')
+          .getPublicUrl(fileName);
+
+        fileData = {
+          file_url: publicUrl,
+          file_name: file.name,
+          file_type: file.type,
+          file_size: file.size
+        };
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        throw error;
+      } finally {
+        setUploading(false);
+      }
+    }
 
     try {
       const { error } = await supabase.from('messages').insert({
         conversation_id: conversation.id,
         sender_id: user.id,
         sender_type: 'client',
-        content,
+        content: content || (fileData ? `Shared a file: ${fileData.file_name}` : ''),
+        ...(fileData && {
+          file_url: fileData.file_url,
+          file_name: fileData.file_name,
+          file_type: fileData.file_type,
+          file_size: fileData.file_size
+        })
       });
 
       if (error) throw error;
@@ -161,7 +212,10 @@ export function useChat() {
           filter: `conversation_id=eq.${conversation.id}`,
         },
         (payload) => {
-          const newMessage = payload.new as Message;
+          const newMessage = {
+            ...payload.new,
+            sender_type: (payload.new as any).sender_type as 'client' | 'admin'
+          } as Message;
           setMessages((prev) => [...prev, newMessage]);
           
           if (newMessage.sender_type === 'admin') {
@@ -181,6 +235,7 @@ export function useChat() {
     messages,
     loading,
     unreadCount,
+    uploading,
     sendMessage,
     markAsRead,
   };

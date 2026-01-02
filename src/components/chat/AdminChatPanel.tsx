@@ -11,7 +11,11 @@ import {
   RefreshCw,
   ArrowLeft,
   Search,
-  MoreVertical
+  MoreVertical,
+  Paperclip,
+  FileIcon,
+  Download,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,12 +27,21 @@ import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+};
+
+const isImageFile = (type: string) => type?.startsWith('image/');
+
 export function AdminChatPanel() {
   const {
     conversations,
     selectedConversation,
     messages,
     loading,
+    uploading,
     selectConversation,
     sendReply,
     closeConversation,
@@ -39,15 +52,43 @@ export function AdminChatPanel() {
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 50 * 1024 * 1024) {
+        toast({
+          title: 'File too large',
+          description: 'Maximum file size is 50MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSend = async () => {
-    if (!inputValue.trim() || sending) return;
+    if ((!inputValue.trim() && !selectedFile) || sending) return;
 
     setSending(true);
     try {
-      await sendReply(inputValue.trim());
+      await sendReply(inputValue.trim(), selectedFile || undefined);
       setInputValue('');
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       toast({
         title: 'Error',
@@ -98,7 +139,6 @@ export function AdminChatPanel() {
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      // Slight smooth scroll delay for better UX
       setTimeout(() => {
         if (scrollRef.current) {
           scrollRef.current.scrollTo({
@@ -116,6 +156,47 @@ export function AdminChatPanel() {
     (c.user_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
     (c.user_email?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
+
+  const renderFileAttachment = (message: typeof messages[0]) => {
+    if (!message.file_url) return null;
+
+    const isImage = isImageFile(message.file_type || '');
+    const isAdmin = message.sender_type === 'admin';
+
+    if (isImage) {
+      return (
+        <a href={message.file_url} target="_blank" rel="noopener noreferrer" className="block mt-2">
+          <img 
+            src={message.file_url} 
+            alt={message.file_name || 'Image'} 
+            className="max-w-[250px] max-h-[250px] rounded-lg object-cover border border-border/20"
+          />
+        </a>
+      );
+    }
+
+    return (
+      <a 
+        href={message.file_url} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className={`flex items-center gap-2 mt-2 p-2 rounded-lg ${
+          isAdmin 
+            ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' 
+            : 'bg-background/50 hover:bg-background/70'
+        } transition-colors`}
+      >
+        <FileIcon className="h-4 w-4 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium truncate">{message.file_name}</p>
+          {message.file_size && (
+            <p className="text-xs opacity-70">{formatFileSize(message.file_size)}</p>
+          )}
+        </div>
+        <Download className="h-4 w-4 shrink-0" />
+      </a>
+    );
+  };
 
   if (loading && conversations.length === 0) {
     return (
@@ -314,6 +395,7 @@ export function AdminChatPanel() {
                                 }`}
                             >
                               {message.content}
+                              {renderFileAttachment(message)}
                             </div>
                             <span className={`text-[10px] text-muted-foreground mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
                               {format(new Date(message.created_at), 'hh:mm a')}
@@ -327,25 +409,66 @@ export function AdminChatPanel() {
               </div>
             </div>
 
+            {/* Selected File Preview */}
+            {selectedFile && (
+              <div className="px-4 py-2 border-t border-border/30 bg-background/40">
+                <div className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg">
+                  {isImageFile(selectedFile.type) ? (
+                    <ImageIcon className="h-4 w-4 text-primary shrink-0" />
+                  ) : (
+                    <FileIcon className="h-4 w-4 text-primary shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{selectedFile.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={handleRemoveFile}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Input Area */}
             <div className="p-4 bg-background/60 backdrop-blur-md border-t border-border/30">
               <div className="relative flex gap-2 items-end bg-secondary/30 p-1.5 rounded-2xl border border-border/20 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 transition-all">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  accept="*/*"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={sending || uploading || selectedConversation.status === 'closed'}
+                  className="h-10 w-10 shrink-0 rounded-xl"
+                >
+                  <Paperclip className="h-5 w-5" />
+                </Button>
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={`Reply to ${selectedConversation.user_name || 'user'}...`}
                   className="flex-1 bg-transparent border-none focus-visible:ring-0 shadow-none min-h-[44px] max-h-[120px] py-3 text-sm"
-                  disabled={sending || selectedConversation.status === 'closed'}
+                  disabled={sending || uploading || selectedConversation.status === 'closed'}
                   autoComplete="off"
                 />
                 <Button
                   onClick={handleSend}
-                  disabled={!inputValue.trim() || sending || selectedConversation.status === 'closed'}
+                  disabled={(!inputValue.trim() && !selectedFile) || sending || uploading || selectedConversation.status === 'closed'}
                   size="icon"
                   className="h-10 w-10 shrink-0 rounded-xl mb-0.5 mr-0.5 transition-all active:scale-95"
                 >
-                  {sending ? (
+                  {sending || uploading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <Send className="h-5 w-5 ml-0.5" />

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Download, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,23 +10,33 @@ import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+};
+
+const isImageFile = (type: string) => type?.startsWith('image/');
+
 export function ClientChatWidget() {
   const { user } = useAuth();
-  const { conversation, messages, loading, unreadCount, sendMessage, markAsRead } = useChat();
+  const { conversation, messages, loading, unreadCount, uploading, sendMessage, markAsRead } = useChat();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive - MUST be before any conditional returns
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current && isOpen) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isOpen]);
 
-  // Don't render if user is not logged in - AFTER all hooks
+  // Don't render if user is not logged in
   if (!user) return null;
 
   const handleOpen = () => {
@@ -38,13 +48,39 @@ export function ClientChatWidget() {
     setIsOpen(false);
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 50 * 1024 * 1024) {
+        toast({
+          title: 'File too large',
+          description: 'Maximum file size is 50MB',
+          variant: 'destructive',
+        });
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSend = async () => {
-    if (!inputValue.trim() || sending) return;
+    if ((!inputValue.trim() && !selectedFile) || sending) return;
 
     setSending(true);
     try {
-      await sendMessage(inputValue.trim());
+      await sendMessage(inputValue.trim(), selectedFile || undefined);
       setInputValue('');
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       toast({
         title: 'Error',
@@ -63,11 +99,49 @@ export function ClientChatWidget() {
     }
   };
 
+  const renderFileAttachment = (message: typeof messages[0]) => {
+    if (!message.file_url) return null;
+
+    const isImage = isImageFile(message.file_type || '');
+
+    if (isImage) {
+      return (
+        <a href={message.file_url} target="_blank" rel="noopener noreferrer" className="block mt-2">
+          <img 
+            src={message.file_url} 
+            alt={message.file_name || 'Image'} 
+            className="max-w-[200px] max-h-[200px] rounded-lg object-cover border border-border/20"
+          />
+        </a>
+      );
+    }
+
+    return (
+      <a 
+        href={message.file_url} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className={`flex items-center gap-2 mt-2 p-2 rounded-lg ${
+          message.sender_type === 'client' 
+            ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' 
+            : 'bg-secondary hover:bg-secondary/80'
+        } transition-colors`}
+      >
+        <FileIcon className="h-4 w-4 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium truncate">{message.file_name}</p>
+          {message.file_size && (
+            <p className="text-xs opacity-70">{formatFileSize(message.file_size)}</p>
+          )}
+        </div>
+        <Download className="h-4 w-4 shrink-0" />
+      </a>
+    );
+  };
+
   return (
     <>
       {/* Chat Button */}
-      {/* Chat Button */}
-      {/* We use a fixed container for positioning, but the internal button has the custom styles */}
       <div className="fixed bottom-6 right-6 z-50">
         <div
           className={`custom-chat-btn-container ${isOpen ? 'active' : ''}`}
@@ -164,6 +238,7 @@ export function ClientChatWidget() {
                         <p className="text-sm whitespace-pre-wrap break-words">
                           {message.content}
                         </p>
+                        {renderFileAttachment(message)}
                         <p
                           className={`text-xs mt-1 ${message.sender_type === 'client'
                             ? 'text-primary-foreground/70'
@@ -179,23 +254,64 @@ export function ClientChatWidget() {
               )}
             </ScrollArea>
 
+            {/* Selected File Preview */}
+            {selectedFile && (
+              <div className="px-4 py-2 border-t border-border bg-secondary/30">
+                <div className="flex items-center gap-2 p-2 bg-background/50 rounded-lg">
+                  {isImageFile(selectedFile.type) ? (
+                    <ImageIcon className="h-4 w-4 text-primary shrink-0" />
+                  ) : (
+                    <FileIcon className="h-4 w-4 text-primary shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">{selectedFile.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={handleRemoveFile}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Input */}
             <div className="p-4 border-t border-border bg-secondary/30">
               <div className="flex gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  accept="*/*"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={sending || uploading || conversation?.status === 'closed'}
+                  className="shrink-0"
+                >
+                  <Paperclip className="h-4 w-4" />
+                </Button>
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Type a message..."
                   className="flex-1"
-                  disabled={sending || conversation?.status === 'closed'}
+                  disabled={sending || uploading || conversation?.status === 'closed'}
                 />
                 <Button
                   onClick={handleSend}
-                  disabled={!inputValue.trim() || sending || conversation?.status === 'closed'}
+                  disabled={(!inputValue.trim() && !selectedFile) || sending || uploading || conversation?.status === 'closed'}
                   size="icon"
                 >
-                  {sending ? (
+                  {sending || uploading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <Send className="h-4 w-4" />

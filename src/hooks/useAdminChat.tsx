@@ -16,6 +16,7 @@ export function useAdminChat() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch all conversations
   const fetchConversations = useCallback(async () => {
@@ -70,7 +71,14 @@ export function useAdminChat() {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages((data as Message[]) || []);
+      
+      // Cast the data to Message[] properly
+      const typedMessages = (data || []).map((m: any) => ({
+        ...m,
+        sender_type: m.sender_type as 'client' | 'admin'
+      })) as Message[];
+      
+      setMessages(typedMessages);
 
       // Mark client messages as read
       await supabase
@@ -91,16 +99,55 @@ export function useAdminChat() {
     }
   }, []);
 
-  // Send reply and email notification
-  const sendReply = async (content: string) => {
+  // Send reply with optional file and email notification
+  const sendReply = async (content: string, file?: File) => {
     if (!user || !selectedConversation) return;
+
+    let fileData: { file_url: string; file_name: string; file_type: string; file_size: number } | null = null;
+
+    // Upload file if provided
+    if (file) {
+      setUploading(true);
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('chat-attachments')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('chat-attachments')
+          .getPublicUrl(fileName);
+
+        fileData = {
+          file_url: publicUrl,
+          file_name: file.name,
+          file_type: file.type,
+          file_size: file.size
+        };
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        throw error;
+      } finally {
+        setUploading(false);
+      }
+    }
 
     try {
       const { error } = await supabase.from('messages').insert({
         conversation_id: selectedConversation.id,
         sender_id: user.id,
         sender_type: 'admin',
-        content,
+        content: content || (fileData ? `Shared a file: ${fileData.file_name}` : ''),
+        ...(fileData && {
+          file_url: fileData.file_url,
+          file_name: fileData.file_name,
+          file_type: fileData.file_type,
+          file_size: fileData.file_size
+        })
       });
 
       if (error) throw error;
@@ -111,7 +158,7 @@ export function useAdminChat() {
           body: {
             recipientEmail: selectedConversation.user_email,
             recipientName: selectedConversation.user_name,
-            messageContent: content,
+            messageContent: content || (fileData ? `Shared a file: ${fileData.file_name}` : ''),
           },
         });
         console.log('Email notification sent to:', selectedConversation.user_email);
@@ -204,7 +251,10 @@ export function useAdminChat() {
           table: 'messages',
         },
         (payload) => {
-          const newMessage = payload.new as Message;
+          const newMessage = {
+            ...payload.new,
+            sender_type: (payload.new as any).sender_type as 'client' | 'admin'
+          } as Message;
           
           // Update messages if we're viewing this conversation
           if (selectedConversation?.id === newMessage.conversation_id) {
@@ -261,6 +311,7 @@ export function useAdminChat() {
     selectedConversation,
     messages,
     loading,
+    uploading,
     selectConversation,
     sendReply,
     closeConversation,
