@@ -27,13 +27,15 @@ import {
   AlertTriangle,
   XCircle,
   RefreshCw,
-  Zap
+  Zap,
+  Star
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,6 +47,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const orderSchema = z.object({
   appName: z.string().trim().min(1, "App name is required").max(50, "App name must be less than 50 characters"),
@@ -84,6 +94,8 @@ interface OrderItem {
   app_name: string;
   status: string;
   total_price: number;
+  customer_name: string;
+  has_review?: boolean;
 }
 
 const includedFeatures = [
@@ -166,14 +178,29 @@ export default function Order() {
   const fetchOrders = async () => {
     setLoadingOrders(true);
     try {
-      const { data, error } = await supabase
+      // Fetch orders
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
-        .select('id, created_at, app_name, status, total_price')
+        .select('id, created_at, app_name, status, total_price, customer_name')
         .eq('user_id', user!.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setOrders(data as OrderItem[]);
+      if (ordersError) throw ordersError;
+
+      // Fetch user's reviews to check which orders have reviews
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select('order_id')
+        .eq('user_id', user!.id);
+
+      const reviewedOrderIds = new Set(reviewsData?.map(r => r.order_id) || []);
+
+      const ordersWithReviewStatus = (ordersData || []).map(order => ({
+        ...order,
+        has_review: reviewedOrderIds.has(order.id)
+      }));
+
+      setOrders(ordersWithReviewStatus as OrderItem[]);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
@@ -1098,6 +1125,40 @@ export default function Order() {
                               ID: {order.id}
                             </div>
                           </div>
+                          
+                          {/* Review Section */}
+                          {(order.status.toLowerCase() === 'published' || order.status.toLowerCase() === 'completed') && (
+                            <div className="mt-4 pt-4 border-t border-white/10">
+                              {order.has_review ? (
+                                <div className="flex items-center gap-2 text-sm text-green-400">
+                                  <CheckCircle size={16} />
+                                  <span>Review submitted - Thank you!</span>
+                                </div>
+                              ) : (
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm" className="gap-2">
+                                      <Star size={16} />
+                                      Leave a Review
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                      <DialogTitle>Review Your Experience</DialogTitle>
+                                      <DialogDescription>
+                                        Share your feedback about our service for "{order.app_name}"
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <ReviewForm 
+                                      orderId={order.id} 
+                                      customerName={order.customer_name}
+                                      onSuccess={fetchOrders}
+                                    />
+                                  </DialogContent>
+                                </Dialog>
+                              )}
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))}
