@@ -27,3 +27,15 @@ export interface ContactMessage {
   status: string;
   created_at: string;
 }
+
+export interface Review {
+  id: string;
+  user_id: string;
+  order_id: string | null;
+  customer_name: string;
+  rating: number;
+  review_text: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+}
