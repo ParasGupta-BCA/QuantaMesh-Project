@@ -1185,7 +1185,7 @@ export default function Order() {
                               </div>
                             )}
                           </div>
-                          )}
+
                         </CardContent>
                       </Card>
                     ))}
