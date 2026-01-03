@@ -270,11 +270,11 @@ export default function Order() {
   const uploadFile = async (file: File, folder: string): Promise<string | null> => {
     const fileExt = file.name.split('.').pop();
     const fileName = `${user!.id}/${folder}/${Date.now()}.${fileExt}`;
-    
+
     const { error } = await supabase.storage
       .from('order-files')
       .upload(fileName, file);
-    
+
     if (error) {
       console.error('Upload error:', error);
       return null;
@@ -310,7 +310,7 @@ export default function Order() {
 
     try {
       const validatedData = result.data;
-      
+
       // Upload files if present (for publishing service)
       let apkFilePath: string | null = null;
       let iconFilePath: string | null = null;
@@ -1125,37 +1125,65 @@ export default function Order() {
                               ID: {order.id}
                             </div>
                           </div>
-                          
+
+                          {/* Review Section */}
                           {/* Review Section */}
                           {(order.status.toLowerCase() === 'published' || order.status.toLowerCase() === 'completed') && (
                             <div className="mt-4 pt-4 border-t border-white/10">
                               {order.has_review ? (
-                                <div className="flex items-center gap-2 text-sm text-green-400">
-                                  <CheckCircle size={16} />
-                                  <span>Review submitted - Thank you!</span>
+                                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-center gap-4 animate-in fade-in zoom-in duration-300">
+                                  <div className="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                                    <CheckCircle className="h-5 w-5 text-emerald-400" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-semibold text-emerald-400 text-sm">Review Submitted</h4>
+                                    <p className="text-xs text-muted-foreground">Thank you for your feedback! It helps us improve.</p>
+                                  </div>
                                 </div>
                               ) : (
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button variant="outline" size="sm" className="gap-2">
-                                      <Star size={16} />
-                                      Leave a Review
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="sm:max-w-md">
-                                    <DialogHeader>
-                                      <DialogTitle>Review Your Experience</DialogTitle>
-                                      <DialogDescription>
-                                        Share your feedback about our service for "{order.app_name}"
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    <ReviewForm 
-                                      orderId={order.id} 
-                                      customerName={order.customer_name}
-                                      onSuccess={fetchOrders}
-                                    />
-                                  </DialogContent>
-                                </Dialog>
+                                <div className="relative overflow-hidden group rounded-xl bg-gradient-to-br from-primary/5 via-primary/10 to-transparent border border-primary/20 p-4 transition-all duration-300 hover:shadow-[0_0_20px_rgba(var(--primary),0.15)] hover:border-primary/40">
+                                  <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Star size={40} className="text-primary fill-primary rotate-12" />
+                                  </div>
+
+                                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+                                    <div className="space-y-1">
+                                      <h4 className="font-semibold text-foreground flex items-center gap-2">
+                                        <Star size={16} className="text-yellow-400 fill-yellow-400" />
+                                        Rate Your Experience
+                                      </h4>
+                                      <p className="text-xs text-muted-foreground max-w-[250px]">
+                                        How was the service? Your review helps others trust us.
+                                      </p>
+                                    </div>
+
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <Button size="sm" className="bg-primary/20 hover:bg-primary/30 text-primary border-primary/20 hover:border-primary/50 shadow-none">
+                                          Write Review
+                                        </Button>
+                                      </DialogTrigger>
+                                      <DialogContent className="sm:max-w-md border-white/10 bg-zinc-950/95 backdrop-blur-xl shadow-2xl">
+                                        <DialogHeader>
+                                          <DialogTitle className="flex items-center gap-2">
+                                            <MessageCircle className="h-5 w-5 text-primary" />
+                                            Review Your Experience
+                                          </DialogTitle>
+                                          <DialogDescription>
+                                            Share your feedback about our service for <span className="text-foreground font-medium">"{order.app_name}"</span>
+                                          </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="py-2">
+                                          <ReviewForm
+                                            orderId={order.id}
+                                            customerName={order.customer_name}
+                                            onSuccess={fetchOrders}
+                                          />
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
+                                  </div>
+                                </div>
                               )}
                             </div>
                           )}
