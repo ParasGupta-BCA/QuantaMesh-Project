@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Download, Image as ImageIcon } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { FileAttachment } from './FileAttachment';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
@@ -102,40 +103,16 @@ export function ClientChatWidget() {
   const renderFileAttachment = (message: typeof messages[0]) => {
     if (!message.file_url) return null;
 
-    const isImage = isImageFile(message.file_type || '');
-
-    if (isImage) {
-      return (
-        <a href={message.file_url} target="_blank" rel="noopener noreferrer" className="block mt-2">
-          <img 
-            src={message.file_url} 
-            alt={message.file_name || 'Image'} 
-            className="max-w-[200px] max-h-[200px] rounded-lg object-cover border border-border/20"
-          />
-        </a>
-      );
-    }
-
     return (
-      <a 
-        href={message.file_url} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className={`flex items-center gap-2 mt-2 p-2 rounded-lg ${
-          message.sender_type === 'client' 
-            ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' 
-            : 'bg-secondary hover:bg-secondary/80'
-        } transition-colors`}
-      >
-        <FileIcon className="h-4 w-4 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium truncate">{message.file_name}</p>
-          {message.file_size && (
-            <p className="text-xs opacity-70">{formatFileSize(message.file_size)}</p>
-          )}
-        </div>
-        <Download className="h-4 w-4 shrink-0" />
-      </a>
+      <FileAttachment
+        fileUrl={message.file_url}
+        fileName={message.file_name}
+        fileType={message.file_type}
+        fileSize={message.file_size}
+        isClientMessage={message.sender_type === 'client'}
+        maxImageWidth="200px"
+        maxImageHeight="200px"
+      />
     );
   };
 

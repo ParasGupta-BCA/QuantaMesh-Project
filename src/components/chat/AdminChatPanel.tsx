@@ -14,7 +14,6 @@ import {
   MoreVertical,
   Paperclip,
   FileIcon,
-  Download,
   Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,6 +25,7 @@ import { useAdminChat, ConversationWithUnread } from '@/hooks/useAdminChat';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { FileAttachment } from './FileAttachment';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
@@ -160,41 +160,16 @@ export function AdminChatPanel() {
   const renderFileAttachment = (message: typeof messages[0]) => {
     if (!message.file_url) return null;
 
-    const isImage = isImageFile(message.file_type || '');
-    const isAdmin = message.sender_type === 'admin';
-
-    if (isImage) {
-      return (
-        <a href={message.file_url} target="_blank" rel="noopener noreferrer" className="block mt-2">
-          <img 
-            src={message.file_url} 
-            alt={message.file_name || 'Image'} 
-            className="max-w-[250px] max-h-[250px] rounded-lg object-cover border border-border/20"
-          />
-        </a>
-      );
-    }
-
     return (
-      <a 
-        href={message.file_url} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className={`flex items-center gap-2 mt-2 p-2 rounded-lg ${
-          isAdmin 
-            ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' 
-            : 'bg-background/50 hover:bg-background/70'
-        } transition-colors`}
-      >
-        <FileIcon className="h-4 w-4 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium truncate">{message.file_name}</p>
-          {message.file_size && (
-            <p className="text-xs opacity-70">{formatFileSize(message.file_size)}</p>
-          )}
-        </div>
-        <Download className="h-4 w-4 shrink-0" />
-      </a>
+      <FileAttachment
+        fileUrl={message.file_url}
+        fileName={message.file_name}
+        fileType={message.file_type}
+        fileSize={message.file_size}
+        isClientMessage={message.sender_type !== 'admin'}
+        maxImageWidth="250px"
+        maxImageHeight="250px"
+      />
     );
   };
 

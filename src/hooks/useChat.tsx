@@ -121,12 +121,9 @@ export function useChat() {
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('chat-attachments')
-          .getPublicUrl(fileName);
-
+        // Store the file path instead of public URL - we'll generate signed URLs on demand
         fileData = {
-          file_url: publicUrl,
+          file_url: fileName, // Store path, not public URL
           file_name: file.name,
           file_type: file.type,
           file_size: file.size

@@ -8,9 +8,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, Download, FileIcon } from 'lucide-react';
+import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, FileIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
+import { FileAttachment } from '@/components/chat/FileAttachment';
 export default function Chat() {
   const { user, loading: authLoading } = useAuth();
   const { conversation, messages, loading, sendMessage, markAsRead, uploading } = useChat();
@@ -71,6 +71,22 @@ export default function Chat() {
 
   const isImageFile = (fileType: string | null) => {
     return fileType?.startsWith('image/');
+  };
+
+  const renderFileAttachment = (message: typeof messages[0]) => {
+    if (!message.file_url) return null;
+
+    return (
+      <FileAttachment
+        fileUrl={message.file_url}
+        fileName={message.file_name}
+        fileType={message.file_type}
+        fileSize={message.file_size}
+        isClientMessage={message.sender_type === 'client'}
+        maxImageWidth="100%"
+        maxImageHeight="192px"
+      />
+    );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -230,31 +246,7 @@ export default function Chat() {
                             : 'bg-card border border-border/50 text-card-foreground rounded-bl-sm'
                             }`}
                         >
-                          {message.file_url && (
-                            <div className="mb-2">
-                              {isImageFile(message.file_type) ? (
-                                <img
-                                  src={message.file_url}
-                                  alt={message.file_name || 'Attachment'}
-                                  className="max-w-full rounded-lg max-h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                                  onClick={() => window.open(message.file_url!, '_blank')}
-                                />
-                              ) : (
-                                <a
-                                  href={message.file_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
-                                    isClient ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' : 'bg-secondary hover:bg-secondary/80'
-                                  }`}
-                                >
-                                  <FileIcon className="h-5 w-5 shrink-0" />
-                                  <span className="text-sm truncate flex-1">{message.file_name}</span>
-                                  <Download className="h-4 w-4 shrink-0" />
-                                </a>
-                              )}
-                            </div>
-                          )}
+                          {renderFileAttachment(message)}
                           {message.content && !message.content.startsWith('Sent a file:') && message.content}
                         </div>
                         <span className="text-[11px] text-muted-foreground/60 px-1 select-none">
