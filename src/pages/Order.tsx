@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { z } from "zod";
+import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 import {
   Upload,
   CheckCircle,
@@ -312,10 +313,11 @@ export default function Order() {
         setStep(3); // Show success view
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      logError('Order submission', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to submit order. Please try again.",
+        description: getSafeErrorMessage(error, "Failed to submit order. Please try again."),
         variant: "destructive"
       });
     } finally {

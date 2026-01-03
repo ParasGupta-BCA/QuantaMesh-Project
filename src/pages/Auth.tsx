@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2, Mail, Lock, User } from "lucide-react";
 import { z } from "zod";
+import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 
 const signInSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
@@ -66,19 +67,12 @@ export default function Auth() {
       if (isSignUp) {
         const { error } = await signUp(email, password, fullName);
         if (error) {
-          if (error.message.includes("already registered")) {
-            toast({
-              title: "Account exists",
-              description: "This email is already registered. Please sign in instead.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Sign up failed",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
+          logError('Sign up', error);
+          toast({
+            title: "Sign up failed",
+            description: getSafeErrorMessage(error, "Failed to create account. Please try again."),
+            variant: "destructive",
+          });
         } else {
           toast({
             title: "Welcome!",
@@ -88,19 +82,12 @@ export default function Auth() {
       } else {
         const { error } = await signIn(email, password);
         if (error) {
-          if (error.message.includes("Invalid login credentials")) {
-            toast({
-              title: "Invalid credentials",
-              description: "Please check your email and password.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Sign in failed",
-              description: error.message,
-              variant: "destructive",
-            });
-          }
+          logError('Sign in', error);
+          toast({
+            title: "Sign in failed",
+            description: getSafeErrorMessage(error, "Failed to sign in. Please try again."),
+            variant: "destructive",
+          });
         } else {
           toast({
             title: "Welcome back!",

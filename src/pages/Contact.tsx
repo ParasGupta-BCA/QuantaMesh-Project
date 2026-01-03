@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { z } from "zod";
+import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 import {
   Mail,
   Instagram,
@@ -36,6 +37,8 @@ export default function Contact() {
     subject: "",
     message: ""
   });
+  // Honeypot field for spam protection - bots will fill this, humans won't see it
+  const [honeypot, setHoneypot] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -50,6 +53,13 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+
+    // Honeypot check - if filled, silently reject (bot detected)
+    if (honeypot) {
+      // Pretend success to avoid giving bots information
+      setIsSubmitted(true);
+      return;
+    }
 
     // Validate form data
     const result = contactSchema.safeParse(formData);
@@ -90,10 +100,11 @@ export default function Contact() {
       });
 
       setIsSubmitted(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      logError('Contact form submission', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to send message. Please try again.",
+        description: getSafeErrorMessage(error, "Failed to send message. Please try again."),
         variant: "destructive"
       });
     } finally {
@@ -263,7 +274,21 @@ export default function Contact() {
                     {errors.message && <p className="text-xs text-destructive">{errors.message}</p>}
                   </div>
 
-                  <Button 
+                  {/* Honeypot field - hidden from users, visible to bots */}
+                  <div className="absolute -left-[9999px] opacity-0 pointer-events-none" aria-hidden="true">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      name="website"
+                      type="text"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <Button
                     type="submit" 
                     variant="hero" 
                     size="lg" 

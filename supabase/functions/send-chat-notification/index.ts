@@ -1,8 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,17 +33,87 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create Supabase client with user's auth context
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    // Verify the user is authenticated
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error("Authentication failed:", authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if user is an admin
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc('has_role', {
+      _user_id: user.id,
+      _role: 'admin'
+    });
+
+    if (roleError) {
+      console.error("Role check error:", roleError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to verify permissions' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!isAdmin) {
+      console.error("User is not an admin:", user.id);
+      return new Response(
+        JSON.stringify({ error: 'Forbidden: Admin access required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { recipientEmail, recipientName, messageContent }: ChatNotificationRequest = await req.json();
     
+    // Validate required fields
+    if (!recipientEmail || !messageContent) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: recipientEmail and messageContent' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(recipientEmail)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Sanitize user-provided content
     const safeMessageContent = escapeHtml(messageContent);
     const safeRecipientName = recipientName ? escapeHtml(recipientName) : null;
 
     if (!RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY is not configured");
+      console.error("RESEND_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: 'Email service not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    console.log("Sending chat notification to:", recipientEmail);
+    console.log("Sending chat notification to:", recipientEmail, "by admin:", user.id);
 
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -105,7 +174,10 @@ const handler = async (req: Request): Promise<Response> => {
     if (!emailResponse.ok) {
       const errorData = await emailResponse.text();
       console.error("Resend API error:", errorData);
-      throw new Error(`Failed to send email: ${errorData}`);
+      return new Response(
+        JSON.stringify({ error: 'Failed to send email notification' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     const data = await emailResponse.json();
@@ -115,10 +187,11 @@ const handler = async (req: Request): Promise<Response> => {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error("Error in send-chat-notification function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Internal server error' }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

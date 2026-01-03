@@ -14,6 +14,7 @@ import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminMessages } from "@/components/admin/AdminMessages";
 import { Order, ContactMessage } from "@/types/admin";
+import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -79,10 +80,11 @@ export default function Admin() {
         title: "Status Updated",
         description: `Order status changed to ${newStatus}`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      logError('Update order status', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to update status",
+        description: getSafeErrorMessage(error, "Failed to update status"),
         variant: "destructive",
       });
     }
@@ -107,10 +109,11 @@ export default function Admin() {
         title: "Status Updated",
         description: `Message marked as ${newStatus}`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      logError('Update message status', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to update status",
+        description: getSafeErrorMessage(error, "Failed to update status"),
         variant: "destructive",
       });
     }
