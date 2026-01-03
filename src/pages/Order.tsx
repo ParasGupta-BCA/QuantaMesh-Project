@@ -240,6 +240,21 @@ export default function Order() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const uploadFile = async (file: File, folder: string): Promise<string | null> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user!.id}/${folder}/${Date.now()}.${fileExt}`;
+    
+    const { error } = await supabase.storage
+      .from('order-files')
+      .upload(fileName, file);
+    
+    if (error) {
+      console.error('Upload error:', error);
+      return null;
+    }
+    return fileName;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -268,6 +283,30 @@ export default function Order() {
 
     try {
       const validatedData = result.data;
+      
+      // Upload files if present (for publishing service)
+      let apkFilePath: string | null = null;
+      let iconFilePath: string | null = null;
+      let featureGraphicPath: string | null = null;
+      let screenshotPaths: string[] = [];
+
+      if (serviceType === 'publishing') {
+        if (files.apk) {
+          apkFilePath = await uploadFile(files.apk, 'apk');
+        }
+        if (files.icon) {
+          iconFilePath = await uploadFile(files.icon, 'icon');
+        }
+        if (files.featureGraphic) {
+          featureGraphicPath = await uploadFile(files.featureGraphic, 'feature-graphic');
+        }
+        if (files.screenshots.length > 0) {
+          const uploadPromises = files.screenshots.map(f => uploadFile(f, 'screenshots'));
+          const results = await Promise.all(uploadPromises);
+          screenshotPaths = results.filter((p): p is string => p !== null);
+        }
+      }
+
       const { error } = await supabase.from('orders').insert([{
         user_id: user!.id,
         app_name: validatedData.appName,
@@ -280,7 +319,11 @@ export default function Order() {
         support_url: 'supportUrl' in validatedData ? validatedData.supportUrl || null : null,
         add_ons: [],
         total_price: serviceType === 'publishing' ? totalPrice : 0,
-        status: 'pending'
+        status: 'pending',
+        apk_file_path: apkFilePath,
+        icon_file_path: iconFilePath,
+        feature_graphic_path: featureGraphicPath,
+        screenshot_paths: screenshotPaths.length > 0 ? screenshotPaths : null
       }] as any);
 
       if (error) throw error;

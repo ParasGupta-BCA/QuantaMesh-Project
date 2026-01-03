@@ -12,6 +12,10 @@ export interface Order {
   status: string;
   total_price: number;
   created_at: string;
+  apk_file_path: string | null;
+  icon_file_path: string | null;
+  feature_graphic_path: string | null;
+  screenshot_paths: string[] | null;
 }
 
 export interface ContactMessage {

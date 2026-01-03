@@ -133,14 +133,18 @@ export type Database = {
       orders: {
         Row: {
           add_ons: string[] | null
+          apk_file_path: string | null
           app_name: string
           category: string | null
           created_at: string
           customer_name: string
           email: string
+          feature_graphic_path: string | null
           full_description: string | null
+          icon_file_path: string | null
           id: string
           privacy_policy_url: string | null
+          screenshot_paths: string[] | null
           short_description: string
           status: string
           support_url: string | null
@@ -150,14 +154,18 @@ export type Database = {
         }
         Insert: {
           add_ons?: string[] | null
+          apk_file_path?: string | null
           app_name: string
           category?: string | null
           created_at?: string
           customer_name: string
           email: string
+          feature_graphic_path?: string | null
           full_description?: string | null
+          icon_file_path?: string | null
           id?: string
           privacy_policy_url?: string | null
+          screenshot_paths?: string[] | null
           short_description: string
           status?: string
           support_url?: string | null
@@ -167,14 +175,18 @@ export type Database = {
         }
         Update: {
           add_ons?: string[] | null
+          apk_file_path?: string | null
           app_name?: string
           category?: string | null
           created_at?: string
           customer_name?: string
           email?: string
+          feature_graphic_path?: string | null
           full_description?: string | null
+          icon_file_path?: string | null
           id?: string
           privacy_policy_url?: string | null
+          screenshot_paths?: string[] | null
           short_description?: string
           status?: string
           support_url?: string | null

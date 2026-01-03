@@ -23,9 +23,11 @@ import {
     DollarSign,
     Box,
     Globe,
-    Smartphone
+    Smartphone,
+    FolderOpen
 } from "lucide-react";
 import { Order } from "@/types/admin";
+import { OrderFilesList } from "./OrderFileDownload";
 
 interface AdminOrdersProps {
     orders: Order[];
@@ -296,6 +298,19 @@ export function AdminOrders({ orders, updateOrderStatus, loading }: AdminOrdersP
                                                         ) : (
                                                             <div className="text-sm text-muted-foreground italic">No external links provided.</div>
                                                         )}
+                                                    </div>
+
+                                                    {/* Uploaded Files Section */}
+                                                    <div className="pt-4 border-t border-border/30">
+                                                        <label className="text-xs text-muted-foreground uppercase tracking-wider font-semibold block mb-3 flex items-center gap-1.5">
+                                                            <FolderOpen className="h-3 w-3" /> Uploaded Files
+                                                        </label>
+                                                        <OrderFilesList
+                                                            apkFilePath={order.apk_file_path}
+                                                            iconFilePath={order.icon_file_path}
+                                                            featureGraphicPath={order.feature_graphic_path}
+                                                            screenshotPaths={order.screenshot_paths}
+                                                        />
                                                     </div>
 
                                                     <div className="pt-4 border-t border-border/30">
