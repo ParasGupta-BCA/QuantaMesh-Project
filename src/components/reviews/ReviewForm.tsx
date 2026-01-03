@@ -23,33 +23,64 @@ export function ReviewForm({ orderId, customerName, onSuccess }: ReviewFormProps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !reviewText.trim()) return;
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to submit a review.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!reviewText.trim()) {
+      toast({
+        title: "Error",
+        description: "Please write a review before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("reviews").insert({
+      console.log("Submitting review:", {
         user_id: user.id,
         order_id: orderId,
         customer_name: customerName,
         rating,
-        review_text: reviewText.trim(),
       });
 
-      if (error) throw error;
+      const { data, error } = await supabase.from("reviews").insert({
+        user_id: user.id,
+        order_id: orderId,
+        customer_name: customerName || "Valued Customer", // Fallback if missing
+        rating,
+        review_text: reviewText.trim(),
+      }).select();
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw error;
+      }
+
+      console.log("Review submitted successfully:", data);
 
       toast({
         title: "Review Submitted!",
-        description: "Thank you! Your review will appear after approval.",
+        description: "Thank you! Your review has been saved.",
+        variant: "default",
+        className: "bg-green-500 text-white border-green-600",
       });
-      
+
       setReviewText("");
       setRating(5);
       onSuccess?.();
-    } catch (error) {
+    } catch (error: any) {
       logError("Submit review", error);
+      console.error("Full error object:", error);
       toast({
-        title: "Error",
-        description: getSafeErrorMessage(error, "Failed to submit review"),
+        title: "Submission Failed",
+        description: error.message || getSafeErrorMessage(error, "Failed to submit review"),
         variant: "destructive",
       });
     } finally {
@@ -73,11 +104,10 @@ export function ReviewForm({ orderId, customerName, onSuccess }: ReviewFormProps
             >
               <Star
                 size={28}
-                className={`transition-colors ${
-                  star <= (hoverRating || rating)
+                className={`transition-colors ${star <= (hoverRating || rating)
                     ? "fill-primary text-primary"
                     : "text-muted-foreground"
-                }`}
+                  }`}
               />
             </button>
           ))}
