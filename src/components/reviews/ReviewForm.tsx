@@ -1,11 +1,23 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
+
+// Zod schema for review validation
+const reviewSchema = z.object({
+  rating: z.number().int().min(1, "Rating must be at least 1").max(5, "Rating cannot exceed 5"),
+  reviewText: z.string()
+    .trim()
+    .min(10, "Review must be at least 10 characters")
+    .max(500, "Review must be less than 500 characters"),
+  orderId: z.string().uuid("Invalid order ID"),
+  customerName: z.string().trim().min(1, "Customer name is required").max(100, "Customer name must be less than 100 characters"),
+});
 
 interface ReviewFormProps {
   orderId: string;
@@ -20,9 +32,12 @@ export function ReviewForm({ orderId, customerName, onSuccess }: ReviewFormProps
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError(null);
+
     if (!user) {
       toast({
         title: "Error",
@@ -32,52 +47,53 @@ export function ReviewForm({ orderId, customerName, onSuccess }: ReviewFormProps
       return;
     }
 
-    if (!reviewText.trim()) {
+    // Validate with Zod schema
+    const validationResult = reviewSchema.safeParse({
+      rating,
+      reviewText: reviewText.trim(),
+      orderId,
+      customerName: customerName || "Valued Customer",
+    });
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      setValidationError(firstError.message);
       toast({
-        title: "Error",
-        description: "Please write a review before submitting.",
+        title: "Validation Error",
+        description: firstError.message,
         variant: "destructive",
       });
       return;
     }
 
+    const validatedData = validationResult.data;
+
     setSubmitting(true);
     try {
-      console.log("Submitting review:", {
-        user_id: user.id,
-        order_id: orderId,
-        customer_name: customerName,
-        rating,
-      });
-
       const { data, error } = await supabase.from("reviews").insert({
         user_id: user.id,
-        order_id: orderId,
-        customer_name: customerName || "Valued Customer", // Fallback if missing
-        rating,
-        review_text: reviewText.trim(),
+        order_id: validatedData.orderId,
+        customer_name: validatedData.customerName,
+        rating: validatedData.rating,
+        review_text: validatedData.reviewText,
       }).select();
 
       if (error) {
-        console.error("Supabase insert error:", error);
+        logError("Supabase insert error", error);
         throw error;
       }
-
-      console.log("Review submitted successfully:", data);
 
       // Send email notification to admins (fire and forget)
       supabase.functions.invoke("send-review-notification", {
         body: {
-          customerName: customerName || "Valued Customer",
-          rating,
-          reviewText: reviewText.trim(),
-          orderId,
+          customerName: validatedData.customerName,
+          rating: validatedData.rating,
+          reviewText: validatedData.reviewText,
+          orderId: validatedData.orderId,
         },
       }).then(({ error: notifError }) => {
         if (notifError) {
-          console.error("Failed to send review notification:", notifError);
-        } else {
-          console.log("Review notification sent to admins");
+          logError("Failed to send review notification", notifError);
         }
       });
 
@@ -90,13 +106,13 @@ export function ReviewForm({ orderId, customerName, onSuccess }: ReviewFormProps
 
       setReviewText("");
       setRating(5);
+      setValidationError(null);
       onSuccess?.();
     } catch (error: any) {
       logError("Submit review", error);
-      console.error("Full error object:", error);
       toast({
         title: "Submission Failed",
-        description: error.message || getSafeErrorMessage(error, "Failed to submit review"),
+        description: getSafeErrorMessage(error, "Failed to submit review"),
         variant: "destructive",
       });
     } finally {
@@ -134,18 +150,26 @@ export function ReviewForm({ orderId, customerName, onSuccess }: ReviewFormProps
         <label className="block text-sm font-medium mb-2">Your Review</label>
         <Textarea
           value={reviewText}
-          onChange={(e) => setReviewText(e.target.value)}
-          placeholder="Tell us about your experience..."
+          onChange={(e) => {
+            setReviewText(e.target.value);
+            setValidationError(null);
+          }}
+          placeholder="Tell us about your experience (minimum 10 characters)..."
           rows={4}
           maxLength={500}
           required
         />
-        <p className="text-xs text-muted-foreground mt-1">
-          {reviewText.length}/500 characters
-        </p>
+        <div className="flex justify-between items-center mt-1">
+          <p className="text-xs text-muted-foreground">
+            {reviewText.length}/500 characters (min 10)
+          </p>
+          {validationError && (
+            <p className="text-xs text-destructive">{validationError}</p>
+          )}
+        </div>
       </div>
 
-      <Button type="submit" disabled={submitting || !reviewText.trim()}>
+      <Button type="submit" disabled={submitting || reviewText.trim().length < 10}>
         {submitting ? "Submitting..." : "Submit Review"}
       </Button>
     </form>
