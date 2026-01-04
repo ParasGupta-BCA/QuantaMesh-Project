@@ -65,9 +65,25 @@ export function ReviewForm({ orderId, customerName, onSuccess }: ReviewFormProps
 
       console.log("Review submitted successfully:", data);
 
+      // Send email notification to admins (fire and forget)
+      supabase.functions.invoke("send-review-notification", {
+        body: {
+          customerName: customerName || "Valued Customer",
+          rating,
+          reviewText: reviewText.trim(),
+          orderId,
+        },
+      }).then(({ error: notifError }) => {
+        if (notifError) {
+          console.error("Failed to send review notification:", notifError);
+        } else {
+          console.log("Review notification sent to admins");
+        }
+      });
+
       toast({
         title: "Review Submitted!",
-        description: "Thank you! Your review has been saved.",
+        description: "Thank you! Your review will appear after approval.",
         variant: "default",
         className: "bg-green-500 text-white border-green-600",
       });
