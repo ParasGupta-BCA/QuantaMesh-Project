@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,22 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Mail, Lock, User } from "lucide-react";
+import { Loader2, Mail, Lock, User, ShieldCheck } from "lucide-react";
 import { z } from "zod";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
+
+// reCAPTCHA site key from environment
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
+
+// Add grecaptcha type for TypeScript
+declare global {
+  interface Window {
+    grecaptcha: {
+      ready: (callback: () => void) => Promise<void>;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    };
+  }
+}
 
 const signInSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
@@ -29,16 +42,61 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+  const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
   
   const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Get redirect URL from query params
+  const redirectUrl = searchParams.get('redirect') || '/';
+
+  // Load reCAPTCHA script
+  useEffect(() => {
+    if (!RECAPTCHA_SITE_KEY) {
+      console.warn("reCAPTCHA site key not configured");
+      return;
+    }
+
+    // Check if already loaded
+    if (window.grecaptcha) {
+      setRecaptchaLoaded(true);
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    script.onload = () => {
+      setRecaptchaLoaded(true);
+    };
+    script.onerror = () => {
+      setRecaptchaError("Failed to load security verification");
+    };
+    document.body.appendChild(script);
+  }, []);
+
+  const executeRecaptcha = useCallback(async (action: string): Promise<string | null> => {
+    if (!RECAPTCHA_SITE_KEY || !window.grecaptcha) {
+      return null;
+    }
+
+    try {
+      await window.grecaptcha.ready(() => {});
+      const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action });
+      return token;
+    } catch (error) {
+      logError("reCAPTCHA execution", error);
+      return null;
+    }
+  }, []);
+
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate(redirectUrl);
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirectUrl]);
 
   useEffect(() => {
     setIsSignUp(searchParams.get('signup') === 'true');
@@ -98,6 +156,27 @@ export default function Auth() {
         setErrors(fieldErrors);
         setLoading(false);
         return;
+      }
+
+      // Execute reCAPTCHA if available
+      if (RECAPTCHA_SITE_KEY && recaptchaLoaded) {
+        const recaptchaToken = await executeRecaptcha(isSignUp ? 'signup' : 'signin');
+        if (recaptchaToken) {
+          // Verify reCAPTCHA on server
+          const { data: verifyData, error: verifyError } = await supabase.functions.invoke("verify-recaptcha", {
+            body: { token: recaptchaToken }
+          });
+
+          if (verifyError || !verifyData?.success) {
+            toast({
+              title: "Security Check Failed",
+              description: "Please try again or refresh the page.",
+              variant: "destructive"
+            });
+            setLoading(false);
+            return;
+          }
+        }
       }
 
       if (isSignUp) {
@@ -276,7 +355,19 @@ export default function Auth() {
                 />
               </svg>
             )}
+            Continue with Google
           </Button>
+
+          {/* reCAPTCHA badge notice */}
+          {RECAPTCHA_SITE_KEY && (
+            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1 mt-4">
+              <ShieldCheck size={14} />
+              Protected by reCAPTCHA
+            </p>
+          )}
+          {recaptchaError && (
+            <p className="text-xs text-warning text-center mt-2">{recaptchaError}</p>
+          )}
 
           {/* Toggle */}
           <div className="mt-6 text-center">
