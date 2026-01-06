@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import {
   MessageCircle,
@@ -14,7 +14,8 @@ import {
   MoreVertical,
   Paperclip,
   FileIcon,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Reply
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { FileAttachment } from './FileAttachment';
+import { ReplyPreview } from './ReplyPreview';
+import { ReplyTo } from '@/hooks/useChat';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
@@ -53,8 +56,16 @@ export function AdminChatPanel() {
   const [sending, setSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [replyTo, setReplyTo] = useState<ReplyTo | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Create a map of messages for quick lookup when showing reply context
+  const messagesMap = useMemo(() => {
+    const map = new Map<string, typeof messages[0]>();
+    messages.forEach(m => map.set(m.id, m));
+    return map;
+  }, [messages]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -83,9 +94,10 @@ export function AdminChatPanel() {
 
     setSending(true);
     try {
-      await sendReply(inputValue.trim(), selectedFile || undefined);
+      await sendReply(inputValue.trim(), selectedFile || undefined, replyTo?.id);
       setInputValue('');
       setSelectedFile(null);
+      setReplyTo(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -98,6 +110,14 @@ export function AdminChatPanel() {
     } finally {
       setSending(false);
     }
+  };
+
+  const handleReply = (message: typeof messages[0]) => {
+    setReplyTo({
+      id: message.id,
+      content: message.content,
+      sender_type: message.sender_type,
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -354,6 +374,7 @@ export function AdminChatPanel() {
                   messages.map((message, index) => {
                     const isAdmin = message.sender_type === 'admin';
                     const showAvatar = index === 0 || messages[index - 1].sender_type !== message.sender_type;
+                    const replyToMessage = message.reply_to_id ? messagesMap.get(message.reply_to_id) : null;
 
                     return (
                       <div key={message.id} className={`flex ${isAdmin ? 'justify-end' : 'justify-start'} group animate-in slide-in-from-bottom-2 fade-in duration-300`}>
@@ -364,13 +385,34 @@ export function AdminChatPanel() {
 
                           <div className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}>
                             <div
-                              className={`px-4 py-2.5 rounded-2xl shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words ${isAdmin
+                              className={`px-4 py-2.5 rounded-2xl shadow-sm text-sm leading-relaxed whitespace-pre-wrap break-words relative ${isAdmin
                                   ? 'bg-primary text-primary-foreground rounded-tr-none'
                                   : 'bg-secondary/80 backdrop-blur-sm text-foreground rounded-tl-none border border-border/10'
                                 }`}
                             >
+                              {/* Reply context */}
+                              {replyToMessage && (
+                                <ReplyPreview
+                                  replyTo={{
+                                    id: replyToMessage.id,
+                                    content: replyToMessage.content,
+                                    sender_type: replyToMessage.sender_type,
+                                  }}
+                                  onClear={() => {}}
+                                  variant="message"
+                                />
+                              )}
                               {message.content}
                               {renderFileAttachment(message)}
+                              {/* Reply button */}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className={`absolute -bottom-1 ${isAdmin ? '-left-8' : '-right-8'} h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity`}
+                                onClick={() => handleReply(message)}
+                              >
+                                <Reply className="h-3.5 w-3.5" />
+                              </Button>
                             </div>
                             <span className={`text-[10px] text-muted-foreground mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity`}>
                               {format(new Date(message.created_at), 'hh:mm a')}
@@ -383,6 +425,13 @@ export function AdminChatPanel() {
                 )}
               </div>
             </div>
+
+            {/* Reply Preview */}
+            {replyTo && (
+              <div className="px-4 py-2 border-t border-border/30 bg-background/40">
+                <ReplyPreview replyTo={replyTo} onClear={() => setReplyTo(null)} />
+              </div>
+            )}
 
             {/* Selected File Preview */}
             {selectedFile && (

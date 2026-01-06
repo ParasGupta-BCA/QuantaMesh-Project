@@ -14,6 +14,13 @@ export interface Message {
   file_name?: string | null;
   file_type?: string | null;
   file_size?: number | null;
+  reply_to_id?: string | null;
+}
+
+export interface ReplyTo {
+  id: string;
+  content: string;
+  sender_type: 'client' | 'admin';
 }
 
 export interface Conversation {
@@ -102,8 +109,8 @@ export function useChat() {
     }
   }, []);
 
-  // Send message with optional file
-  const sendMessage = async (content: string, file?: File) => {
+  // Send message with optional file and reply reference
+  const sendMessage = async (content: string, file?: File, replyToId?: string) => {
     if (!user || !conversation) return;
 
     let fileData: { file_url: string; file_name: string; file_type: string; file_size: number } | null = null;
@@ -142,6 +149,7 @@ export function useChat() {
         sender_id: user.id,
         sender_type: 'client',
         content: content || (fileData ? `Shared a file: ${fileData.file_name}` : ''),
+        reply_to_id: replyToId || null,
         ...(fileData && {
           file_url: fileData.file_url,
           file_name: fileData.file_name,
