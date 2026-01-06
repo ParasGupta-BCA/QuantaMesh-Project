@@ -1,15 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Image as ImageIcon } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Image as ImageIcon, Reply } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { useChat } from '@/hooks/useChat';
+import { useChat, ReplyTo } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { FileAttachment } from './FileAttachment';
+import { ReplyPreview } from './ReplyPreview';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
@@ -27,8 +28,16 @@ export function ClientChatWidget() {
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [replyTo, setReplyTo] = useState<ReplyTo | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Create a map of messages for quick lookup when showing reply context
+  const messagesMap = useMemo(() => {
+    const map = new Map<string, typeof messages[0]>();
+    messages.forEach(m => map.set(m.id, m));
+    return map;
+  }, [messages]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -76,9 +85,10 @@ export function ClientChatWidget() {
 
     setSending(true);
     try {
-      await sendMessage(inputValue.trim(), selectedFile || undefined);
+      await sendMessage(inputValue.trim(), selectedFile || undefined, replyTo?.id);
       setInputValue('');
       setSelectedFile(null);
+      setReplyTo(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -91,6 +101,14 @@ export function ClientChatWidget() {
     } finally {
       setSending(false);
     }
+  };
+
+  const handleReply = (message: typeof messages[0]) => {
+    setReplyTo({
+      id: message.id,
+      content: message.content,
+      sender_type: message.sender_type,
+    });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -200,36 +218,68 @@ export function ClientChatWidget() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender_type === 'client' ? 'justify-end' : 'justify-start'
-                        }`}
-                    >
+                  {messages.map((message) => {
+                    const replyToMessage = message.reply_to_id ? messagesMap.get(message.reply_to_id) : null;
+                    
+                    return (
                       <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-2 ${message.sender_type === 'client'
-                          ? 'bg-primary text-primary-foreground rounded-br-md'
-                          : 'bg-secondary text-secondary-foreground rounded-bl-md'
-                          }`}
+                        key={message.id}
+                        className={`flex ${message.sender_type === 'client' ? 'justify-end' : 'justify-start'} group`}
                       >
-                        <p className="text-sm whitespace-pre-wrap break-words">
-                          {message.content}
-                        </p>
-                        {renderFileAttachment(message)}
-                        <p
-                          className={`text-xs mt-1 ${message.sender_type === 'client'
-                            ? 'text-primary-foreground/70'
-                            : 'text-muted-foreground'
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-4 py-2 ${message.sender_type === 'client'
+                            ? 'bg-primary text-primary-foreground rounded-br-md'
+                            : 'bg-secondary text-secondary-foreground rounded-bl-md'
                             }`}
                         >
-                          {format(new Date(message.created_at), 'HH:mm')}
-                        </p>
+                          {/* Reply context */}
+                          {replyToMessage && (
+                            <ReplyPreview
+                              replyTo={{
+                                id: replyToMessage.id,
+                                content: replyToMessage.content,
+                                sender_type: replyToMessage.sender_type,
+                              }}
+                              onClear={() => {}}
+                              variant="message"
+                            />
+                          )}
+                          <p className="text-sm whitespace-pre-wrap break-words">
+                            {message.content}
+                          </p>
+                          {renderFileAttachment(message)}
+                          <div className="flex items-center justify-between gap-2 mt-1">
+                            <p
+                              className={`text-xs ${message.sender_type === 'client'
+                                ? 'text-primary-foreground/70'
+                                : 'text-muted-foreground'
+                                }`}
+                            >
+                              {format(new Date(message.created_at), 'HH:mm')}
+                            </p>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => handleReply(message)}
+                            >
+                              <Reply className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </ScrollArea>
+
+            {/* Reply Preview */}
+            {replyTo && (
+              <div className="px-4 py-2 border-t border-border bg-secondary/30">
+                <ReplyPreview replyTo={replyTo} onClear={() => setReplyTo(null)} />
+              </div>
+            )}
 
             {/* Selected File Preview */}
             {selectedFile && (

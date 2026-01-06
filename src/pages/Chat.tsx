@@ -1,16 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/hooks/useAuth';
-import { useChat } from '@/hooks/useChat';
+import { useChat, ReplyTo } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, FileIcon } from 'lucide-react';
+import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, FileIcon, Reply } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FileAttachment } from '@/components/chat/FileAttachment';
+import { ReplyPreview } from '@/components/chat/ReplyPreview';
 export default function Chat() {
   const { user, loading: authLoading } = useAuth();
   const { conversation, messages, loading, sendMessage, markAsRead, uploading } = useChat();
@@ -18,8 +19,16 @@ export default function Chat() {
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [replyTo, setReplyTo] = useState<ReplyTo | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Create a map of messages for quick lookup when showing reply context
+  const messagesMap = useMemo(() => {
+    const map = new Map<string, typeof messages[0]>();
+    messages.forEach(m => map.set(m.id, m));
+    return map;
+  }, [messages]);
 
   // Mark messages as read when page loads
   useEffect(() => {
@@ -40,9 +49,10 @@ export default function Chat() {
 
     setSending(true);
     try {
-      await sendMessage(inputValue.trim() || (selectedFile ? `Sent a file: ${selectedFile.name}` : ''), selectedFile || undefined);
+      await sendMessage(inputValue.trim() || (selectedFile ? `Sent a file: ${selectedFile.name}` : ''), selectedFile || undefined, replyTo?.id);
       setInputValue('');
       setSelectedFile(null);
+      setReplyTo(null);
     } catch (error) {
       toast({
         title: 'Error',
@@ -52,6 +62,14 @@ export default function Chat() {
     } finally {
       setSending(false);
     }
+  };
+
+  const handleReply = (message: typeof messages[0]) => {
+    setReplyTo({
+      id: message.id,
+      content: message.content,
+      sender_type: message.sender_type,
+    });
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,21 +251,44 @@ export default function Chat() {
               <div className="space-y-6 pb-4">
                 {messages.map((message, index) => {
                   const isClient = message.sender_type === 'client';
+                  const replyToMessage = message.reply_to_id ? messagesMap.get(message.reply_to_id) : null;
+                  
                   return (
                     <div
                       key={message.id}
-                      className={`flex w-full ${isClient ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                      className={`flex w-full ${isClient ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300 group`}
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <div className={`flex flex-col gap-1 max-w-[85%] md:max-w-[70%] ${isClient ? 'items-end' : 'items-start'}`}>
                         <div
-                          className={`rounded-2xl px-5 py-3 shadow-sm text-[15px] leading-relaxed relative group ${isClient
+                          className={`rounded-2xl px-5 py-3 shadow-sm text-[15px] leading-relaxed relative ${isClient
                             ? 'bg-primary text-primary-foreground rounded-br-sm'
                             : 'bg-card border border-border/50 text-card-foreground rounded-bl-sm'
                             }`}
                         >
+                          {/* Reply context */}
+                          {replyToMessage && (
+                            <ReplyPreview
+                              replyTo={{
+                                id: replyToMessage.id,
+                                content: replyToMessage.content,
+                                sender_type: replyToMessage.sender_type,
+                              }}
+                              onClear={() => {}}
+                              variant="message"
+                            />
+                          )}
                           {renderFileAttachment(message)}
                           {message.content && !message.content.startsWith('Sent a file:') && message.content}
+                          {/* Reply button */}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute -bottom-1 -right-8 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => handleReply(message)}
+                          >
+                            <Reply className="h-3.5 w-3.5" />
+                          </Button>
                         </div>
                         <span className="text-[11px] text-muted-foreground/60 px-1 select-none">
                           {format(new Date(message.created_at), 'h:mm a')}
@@ -268,6 +309,10 @@ export default function Chat() {
               </div>
             ) : (
               <div className="space-y-3 max-w-4xl mx-auto">
+                {/* Reply Preview */}
+                {replyTo && (
+                  <ReplyPreview replyTo={replyTo} onClear={() => setReplyTo(null)} />
+                )}
                 {selectedFile && (
                   <div className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg">
                     {selectedFile.type.startsWith('image/') ? (

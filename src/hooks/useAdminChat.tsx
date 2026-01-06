@@ -99,8 +99,8 @@ export function useAdminChat() {
     }
   }, []);
 
-  // Send reply with optional file and email notification
-  const sendReply = async (content: string, file?: File) => {
+  // Send reply with optional file, email notification, and reply reference
+  const sendReply = async (content: string, file?: File, replyToId?: string) => {
     if (!user || !selectedConversation) return;
 
     let fileData: { file_url: string; file_name: string; file_type: string; file_size: number } | null = null;
@@ -139,6 +139,7 @@ export function useAdminChat() {
         sender_id: user.id,
         sender_type: 'admin',
         content: content || (fileData ? `Shared a file: ${fileData.file_name}` : ''),
+        reply_to_id: replyToId || null,
         ...(fileData && {
           file_url: fileData.file_url,
           file_name: fileData.file_name,
