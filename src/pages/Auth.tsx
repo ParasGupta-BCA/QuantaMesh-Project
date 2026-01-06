@@ -1,15 +1,64 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Mail, Lock, User, ShieldCheck } from "lucide-react";
+import { Loader2, Mail, Lock, User, ShieldCheck, AlertTriangle, X } from "lucide-react";
 import { z } from "zod";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
+
+// OAuth error information with human-readable messages and fix steps
+const OAUTH_ERROR_INFO: Record<string, { title: string; steps: string[] }> = {
+  invalid_client: {
+    title: "Google OAuth Client Configuration Error",
+    steps: [
+      "Open Google Cloud Console → Credentials",
+      "Ensure you're using a 'Web application' OAuth Client (not Android/iOS/Desktop)",
+      "Copy Client ID + Client Secret from the SAME OAuth client",
+      "Paste them in Lovable Cloud → Users → Auth Settings → Google",
+      "If unsure, generate a NEW Client Secret and update it",
+    ],
+  },
+  redirect_uri_mismatch: {
+    title: "Redirect URI Mismatch",
+    steps: [
+      "Open Lovable Cloud → Users → Auth Settings → Google",
+      "Copy the Callback/Redirect URL shown there",
+      "In Google Cloud Console → Credentials → your Web OAuth client",
+      "Add that EXACT URL to 'Authorized redirect URIs'",
+      "Also add your site (https://www.quantamesh.store) to 'Authorized JavaScript origins'",
+    ],
+  },
+  access_denied: {
+    title: "Access Denied",
+    steps: [
+      "If your app is in 'Testing' mode on Google Consent Screen, add your email as a Test User",
+      "Go to Google Cloud Console → OAuth consent screen → Test users",
+      "Add the email you're trying to sign in with",
+    ],
+  },
+  server_error: {
+    title: "Server Error During OAuth",
+    steps: [
+      "This usually means the Client ID/Secret is invalid or mismatched",
+      "In Lovable Cloud, verify the Google Client ID and Secret are correct",
+      "Try generating a new Client Secret in Google Cloud Console and updating it",
+    ],
+  },
+  unexpected_failure: {
+    title: "Unexpected OAuth Failure",
+    steps: [
+      "Check that your Google OAuth Client ID and Secret are from a 'Web application' client",
+      "Ensure the redirect URI in Google matches the one shown in Lovable Cloud",
+      "Try regenerating the Client Secret and updating it in Lovable Cloud",
+    ],
+  },
+};
 
 // reCAPTCHA site key from environment
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || "";
@@ -44,6 +93,7 @@ export default function Auth() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
+  const [oauthErrorDismissed, setOauthErrorDismissed] = useState(false);
   
   const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
@@ -51,6 +101,46 @@ export default function Auth() {
 
   // Get redirect URL from query params
   const redirectUrl = searchParams.get('redirect') || '/';
+
+  // Parse OAuth error from URL (comes from failed Google login callback)
+  const oauthError = useMemo(() => {
+    const errorCode = searchParams.get('error_code') || searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    
+    if (!errorCode && !errorDescription) return null;
+    
+    // Find matching error info
+    let errorInfo = OAUTH_ERROR_INFO[errorCode || ''];
+    
+    // Check if description contains known error patterns
+    if (!errorInfo && errorDescription) {
+      if (errorDescription.includes('invalid_client')) {
+        errorInfo = OAUTH_ERROR_INFO.invalid_client;
+      } else if (errorDescription.includes('redirect_uri')) {
+        errorInfo = OAUTH_ERROR_INFO.redirect_uri_mismatch;
+      } else if (errorDescription.includes('Unable to exchange')) {
+        errorInfo = OAUTH_ERROR_INFO.invalid_client;
+      }
+    }
+    
+    // Fallback for unknown errors
+    if (!errorInfo) {
+      errorInfo = {
+        title: "OAuth Authentication Error",
+        steps: [
+          "Check your Google OAuth configuration in Lovable Cloud",
+          "Verify Client ID and Secret are correct",
+          "Ensure redirect URIs match exactly",
+        ],
+      };
+    }
+    
+    return {
+      code: errorCode,
+      description: errorDescription ? decodeURIComponent(errorDescription.replace(/\+/g, ' ')) : null,
+      ...errorInfo,
+    };
+  }, [searchParams]);
 
   // Load reCAPTCHA script
   useEffect(() => {
@@ -224,6 +314,35 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-20">
       <div className="w-full max-w-md">
+        {/* OAuth Error Banner */}
+        {oauthError && !oauthErrorDismissed && (
+          <Alert variant="destructive" className="mb-4 relative">
+            <AlertTriangle className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 h-6 w-6"
+              onClick={() => setOauthErrorDismissed(true)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <AlertTitle className="pr-8">{oauthError.title}</AlertTitle>
+            <AlertDescription className="mt-2">
+              {oauthError.description && (
+                <p className="text-xs mb-3 opacity-80 break-words">
+                  Error: {oauthError.description}
+                </p>
+              )}
+              <p className="font-medium mb-2">How to fix:</p>
+              <ol className="list-decimal list-inside space-y-1 text-sm">
+                {oauthError.steps.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ol>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="glass-card p-8 md:p-10">
           {/* Header */}
           <div className="text-center mb-8">
