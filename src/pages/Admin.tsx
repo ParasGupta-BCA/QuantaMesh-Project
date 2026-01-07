@@ -8,14 +8,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star } from "lucide-react";
+import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users } from "lucide-react";
 import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminMessages } from "@/components/admin/AdminMessages";
 import { AdminReviews } from "@/components/admin/AdminReviews";
+import { AdminLeads } from "@/components/admin/AdminLeads";
 import { Order, ContactMessage, Review } from "@/types/admin";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
+
+interface Lead {
+  id: string;
+  name: string;
+  email: string;
+  source: string;
+  status: string;
+  niche: string | null;
+  notes: string | null;
+  created_at: string;
+  last_contacted_at: string | null;
+}
+
+interface EmailSequence {
+  id: string;
+  lead_id: string;
+  sequence_type: string;
+  subject: string;
+  content: string;
+  sent_at: string;
+  status: string;
+}
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -25,6 +48,8 @@ export default function Admin() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [emailSequences, setEmailSequences] = useState<EmailSequence[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -39,31 +64,59 @@ export default function Admin() {
     }
   }, [user, authLoading, isAdmin, adminLoading, navigate]);
 
+  const fetchData = async () => {
+    if (!isAdmin) return;
+
+    try {
+      const [ordersResult, messagesResult, reviewsResult, leadsResult, emailsResult] = await Promise.all([
+        supabase.from("orders").select("*").order("created_at", { ascending: false }),
+        supabase.from("contact_messages").select("*").order("created_at", { ascending: false }),
+        supabase.from("reviews").select("*").order("created_at", { ascending: false }),
+        supabase.from("leads").select("*").order("created_at", { ascending: false }),
+        supabase.from("email_sequences").select("*").order("sent_at", { ascending: false }),
+      ]);
+
+      if (ordersResult.data) setOrders(ordersResult.data);
+      if (messagesResult.data) setMessages(messagesResult.data);
+      if (reviewsResult.data) setReviews(reviewsResult.data as Review[]);
+      if (leadsResult.data) setLeads(leadsResult.data as Lead[]);
+      if (emailsResult.data) setEmailSequences(emailsResult.data as EmailSequence[]);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!isAdmin) return;
-
-      try {
-        const [ordersResult, messagesResult, reviewsResult] = await Promise.all([
-          supabase.from("orders").select("*").order("created_at", { ascending: false }),
-          supabase.from("contact_messages").select("*").order("created_at", { ascending: false }),
-          supabase.from("reviews").select("*").order("created_at", { ascending: false }),
-        ]);
-
-        if (ordersResult.data) setOrders(ordersResult.data);
-        if (messagesResult.data) setMessages(messagesResult.data);
-        if (reviewsResult.data) setReviews(reviewsResult.data as Review[]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoadingData(false);
-      }
-    };
-
     if (isAdmin) {
       fetchData();
     }
   }, [isAdmin]);
+
+  const updateLeadStatus = async (leadId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase.from("leads").update({ status: newStatus }).eq("id", leadId);
+      if (error) throw error;
+      setLeads((prev) => prev.map((lead) => (lead.id === leadId ? { ...lead, status: newStatus } : lead)));
+      toast({ title: "Lead Updated", description: `Status changed to ${newStatus}` });
+    } catch (error: unknown) {
+      logError("Update lead status", error);
+      toast({ title: "Error", description: getSafeErrorMessage(error, "Failed to update"), variant: "destructive" });
+    }
+  };
+
+  const deleteLead = async (leadId: string) => {
+    try {
+      const { error } = await supabase.from("leads").delete().eq("id", leadId);
+      if (error) throw error;
+      setLeads((prev) => prev.filter((lead) => lead.id !== leadId));
+      toast({ title: "Lead Deleted" });
+    } catch (error: unknown) {
+      logError("Delete lead", error);
+      toast({ title: "Error", description: getSafeErrorMessage(error, "Failed to delete"), variant: "destructive" });
+    }
+  };
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
@@ -231,6 +284,13 @@ export default function Admin() {
                   <Star className="h-4 w-4" />
                   Reviews <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{reviews.length}</Badge>
                 </TabsTrigger>
+                <TabsTrigger 
+                  value="leads" 
+                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
+                >
+                  <Users className="h-4 w-4" />
+                  Leads <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{leads.length}</Badge>
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -259,6 +319,17 @@ export default function Admin() {
                 reviews={reviews}
                 updateReviewApproval={updateReviewApproval}
                 loading={loadingData}
+              />
+            </TabsContent>
+
+            <TabsContent value="leads" className="outline-none focus:ring-0 animate-slide-up">
+              <AdminLeads
+                leads={leads}
+                emailSequences={emailSequences}
+                loading={loadingData}
+                onRefresh={fetchData}
+                onUpdateStatus={updateLeadStatus}
+                onDeleteLead={deleteLead}
               />
             </TabsContent>
           </Tabs>

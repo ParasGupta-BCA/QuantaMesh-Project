@@ -5,3 +5,9 @@ verify_jwt = true
 
 [functions.send-review-notification]
 verify_jwt = false
+
+[functions.send-lead-email]
+verify_jwt = false
+
+[functions.generate-leads]
+verify_jwt = true

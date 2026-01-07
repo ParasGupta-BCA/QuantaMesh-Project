@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_generated_leads: {
+        Row: {
+          created_at: string
+          id: string
+          processed: boolean
+          results: Json
+          search_query: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          processed?: boolean
+          results?: Json
+          search_query: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          processed?: boolean
+          results?: Json
+          search_query?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -77,6 +101,89 @@ export type Database = {
           user_email?: string
           user_id?: string
           user_name?: string | null
+        }
+        Relationships: []
+      }
+      email_sequences: {
+        Row: {
+          clicked_at: string | null
+          content: string
+          id: string
+          lead_id: string
+          opened_at: string | null
+          sent_at: string
+          sequence_type: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          content: string
+          id?: string
+          lead_id: string
+          opened_at?: string | null
+          sent_at?: string
+          sequence_type: string
+          status?: string
+          subject: string
+        }
+        Update: {
+          clicked_at?: string | null
+          content?: string
+          id?: string
+          lead_id?: string
+          opened_at?: string | null
+          sent_at?: string
+          sequence_type?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_sequences_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          last_contacted_at: string | null
+          name: string
+          niche: string | null
+          notes: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          last_contacted_at?: string | null
+          name: string
+          niche?: string | null
+          notes?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          last_contacted_at?: string | null
+          name?: string
+          niche?: string | null
+          notes?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
