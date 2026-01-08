@@ -197,27 +197,179 @@ serve(async (req) => {
         <!DOCTYPE html>
         <html>
         <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .content { white-space: pre-wrap; }
-            .cta { display: inline-block; background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin: 20px 0; }
-            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+              line-height: 1.7; 
+              color: #1a1a2e; 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              padding: 40px 20px;
+            }
+            .container { 
+              max-width: 600px; 
+              margin: 0 auto; 
+              background: #ffffff;
+              border-radius: 24px;
+              overflow: hidden;
+              box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+            .header { 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              padding: 40px 30px;
+              text-align: center;
+            }
+            .header h1 { 
+              color: #ffffff; 
+              font-size: 32px; 
+              font-weight: 700;
+              letter-spacing: -0.5px;
+              margin: 0;
+              text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .header p {
+              color: rgba(255,255,255,0.9);
+              font-size: 14px;
+              margin-top: 8px;
+            }
+            .body-content { 
+              padding: 40px 35px;
+            }
+            .content { 
+              font-size: 16px;
+              color: #4a5568;
+              line-height: 1.8;
+            }
+            .cta-wrapper {
+              text-align: center;
+              padding: 30px 0 20px;
+            }
+            .cta { 
+              display: inline-block; 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: #ffffff !important; 
+              padding: 18px 48px; 
+              border-radius: 50px;
+              text-decoration: none; 
+              font-weight: 600;
+              font-size: 16px;
+              letter-spacing: 0.3px;
+              box-shadow: 0 10px 40px -10px rgba(102, 126, 234, 0.5);
+              transition: all 0.3s ease;
+            }
+            .cta:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 15px 50px -10px rgba(102, 126, 234, 0.6);
+            }
+            .cta-arrow {
+              display: inline-block;
+              margin-left: 8px;
+              transition: transform 0.3s ease;
+            }
+            .features {
+              background: #f8fafc;
+              border-radius: 16px;
+              padding: 25px;
+              margin: 25px 0;
+            }
+            .feature-item {
+              display: flex;
+              align-items: center;
+              margin: 12px 0;
+              font-size: 15px;
+              color: #4a5568;
+            }
+            .feature-icon {
+              width: 24px;
+              height: 24px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              border-radius: 50%;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+              font-size: 12px;
+              color: white;
+            }
+            .footer { 
+              background: #f8fafc;
+              padding: 30px 35px;
+              text-align: center;
+              border-top: 1px solid #e2e8f0;
+            }
+            .footer p { 
+              font-size: 13px; 
+              color: #718096;
+              margin: 5px 0;
+            }
+            .social-links {
+              margin: 20px 0;
+            }
+            .social-link {
+              display: inline-block;
+              width: 36px;
+              height: 36px;
+              background: #e2e8f0;
+              border-radius: 50%;
+              margin: 0 5px;
+              line-height: 36px;
+              font-size: 14px;
+              color: #667eea;
+              text-decoration: none;
+            }
+            .discount-badge {
+              display: inline-block;
+              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+              color: white;
+              padding: 8px 20px;
+              border-radius: 20px;
+              font-size: 14px;
+              font-weight: 600;
+              margin: 15px 0;
+            }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1 style="color: #6366f1;">Quanta Mesh</h1>
+              <h1>🚀 Quanta Mesh</h1>
+              <p>Your Android App Publishing Partner</p>
             </div>
-            <div class="content">${emailContent.content.replace(/\n/g, "<br>")}</div>
-            <div style="text-align: center;">
-              <a href="https://www.quantamesh.store/order" class="cta">Publish My App Now →</a>
+            <div class="body-content">
+              <div class="content">${emailContent.content.replace(/\n/g, "<br>")}</div>
+              
+              <div class="features">
+                <div class="feature-item">
+                  <span class="feature-icon">✓</span>
+                  <span>Fast Google Play Store publishing</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">✓</span>
+                  <span>Professional metadata & screenshots</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">✓</span>
+                  <span>100% Policy compliance guaranteed</span>
+                </div>
+              </div>
+              
+              <div class="cta-wrapper">
+                <span class="discount-badge">💰 $5 OFF - Limited Time!</span>
+                <br><br>
+                <a href="https://www.quantamesh.store/order" class="cta">
+                  Publish My App Now <span class="cta-arrow">→</span>
+                </a>
+              </div>
             </div>
             <div class="footer">
-              <p>© 2025 Quanta Mesh. All rights reserved.</p>
-              <p>You received this email because you signed up at quantamesh.store</p>
+              <p><strong>© 2025 Quanta Mesh</strong></p>
+              <p>Trusted by 500+ Android developers worldwide</p>
+              <p style="margin-top: 15px; font-size: 11px; color: #a0aec0;">
+                You received this email because you signed up at quantamesh.store<br>
+                <a href="https://www.quantamesh.store" style="color: #667eea;">Unsubscribe</a>
+              </p>
             </div>
           </div>
         </body>
