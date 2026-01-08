@@ -19,6 +19,41 @@ interface EmailRequest {
   sequenceType: "welcome" | "follow_up" | "follow_up_2" | "follow_up_3";
 }
 
+type ExtractedErrorInfo = {
+  message: string;
+  status: number;
+  name?: string;
+};
+
+function extractErrorInfo(error: unknown): ExtractedErrorInfo {
+  // Resend errors are often plain objects: { statusCode, name, message }
+  if (error && typeof error === "object") {
+    const anyErr = error as Record<string, unknown>;
+    const message = typeof anyErr.message === "string" ? anyErr.message : undefined;
+    const statusCode = typeof anyErr.statusCode === "number" ? anyErr.statusCode : undefined;
+    const name = typeof anyErr.name === "string" ? anyErr.name : undefined;
+
+    if (message) {
+      return {
+        message,
+        status: statusCode && statusCode >= 400 && statusCode <= 599 ? statusCode : 500,
+        name,
+      };
+    }
+
+    // Our own function may throw { error: "..." }
+    if (typeof anyErr.error === "string") {
+      return { message: anyErr.error, status: 500 };
+    }
+  }
+
+  if (error instanceof Error) {
+    return { message: error.message, status: 500 };
+  }
+
+  return { message: "Unknown error", status: 500 };
+}
+
 async function generateEmailWithAI(name: string, sequenceType: string): Promise<{ subject: string; content: string }> {
   const prompts: Record<string, string> = {
     welcome: `Write a friendly, professional welcome email for a new lead named "${name}" who just signed up on Quanta Mesh - an Android app publishing service. 
@@ -237,11 +272,16 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: unknown) {
-    console.error("Error in send-lead-email:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const info = extractErrorInfo(error);
+    console.error("Error in send-lead-email:", {
+      status: info.status,
+      name: info.name,
+      message: info.message,
+    });
+
     return new Response(
-      JSON.stringify({ error: message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: info.message, name: info.name }),
+      { status: info.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

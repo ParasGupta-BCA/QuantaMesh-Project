@@ -115,9 +115,29 @@ export function AdminLeads({
       onRefresh();
     } catch (error) {
       console.error("Error sending email:", error);
+
+      const raw = error instanceof Error ? error.message : String(error);
+      let description = "Please try again later";
+
+      const jsonMatch = raw.match(/\{[\s\S]*\}$/);
+      if (jsonMatch) {
+        try {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (typeof parsed?.error === "string") {
+            description = parsed.error;
+          } else {
+            description = raw;
+          }
+        } catch {
+          description = raw;
+        }
+      } else if (raw) {
+        description = raw;
+      }
+
       toast({
         title: "Failed to send email",
-        description: "Please try again later",
+        description,
         variant: "destructive",
       });
     } finally {
