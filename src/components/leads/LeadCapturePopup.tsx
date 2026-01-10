@@ -152,10 +152,10 @@ export function LeadCapturePopup() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md border-primary/20 bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-[95vw] sm:max-w-md mx-auto border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-4 sm:p-6 rounded-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
         <button
           onClick={handleDismiss}
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          className="absolute right-3 top-3 sm:right-4 sm:top-4 rounded-full p-1.5 bg-muted/50 opacity-70 ring-offset-background transition-all hover:opacity-100 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
@@ -163,42 +163,42 @@ export function LeadCapturePopup() {
 
         {!submitted ? (
           <>
-            <DialogHeader className="text-center space-y-3">
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30">
-                <Gift className="h-8 w-8 text-primary-foreground" />
+            <DialogHeader className="text-center space-y-2 sm:space-y-3 pt-2">
+              <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/30">
+                <Gift className="h-6 w-6 sm:h-8 sm:w-8 text-primary-foreground" />
               </div>
-              <DialogTitle className="text-2xl font-bold">
+              <DialogTitle className="text-xl sm:text-2xl font-bold leading-tight px-2">
                 Get $5 OFF Your First App! 🚀
               </DialogTitle>
-              <DialogDescription className="text-base">
+              <DialogDescription className="text-sm sm:text-base px-2 leading-relaxed">
                 Join 500+ developers who publish apps without the hassle. Get exclusive tips & a discount code!
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="lead-name">Your Name</Label>
+            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="lead-name" className="text-sm sm:text-base">Your Name</Label>
                 <Input
                   id="lead-name"
                   placeholder="John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className={errors.name ? "border-destructive" : ""}
+                  className={`h-11 sm:h-12 text-base ${errors.name ? "border-destructive" : ""}`}
                 />
                 {errors.name && (
                   <p className="text-xs text-destructive">{errors.name}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="lead-email">Email Address</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="lead-email" className="text-sm sm:text-base">Email Address</Label>
                 <Input
                   id="lead-email"
                   type="email"
                   placeholder="john@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={errors.email ? "border-destructive" : ""}
+                  className={`h-11 sm:h-12 text-base ${errors.email ? "border-destructive" : ""}`}
                 />
                 {errors.email && (
                   <p className="text-xs text-destructive">{errors.email}</p>
@@ -207,35 +207,34 @@ export function LeadCapturePopup() {
 
               <Button
                 type="submit"
-                className="w-full gap-2"
-                size="lg"
+                className="w-full gap-2 h-12 sm:h-14 text-base sm:text-lg font-semibold mt-2"
                 disabled={loading}
               >
                 {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-5 w-5" />
                 )}
                 Claim My Discount
               </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
+              <p className="text-xs sm:text-sm text-center text-muted-foreground pt-1">
                 No spam, unsubscribe anytime. We respect your privacy.
               </p>
             </form>
           </>
         ) : (
-          <div className="text-center py-6 space-y-4">
-            <div className="mx-auto w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center">
-              <CheckCircle2 className="h-8 w-8 text-green-500" />
+          <div className="text-center py-4 sm:py-6 space-y-3 sm:space-y-4">
+            <div className="mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-green-500/20 flex items-center justify-center">
+              <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8 text-green-500" />
             </div>
-            <DialogTitle className="text-2xl font-bold">
+            <DialogTitle className="text-xl sm:text-2xl font-bold">
               You're In! 🎉
             </DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogDescription className="text-sm sm:text-base px-2">
               Check your inbox for your exclusive $5 discount code and welcome guide!
             </DialogDescription>
-            <Button onClick={() => setOpen(false)} variant="outline" className="mt-4">
+            <Button onClick={() => setOpen(false)} variant="outline" className="mt-3 sm:mt-4 h-11 sm:h-12 px-6">
               Continue Browsing
             </Button>
           </div>
