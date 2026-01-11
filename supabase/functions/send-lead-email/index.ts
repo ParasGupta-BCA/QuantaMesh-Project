@@ -166,16 +166,19 @@ The Quanta Mesh Team`,
   }
 }
 
-// Apple-inspired email template
+// Apple-inspired email template with mobile-first inline styles
 function generateAppleStyleEmail(content: string, name: string): string {
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
   <meta name="color-scheme" content="light dark">
   <meta name="supported-color-schemes" content="light dark">
+  <title>Quanta Mesh</title>
   <!--[if mso]>
   <noscript>
     <xml>
@@ -184,370 +187,198 @@ function generateAppleStyleEmail(content: string, name: string): string {
       </o:OfficeDocumentSettings>
     </xml>
   </noscript>
+  <style>
+    table { border-collapse: collapse; }
+    td { font-family: Arial, sans-serif; }
+  </style>
   <![endif]-->
   <style>
-    :root {
-      color-scheme: light dark;
-      supported-color-schemes: light dark;
-    }
+    /* Reset */
+    body, table, td, p, a, li { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
     
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-    }
-    
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      line-height: 1.5; 
-      color: #1d1d1f;
-      background-color: #f5f5f7;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    
-    .wrapper {
-      width: 100%;
-      background-color: #f5f5f7;
-      padding: 40px 20px;
-    }
-    
-    .container { 
-      max-width: 680px; 
-      margin: 0 auto; 
-      background: #ffffff;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    }
-    
-    .hero-image {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-    
-    .content-wrapper {
-      padding: 48px 48px 40px;
-      text-align: center;
-    }
-    
-    .eyebrow {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: #86868b;
-      margin-bottom: 8px;
-    }
-    
-    .headline {
-      font-size: 40px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: #1d1d1f;
-      margin-bottom: 16px;
-    }
-    
-    .subheadline {
-      font-size: 21px;
-      font-weight: 400;
-      color: #86868b;
-      margin-bottom: 32px;
-      line-height: 1.4;
-    }
-    
-    .body-text {
-      font-size: 17px;
-      color: #1d1d1f;
-      line-height: 1.6;
-      text-align: left;
-      margin-bottom: 32px;
-    }
-    
-    .body-text p {
-      margin-bottom: 16px;
-    }
-    
-    .feature-grid {
-      display: table;
-      width: 100%;
-      margin: 32px 0;
-      border-spacing: 12px;
-    }
-    
-    .feature-row {
-      display: table-row;
-    }
-    
-    .feature-item {
-      display: table-cell;
-      width: 33.33%;
-      background: #f5f5f7;
-      border-radius: 12px;
-      padding: 24px 16px;
-      text-align: center;
-      vertical-align: top;
-    }
-    
-    .feature-icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-    
-    .feature-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #1d1d1f;
-      margin-bottom: 4px;
-    }
-    
-    .feature-desc {
-      font-size: 12px;
-      color: #86868b;
-    }
-    
-    .cta-section {
-      padding: 32px 0;
-      text-align: center;
-    }
-    
-    .discount-pill {
-      display: inline-block;
-      background: linear-gradient(135deg, #af52de 0%, #5e5ce6 100%);
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px 20px;
-      border-radius: 100px;
-      margin-bottom: 24px;
-      letter-spacing: 0.3px;
-    }
-    
-    .cta-button {
-      display: inline-block;
-      background: #0071e3;
-      color: #ffffff !important;
-      font-size: 17px;
-      font-weight: 400;
-      padding: 16px 32px;
-      border-radius: 980px;
-      text-decoration: none;
-      transition: background 0.2s ease;
-    }
-    
-    .cta-button:hover {
-      background: #0077ed;
-    }
-    
-    .cta-link {
-      display: block;
-      margin-top: 16px;
-      font-size: 17px;
-      color: #0071e3;
-      text-decoration: none;
-    }
-    
-    .divider {
-      height: 1px;
-      background: #d2d2d7;
-      margin: 40px 48px;
-    }
-    
-    .footer {
-      padding: 0 48px 40px;
-      text-align: center;
-    }
-    
-    .footer-logo {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1d1d1f;
-      margin-bottom: 16px;
-      letter-spacing: -0.02em;
-    }
-    
-    .footer-text {
-      font-size: 12px;
-      color: #86868b;
-      line-height: 1.6;
-      margin-bottom: 8px;
-    }
-    
-    .footer-links {
-      margin-top: 16px;
-    }
-    
-    .footer-link {
-      display: inline-block;
-      font-size: 12px;
-      color: #0071e3;
-      text-decoration: none;
-      margin: 0 8px;
-    }
-    
-    @media only screen and (max-width: 600px) {
-      .wrapper {
-        padding: 20px 16px;
-      }
-      
-      .content-wrapper {
-        padding: 32px 24px 28px;
-      }
-      
-      .headline {
-        font-size: 28px;
-      }
-      
-      .subheadline {
-        font-size: 17px;
-      }
-      
-      .body-text {
-        font-size: 15px;
-      }
-      
-      .feature-grid {
-        display: block;
-      }
-      
-      .feature-item {
-        display: block;
-        width: 100%;
-        margin-bottom: 12px;
-      }
-      
-      .divider {
-        margin: 32px 24px;
-      }
-      
-      .footer {
-        padding: 0 24px 32px;
-      }
-      
-      .cta-button {
-        display: block;
-        padding: 18px 32px;
-      }
-    }
-    
+    /* Dark mode */
     @media (prefers-color-scheme: dark) {
-      body {
-        background-color: #000000;
-        color: #f5f5f7;
-      }
-      
-      .wrapper {
-        background-color: #000000;
-      }
-      
-      .container {
-        background: #1d1d1f;
-      }
-      
-      .headline {
-        color: #f5f5f7;
-      }
-      
-      .body-text {
-        color: #f5f5f7;
-      }
-      
-      .feature-item {
-        background: #2d2d2f;
-      }
-      
-      .feature-title {
-        color: #f5f5f7;
-      }
-      
-      .divider {
-        background: #424245;
-      }
-      
-      .footer-logo {
-        color: #f5f5f7;
-      }
+      .dark-bg { background-color: #1d1d1f !important; }
+      .dark-text { color: #f5f5f7 !important; }
+      .dark-feature { background-color: #2d2d2f !important; }
     }
+    
+    [data-ogsc] .dark-bg { background-color: #1d1d1f !important; }
+    [data-ogsc] .dark-text { color: #f5f5f7 !important; }
+    [data-ogsc] .dark-feature { background-color: #2d2d2f !important; }
   </style>
 </head>
-<body>
-  <div class="wrapper">
-    <div class="container">
-      <!-- Hero Image -->
-      <img 
-        src="${BASE_URL}/email-hero-banner.png" 
-        alt="Quanta Mesh - Launch Your App" 
-        class="hero-image"
-        width="680"
-        style="width: 100%; height: auto; display: block;"
-      />
-      
-      <!-- Main Content -->
-      <div class="content-wrapper">
-        <p class="eyebrow">App Publishing Made Simple</p>
-        <h1 class="headline">Your app deserves<br/>to be live.</h1>
-        <p class="subheadline">We handle everything. You focus on building.</p>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+  
+  <!-- Wrapper Table -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f5f5f7;">
+    <tr>
+      <td align="center" style="padding: 24px 16px;">
         
-        <div class="body-text">
-          ${content.replace(/\n/g, "<br/>")}
-        </div>
-        
-        <!-- Features Grid -->
-        <table class="feature-grid" role="presentation" cellspacing="12" cellpadding="0">
-          <tr class="feature-row">
-            <td class="feature-item">
-              <div class="feature-icon">⚡️</div>
-              <div class="feature-title">24hr Delivery</div>
-              <div class="feature-desc">Lightning fast</div>
-            </td>
-            <td class="feature-item">
-              <div class="feature-icon">🛡️</div>
-              <div class="feature-title">Policy Safe</div>
-              <div class="feature-desc">100% compliant</div>
-            </td>
-            <td class="feature-item">
-              <div class="feature-icon">✨</div>
-              <div class="feature-title">Full Service</div>
-              <div class="feature-desc">We do it all</div>
+        <!-- Container -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden;" class="dark-bg">
+          
+          <!-- Hero Image -->
+          <tr>
+            <td>
+              <img src="${BASE_URL}/email-hero-banner.png" alt="Quanta Mesh" width="600" style="width: 100%; max-width: 600px; height: auto; display: block;">
             </td>
           </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 32px 24px 24px; text-align: center;">
+              
+              <!-- Eyebrow -->
+              <p style="margin: 0 0 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: #86868b;">
+                App Publishing Made Simple
+              </p>
+              
+              <!-- Headline -->
+              <h1 style="margin: 0 0 12px; font-size: 28px; font-weight: 700; line-height: 1.15; color: #1d1d1f; letter-spacing: -0.5px;" class="dark-text">
+                Your app deserves<br>to be live.
+              </h1>
+              
+              <!-- Subheadline -->
+              <p style="margin: 0 0 24px; font-size: 16px; font-weight: 400; line-height: 1.4; color: #86868b;">
+                We handle everything. You focus on building.
+              </p>
+              
+              <!-- Body Text -->
+              <div style="font-size: 15px; line-height: 1.6; color: #1d1d1f; text-align: left; margin-bottom: 24px;" class="dark-text">
+                ${content.replace(/\n/g, "<br>")}
+              </div>
+              
+            </td>
+          </tr>
+          
+          <!-- Features - Stacked for Mobile Compatibility -->
+          <tr>
+            <td style="padding: 0 24px 24px;">
+              
+              <!-- Feature 1 -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 12px;">
+                <tr>
+                  <td style="background-color: #f5f5f7; border-radius: 12px; padding: 20px; text-align: center;" class="dark-feature">
+                    <span style="font-size: 24px; display: block; margin-bottom: 6px;">⚡️</span>
+                    <span style="font-size: 14px; font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 2px;" class="dark-text">24hr Delivery</span>
+                    <span style="font-size: 12px; color: #86868b;">Lightning fast publishing</span>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Feature 2 -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 12px;">
+                <tr>
+                  <td style="background-color: #f5f5f7; border-radius: 12px; padding: 20px; text-align: center;" class="dark-feature">
+                    <span style="font-size: 24px; display: block; margin-bottom: 6px;">🛡️</span>
+                    <span style="font-size: 14px; font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 2px;" class="dark-text">Policy Safe</span>
+                    <span style="font-size: 12px; color: #86868b;">100% Google compliant</span>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Feature 3 -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 12px;">
+                <tr>
+                  <td style="background-color: #f5f5f7; border-radius: 12px; padding: 20px; text-align: center;" class="dark-feature">
+                    <span style="font-size: 24px; display: block; margin-bottom: 6px;">✨</span>
+                    <span style="font-size: 14px; font-weight: 600; color: #1d1d1f; display: block; margin-bottom: 2px;" class="dark-text">Full Service</span>
+                    <span style="font-size: 12px; color: #86868b;">We handle everything</span>
+                  </td>
+                </tr>
+              </table>
+              
+            </td>
+          </tr>
+          
+          <!-- CTA Section -->
+          <tr>
+            <td style="padding: 0 24px 32px; text-align: center;">
+              
+              <!-- Discount Badge -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom: 20px;">
+                    <span style="display: inline-block; background: linear-gradient(135deg, #af52de 0%, #5e5ce6 100%); color: #ffffff; font-size: 13px; font-weight: 600; padding: 10px 24px; border-radius: 50px;">
+                      🎁 $5 OFF — Your Exclusive Offer
+                    </span>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Primary CTA Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="https://www.quantamesh.store/order" target="_blank" style="display: inline-block; background-color: #0071e3; color: #ffffff; font-size: 16px; font-weight: 500; text-decoration: none; padding: 16px 40px; border-radius: 50px; min-width: 200px;">
+                      Publish Your App
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Secondary Link -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-top: 16px;">
+                    <a href="https://www.quantamesh.store/services" target="_blank" style="color: #0071e3; font-size: 15px; text-decoration: none;">
+                      Learn more →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+            </td>
+          </tr>
+          
+          <!-- Divider -->
+          <tr>
+            <td style="padding: 0 24px;">
+              <div style="height: 1px; background-color: #e5e5e5;"></div>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; text-align: center;">
+              
+              <!-- Logo -->
+              <p style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.5px;" class="dark-text">
+                Quanta Mesh
+              </p>
+              
+              <!-- Footer Text -->
+              <p style="margin: 0 0 8px; font-size: 12px; color: #86868b; line-height: 1.5;">
+                Trusted by 500+ developers worldwide.
+              </p>
+              <p style="margin: 0 0 16px; font-size: 11px; color: #86868b;">
+                © ${new Date().getFullYear()} Quanta Mesh. All rights reserved.
+              </p>
+              
+              <!-- Footer Links -->
+              <p style="margin: 0; font-size: 12px;">
+                <a href="https://www.quantamesh.store" target="_blank" style="color: #0071e3; text-decoration: none; margin: 0 8px;">Website</a>
+                <a href="https://www.quantamesh.store/privacy-policy" target="_blank" style="color: #0071e3; text-decoration: none; margin: 0 8px;">Privacy</a>
+                <a href="mailto:parasgupta4494@gmail.com" style="color: #0071e3; text-decoration: none; margin: 0 8px;">Contact</a>
+              </p>
+              
+              <p style="margin: 16px 0 0; font-size: 10px; color: #adadad;">
+                You're receiving this because you signed up at quantamesh.store
+              </p>
+              
+            </td>
+          </tr>
+          
         </table>
         
-        <!-- CTA Section -->
-        <div class="cta-section">
-          <span class="discount-pill">🎁 $5 OFF — Your Exclusive Offer</span>
-          <br/><br/>
-          <a href="https://www.quantamesh.store/order" class="cta-button">
-            Publish Your App
-          </a>
-          <a href="https://www.quantamesh.store/services" class="cta-link">
-            Learn more →
-          </a>
-        </div>
-      </div>
-      
-      <div class="divider"></div>
-      
-      <!-- Footer -->
-      <div class="footer">
-        <p class="footer-logo">Quanta Mesh</p>
-        <p class="footer-text">
-          Trusted by 500+ developers worldwide.<br/>
-          © 2025 Quanta Mesh. All rights reserved.
-        </p>
-        <p class="footer-text">
-          You're receiving this because you signed up at quantamesh.store
-        </p>
-        <div class="footer-links">
-          <a href="https://www.quantamesh.store" class="footer-link">Visit Website</a>
-          <a href="https://www.quantamesh.store/privacy-policy" class="footer-link">Privacy</a>
-          <a href="mailto:parasgupta4494@gmail.com" class="footer-link">Contact</a>
-        </div>
-      </div>
-    </div>
-  </div>
+      </td>
+    </tr>
+  </table>
+  
 </body>
 </html>
 `;
