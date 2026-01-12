@@ -19,7 +19,9 @@ interface EmailRequest {
   leadId?: string;
   email: string;
   name: string;
-  sequenceType: "welcome" | "follow_up" | "follow_up_2" | "follow_up_3";
+  sequenceType: "welcome" | "follow_up" | "follow_up_2" | "follow_up_3" | 
+    "tip_aso" | "tip_screenshots" | "tip_description" | "tip_keywords" | 
+    "tip_updates" | "tip_reviews" | "tip_monetization";
 }
 
 type ExtractedErrorInfo = {
@@ -99,6 +101,77 @@ Key points:
 - Thank them for their time if they're not interested
 
 Keep it under 80 words. Be respectful of their decision.`,
+
+    // Daily engagement tips
+    tip_aso: `Write a helpful email for "${name}" about App Store Optimization (ASO).
+
+Key points:
+- Share 2-3 practical ASO tips for Google Play
+- Explain how good ASO increases downloads
+- Mention that we optimize listings as part of our service
+- Soft CTA to publish with us
+
+Keep it under 100 words. Be educational and valuable.`,
+
+    tip_screenshots: `Write a helpful email for "${name}" about app screenshots.
+
+Key points:
+- Share tips for creating compelling app screenshots
+- Mention optimal dimensions and count for Google Play
+- Explain screenshots impact on conversion rates
+- We create feature graphics as an add-on
+
+Keep it under 100 words. Be practical and helpful.`,
+
+    tip_description: `Write a helpful email for "${name}" about writing app descriptions.
+
+Key points:
+- Tips for writing effective Google Play descriptions
+- Importance of first 80 characters
+- Using bullet points and emojis strategically
+- We help optimize descriptions in our service
+
+Keep it under 100 words. Be actionable.`,
+
+    tip_keywords: `Write a helpful email for "${name}" about keyword optimization.
+
+Key points:
+- How to research keywords for your app
+- Where to place keywords in the listing
+- Long-tail vs competitive keywords
+- We help with keyword research
+
+Keep it under 100 words. Be educational.`,
+
+    tip_updates: `Write a helpful email for "${name}" about app update strategies.
+
+Key points:
+- Why regular updates matter for ranking
+- What to include in update notes
+- How updates affect user retention
+- We can help with future updates too
+
+Keep it under 100 words. Be strategic.`,
+
+    tip_reviews: `Write a helpful email for "${name}" about getting app reviews.
+
+Key points:
+- Tips for encouraging positive reviews
+- Best timing to ask for reviews
+- How to respond to negative feedback
+- Good reviews = more downloads
+
+Keep it under 100 words. Be practical.`,
+
+    tip_monetization: `Write a helpful email for "${name}" about app monetization.
+
+Key points:
+- Overview of monetization options (ads, IAP, subscriptions)
+- Which model works for different app types
+- Setting up monetization on Google Play
+- We ensure proper monetization setup
+
+Keep it under 100 words. Be informative.`,
   };
 
   try {
