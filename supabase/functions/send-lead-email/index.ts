@@ -240,7 +240,16 @@ The Quanta Mesh Team`,
 }
 
 // Apple-inspired email template with mobile-first inline styles
-function generateAppleStyleEmail(content: string, name: string): string {
+function generateAppleStyleEmail(content: string, name: string, emailId: string, leadId: string): string {
+  const trackingBaseUrl = `${SUPABASE_URL}/functions/v1/track-email`;
+  const unsubscribeUrl = `${SUPABASE_URL}/functions/v1/unsubscribe?id=${leadId}`;
+  
+  // Create tracked URLs
+  const orderUrl = `${trackingBaseUrl}?id=${emailId}&action=click&redirect=${encodeURIComponent("https://www.quantamesh.store/order")}`;
+  const servicesUrl = `${trackingBaseUrl}?id=${emailId}&action=click&redirect=${encodeURIComponent("https://www.quantamesh.store/services")}`;
+  const websiteUrl = `${trackingBaseUrl}?id=${emailId}&action=click&redirect=${encodeURIComponent("https://www.quantamesh.store")}`;
+  const openPixelUrl = `${trackingBaseUrl}?id=${emailId}&action=open`;
+  
   return `
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -387,7 +396,7 @@ function generateAppleStyleEmail(content: string, name: string): string {
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td align="center">
-                    <a href="https://www.quantamesh.store/order" target="_blank" style="display: inline-block; background-color: #0071e3; color: #ffffff; font-size: 16px; font-weight: 500; text-decoration: none; padding: 16px 40px; border-radius: 50px; min-width: 200px;">
+                    <a href="${orderUrl}" target="_blank" style="display: inline-block; background-color: #0071e3; color: #ffffff; font-size: 16px; font-weight: 500; text-decoration: none; padding: 16px 40px; border-radius: 50px; min-width: 200px;">
                       Publish Your App
                     </a>
                   </td>
@@ -398,7 +407,7 @@ function generateAppleStyleEmail(content: string, name: string): string {
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
                   <td align="center" style="padding-top: 16px;">
-                    <a href="https://www.quantamesh.store/services" target="_blank" style="color: #0071e3; font-size: 15px; text-decoration: none;">
+                    <a href="${servicesUrl}" target="_blank" style="color: #0071e3; font-size: 15px; text-decoration: none;">
                       Learn more →
                     </a>
                   </td>
@@ -434,14 +443,18 @@ function generateAppleStyleEmail(content: string, name: string): string {
               
               <!-- Footer Links -->
               <p style="margin: 0; font-size: 12px;">
-                <a href="https://www.quantamesh.store" target="_blank" style="color: #0071e3; text-decoration: none; margin: 0 8px;">Website</a>
+                <a href="${websiteUrl}" target="_blank" style="color: #0071e3; text-decoration: none; margin: 0 8px;">Website</a>
                 <a href="https://www.quantamesh.store/privacy-policy" target="_blank" style="color: #0071e3; text-decoration: none; margin: 0 8px;">Privacy</a>
                 <a href="mailto:parasgupta4494@gmail.com" style="color: #0071e3; text-decoration: none; margin: 0 8px;">Contact</a>
               </p>
               
               <p style="margin: 16px 0 0; font-size: 10px; color: #adadad;">
-                You're receiving this because you signed up at quantamesh.store
+                You're receiving this because you signed up at quantamesh.store<br>
+                <a href="${unsubscribeUrl}" target="_blank" style="color: #adadad; text-decoration: underline;">Unsubscribe</a>
               </p>
+              
+              <!-- Open Tracking Pixel -->
+              <img src="${openPixelUrl}" width="1" height="1" alt="" style="display: none; width: 1px; height: 1px; border: 0;" />
               
             </td>
           </tr>
@@ -474,8 +487,48 @@ serve(async (req) => {
     console.log(`Generating ${sequenceType} email for ${name}`);
     const emailContent = await generateEmailWithAI(name, sequenceType);
 
-    // Generate Apple-style HTML email
-    const htmlEmail = generateAppleStyleEmail(emailContent.content, name);
+    // Get lead ID first if not provided
+    let actualLeadId = leadId;
+    if (!actualLeadId) {
+      const { data: leadData } = await supabase
+        .from("leads")
+        .select("id")
+        .eq("email", email)
+        .single();
+      actualLeadId = leadData?.id;
+    }
+
+
+    // First, insert the email sequence record to get the ID
+    let emailSequenceId: string | null = null;
+    
+    if (actualLeadId) {
+      const { data: insertData, error: insertError } = await supabase
+        .from("email_sequences")
+        .insert({
+          lead_id: actualLeadId,
+          sequence_type: sequenceType,
+          subject: emailContent.subject,
+          content: emailContent.content,
+          status: "pending",
+        })
+        .select("id")
+        .single();
+
+      if (insertError) {
+        console.error("Failed to save email sequence:", insertError);
+      } else {
+        emailSequenceId = insertData?.id;
+      }
+    }
+
+    // Generate Apple-style HTML email with tracking
+    const htmlEmail = generateAppleStyleEmail(
+      emailContent.content, 
+      name, 
+      emailSequenceId || "unknown",
+      actualLeadId || "unknown"
+    );
 
     console.log(`Sending email to ${email}`);
     const { data: emailData, error: emailError } = await resend.emails.send({
@@ -487,32 +540,26 @@ serve(async (req) => {
 
     if (emailError) {
       console.error("Resend error:", emailError);
+      // Update email sequence status to failed
+      if (emailSequenceId) {
+        await supabase
+          .from("email_sequences")
+          .update({ status: "failed" })
+          .eq("id", emailSequenceId);
+      }
       throw emailError;
     }
 
-    let actualLeadId = leadId;
-    if (!actualLeadId) {
-      const { data: leadData } = await supabase
-        .from("leads")
-        .select("id")
-        .eq("email", email)
-        .single();
-      actualLeadId = leadData?.id;
+    // Update email sequence status to sent
+    if (emailSequenceId) {
+      await supabase
+        .from("email_sequences")
+        .update({ status: "sent" })
+        .eq("id", emailSequenceId);
     }
 
+    // Update lead status
     if (actualLeadId) {
-      const { error: insertError } = await supabase.from("email_sequences").insert({
-        lead_id: actualLeadId,
-        sequence_type: sequenceType,
-        subject: emailContent.subject,
-        content: emailContent.content,
-        status: "sent",
-      });
-
-      if (insertError) {
-        console.error("Failed to save email sequence:", insertError);
-      }
-
       await supabase
         .from("leads")
         .update({

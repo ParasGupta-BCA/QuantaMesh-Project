@@ -8,13 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users } from "lucide-react";
+import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users, BarChart3 } from "lucide-react";
 import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminMessages } from "@/components/admin/AdminMessages";
 import { AdminReviews } from "@/components/admin/AdminReviews";
 import { AdminLeads } from "@/components/admin/AdminLeads";
+import { AdminEmailAnalytics } from "@/components/admin/AdminEmailAnalytics";
 import { Order, ContactMessage, Review } from "@/types/admin";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 
@@ -38,6 +39,8 @@ interface EmailSequence {
   content: string;
   sent_at: string;
   status: string;
+  opened_at: string | null;
+  clicked_at: string | null;
 }
 
 export default function Admin() {
@@ -291,6 +294,13 @@ export default function Admin() {
                   <Users className="h-4 w-4" />
                   Leads <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{leads.length}</Badge>
                 </TabsTrigger>
+                <TabsTrigger 
+                  value="email-analytics" 
+                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  Email Analytics
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -331,6 +341,10 @@ export default function Admin() {
                 onUpdateStatus={updateLeadStatus}
                 onDeleteLead={deleteLead}
               />
+            </TabsContent>
+
+            <TabsContent value="email-analytics" className="outline-none focus:ring-0 animate-slide-up">
+              <AdminEmailAnalytics emailSequences={emailSequences} />
             </TabsContent>
           </Tabs>
         </div>
