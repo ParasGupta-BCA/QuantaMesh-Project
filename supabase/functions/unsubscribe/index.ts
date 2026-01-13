@@ -18,9 +18,10 @@ serve(async (req) => {
   const url = new URL(req.url);
   const leadId = url.searchParams.get("id");
   const email = url.searchParams.get("email");
+  const action = url.searchParams.get("action") || "unsubscribe"; // unsubscribe or resubscribe
 
   if (!leadId && !email) {
-    return new Response(generateHTML("error", "Invalid unsubscribe link"), {
+    return new Response(generateHTML("error", action, "Invalid link"), {
       status: 400,
       headers: { "Content-Type": "text/html", ...corsHeaders },
     });
@@ -29,9 +30,11 @@ serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Update lead status to unsubscribed
+    const newStatus = action === "resubscribe" ? "new" : "unsubscribed";
+    
+    // Update lead status
     let query = supabase.from("leads").update({ 
-      status: "unsubscribed",
+      status: newStatus,
       updated_at: new Date().toISOString()
     });
 
@@ -41,31 +44,44 @@ serve(async (req) => {
       query = query.eq("email", email);
     }
 
-    const { error, count } = await query;
+    const { error } = await query;
 
     if (error) {
-      console.error("Error unsubscribing:", error);
+      console.error(`Error ${action}:`, error);
       throw error;
     }
 
-    console.log(`Unsubscribed: leadId=${leadId}, email=${email}`);
+    console.log(`${action}: leadId=${leadId}, email=${email}`);
 
     // Return a styled HTML page
-    return new Response(generateHTML("success"), {
+    return new Response(generateHTML("success", action, undefined, leadId, email), {
       status: 200,
       headers: { "Content-Type": "text/html", ...corsHeaders },
     });
   } catch (error) {
-    console.error("Error processing unsubscribe:", error);
-    return new Response(generateHTML("error", "Something went wrong. Please try again."), {
+    console.error(`Error processing ${action}:`, error);
+    return new Response(generateHTML("error", action, "Something went wrong. Please try again."), {
       status: 500,
       headers: { "Content-Type": "text/html", ...corsHeaders },
     });
   }
 });
 
-function generateHTML(status: "success" | "error", errorMessage?: string): string {
+function generateHTML(
+  status: "success" | "error", 
+  action: string,
+  errorMessage?: string,
+  leadId?: string | null,
+  email?: string | null
+): string {
   const isSuccess = status === "success";
+  const isResubscribe = action === "resubscribe";
+  
+  // Build the opposite action URL
+  const baseUrl = `https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/unsubscribe`;
+  const params = leadId ? `id=${leadId}` : `email=${encodeURIComponent(email || '')}`;
+  const oppositeAction = isResubscribe ? "unsubscribe" : "resubscribe";
+  const toggleUrl = `${baseUrl}?${params}&action=${oppositeAction}`;
   
   return `
 <!DOCTYPE html>
@@ -73,7 +89,7 @@ function generateHTML(status: "success" | "error", errorMessage?: string): strin
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${isSuccess ? "Unsubscribed" : "Error"} - Quanta Mesh</title>
+  <title>${isSuccess ? (isResubscribe ? "Subscribed" : "Unsubscribed") : "Error"} - Quanta Mesh</title>
   <style>
     * {
       margin: 0;
@@ -113,6 +129,9 @@ function generateHTML(status: "success" | "error", errorMessage?: string): strin
     .icon.success {
       background: linear-gradient(135deg, #30d158 0%, #34c759 100%);
     }
+    .icon.resubscribe {
+      background: linear-gradient(135deg, #0071e3 0%, #0077ed 100%);
+    }
     .icon.error {
       background: linear-gradient(135deg, #ff453a 0%, #ff3b30 100%);
     }
@@ -126,7 +145,7 @@ function generateHTML(status: "success" | "error", errorMessage?: string): strin
       font-size: 16px;
       color: #86868b;
       line-height: 1.5;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
     .button {
       display: inline-block;
@@ -138,15 +157,26 @@ function generateHTML(status: "success" | "error", errorMessage?: string): strin
       padding: 14px 28px;
       border-radius: 50px;
       transition: all 0.3s ease;
+      margin-bottom: 16px;
     }
     .button:hover {
       background: #0077ed;
       transform: translateY(-1px);
     }
+    .toggle-link {
+      display: inline-block;
+      color: #86868b;
+      font-size: 14px;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .toggle-link:hover {
+      color: #f5f5f7;
+    }
     .logo {
       font-size: 20px;
       font-weight: 700;
-      margin-top: 32px;
+      margin-top: 24px;
       color: #f5f5f7;
       letter-spacing: -0.5px;
     }
@@ -154,18 +184,28 @@ function generateHTML(status: "success" | "error", errorMessage?: string): strin
 </head>
 <body>
   <div class="container">
-    <div class="icon ${status}">
-      ${isSuccess ? "✓" : "✕"}
+    <div class="icon ${isSuccess ? (isResubscribe ? 'resubscribe' : 'success') : 'error'}">
+      ${isSuccess ? (isResubscribe ? "✓" : "✓") : "✕"}
     </div>
-    <h1>${isSuccess ? "You're Unsubscribed" : "Oops!"}</h1>
+    <h1>${isSuccess 
+      ? (isResubscribe ? "Welcome Back!" : "You're Unsubscribed") 
+      : "Oops!"}</h1>
     <p>
       ${isSuccess 
-        ? "You've been successfully unsubscribed from our emails. We're sorry to see you go!" 
+        ? (isResubscribe 
+          ? "You've successfully re-subscribed to our emails. We're excited to have you back!" 
+          : "You've been successfully unsubscribed from our emails. We're sorry to see you go!") 
         : errorMessage || "Something went wrong. Please try again."}
     </p>
     <a href="https://www.quantamesh.store" class="button">
       ${isSuccess ? "Visit Website" : "Go Home"}
     </a>
+    ${isSuccess ? `
+    <br>
+    <a href="${toggleUrl}" class="toggle-link">
+      ${isResubscribe ? "Changed your mind? Unsubscribe" : "Changed your mind? Re-subscribe"}
+    </a>
+    ` : ''}
     <p class="logo">Quanta Mesh</p>
   </div>
 </body>
