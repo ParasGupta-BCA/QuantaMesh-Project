@@ -239,10 +239,27 @@ The Quanta Mesh Team`,
   }
 }
 
+// Convert markdown-style formatting to HTML
+function formatContentToHtml(content: string): string {
+  return content
+    // Convert **bold** to <strong>
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    // Convert *italic* to <em>
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    // Convert bullet points
+    .replace(/^\* /gm, '• ')
+    .replace(/^- /gm, '• ')
+    // Convert newlines to <br>
+    .replace(/\n/g, '<br>');
+}
+
 // Apple-inspired email template with mobile-first inline styles
 function generateAppleStyleEmail(content: string, name: string, emailId: string, leadId: string): string {
   const trackingBaseUrl = `${SUPABASE_URL}/functions/v1/track-email`;
   const unsubscribeUrl = `${SUPABASE_URL}/functions/v1/unsubscribe?id=${leadId}`;
+  
+  // Format content - convert markdown to HTML
+  const formattedContent = formatContentToHtml(content);
   
   // Create tracked URLs
   const orderUrl = `${trackingBaseUrl}?id=${emailId}&action=click&redirect=${encodeURIComponent("https://www.quantamesh.store/order")}`;
@@ -331,7 +348,7 @@ function generateAppleStyleEmail(content: string, name: string, emailId: string,
               
               <!-- Body Text -->
               <div style="font-size: 15px; line-height: 1.6; color: #1d1d1f; text-align: left; margin-bottom: 24px;" class="dark-text">
-                ${content.replace(/\n/g, "<br>")}
+                ${formattedContent}
               </div>
               
             </td>
