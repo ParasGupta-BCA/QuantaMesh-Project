@@ -10,8 +10,21 @@ import {
   MousePointerClick, 
   TrendingUp,
   BarChart3,
-  Sparkles
+  Sparkles,
+  CalendarDays
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
+import { format, subDays, parseISO, startOfDay, isWithinInterval } from "date-fns";
 
 interface EmailSequence {
   id: string;
@@ -32,6 +45,16 @@ interface AdminEmailAnalyticsProps {
 interface TopicStats {
   name: string;
   displayName: string;
+  sent: number;
+  opened: number;
+  clicked: number;
+  openRate: number;
+  clickRate: number;
+}
+
+interface DailyStats {
+  date: string;
+  displayDate: string;
   sent: number;
   opened: number;
   clicked: number;
@@ -93,6 +116,39 @@ export function AdminEmailAnalytics({ emailSequences }: AdminEmailAnalyticsProps
       }))
       .sort((a, b) => b.clickRate - a.clickRate);
 
+    // Calculate daily trends for the last 14 days
+    const today = startOfDay(new Date());
+    const dailyStats: DailyStats[] = [];
+    
+    for (let i = 13; i >= 0; i--) {
+      const date = subDays(today, i);
+      const dateStr = format(date, "yyyy-MM-dd");
+      const nextDate = subDays(today, i - 1);
+      
+      const dayEmails = emailSequences.filter((email) => {
+        try {
+          const sentDate = startOfDay(parseISO(email.sent_at));
+          return isWithinInterval(sentDate, { start: date, end: date });
+        } catch {
+          return false;
+        }
+      });
+      
+      const sent = dayEmails.length;
+      const opened = dayEmails.filter((e) => e.opened_at).length;
+      const clicked = dayEmails.filter((e) => e.clicked_at).length;
+      
+      dailyStats.push({
+        date: dateStr,
+        displayDate: format(date, "MMM d"),
+        sent,
+        opened,
+        clicked,
+        openRate: sent > 0 ? (opened / sent) * 100 : 0,
+        clickRate: sent > 0 ? (clicked / sent) * 100 : 0,
+      });
+    }
+
     return {
       totalSent,
       totalOpened,
@@ -101,6 +157,7 @@ export function AdminEmailAnalytics({ emailSequences }: AdminEmailAnalyticsProps
       clickRate,
       clickToOpenRate,
       topicStats,
+      dailyStats,
     };
   }, [emailSequences]);
 
@@ -164,6 +221,151 @@ export function AdminEmailAnalytics({ emailSequences }: AdminEmailAnalyticsProps
           </CardContent>
         </Card>
       </div>
+
+      {/* Email Volume Trend Chart */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 text-primary" />
+            Email Activity (Last 14 Days)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {analytics.dailyStats.every((d) => d.sent === 0) ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Mail className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No email activity in the last 14 days</p>
+            </div>
+          ) : (
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={analytics.dailyStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorSent" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorOpened" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                  <XAxis 
+                    dataKey="displayDate" 
+                    tick={{ fontSize: 11 }} 
+                    tickLine={false}
+                    axisLine={false}
+                    className="text-muted-foreground"
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11 }} 
+                    tickLine={false}
+                    axisLine={false}
+                    className="text-muted-foreground"
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      fontSize: '12px'
+                    }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="sent"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorSent)"
+                    name="Sent"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="opened"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorOpened)"
+                    name="Opened"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Engagement Rate Trend Chart */}
+      <Card className="border-border/50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Engagement Rate Trends
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {analytics.dailyStats.every((d) => d.sent === 0) ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Send emails to see engagement trends</p>
+            </div>
+          ) : (
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={analytics.dailyStats} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                  <XAxis 
+                    dataKey="displayDate" 
+                    tick={{ fontSize: 11 }} 
+                    tickLine={false}
+                    axisLine={false}
+                    className="text-muted-foreground"
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 11 }} 
+                    tickLine={false}
+                    axisLine={false}
+                    domain={[0, 100]}
+                    className="text-muted-foreground"
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      fontSize: '12px'
+                    }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    formatter={(value: number) => [`${value.toFixed(1)}%`, '']}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="openRate"
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                    dot={{ fill: '#22c55e', strokeWidth: 0, r: 3 }}
+                    activeDot={{ r: 5 }}
+                    name="Open Rate"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="clickRate"
+                    stroke="#a855f7"
+                    strokeWidth={2}
+                    dot={{ fill: '#a855f7', strokeWidth: 0, r: 3 }}
+                    activeDot={{ r: 5 }}
+                    name="Click Rate"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Topic Performance */}
       <Card className="border-border/50">
