@@ -13,6 +13,7 @@ import Contact from "./pages/Contact";
 import Chat from "./pages/Chat";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import Portfolio from "./pages/Portfolio";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
@@ -33,6 +34,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
+              <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />

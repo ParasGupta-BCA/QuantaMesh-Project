@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Play, Volume2, VolumeX, Instagram } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -112,6 +112,30 @@ function VideoCard({ src, onClick, isMobile }: VideoCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
+  // Intersection observer for autoplay on scroll
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+          } else {
+            video.pause();
+            video.currentTime = 0;
+            setIsPlaying(false);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
   const handleMouseEnter = () => {
     if (!isMobile) {
       videoRef.current?.play();
@@ -124,13 +148,6 @@ function VideoCard({ src, onClick, isMobile }: VideoCardProps) {
       videoRef.current?.pause();
       if (videoRef.current) videoRef.current.currentTime = 0;
       setIsPlaying(false);
-    }
-  };
-
-  const handleTouchStart = () => {
-    if (isMobile) {
-      videoRef.current?.play();
-      setIsPlaying(true);
     }
   };
 
@@ -158,7 +175,6 @@ function VideoCard({ src, onClick, isMobile }: VideoCardProps) {
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onTouchStart={handleTouchStart}
       onClick={handleClick}
     >
       <video
