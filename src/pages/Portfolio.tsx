@@ -1,12 +1,15 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
-import { Play, Volume2, VolumeX, X, ChevronLeft, ChevronRight, Filter, Instagram } from "lucide-react";
+import { Play, Volume2, VolumeX, X, ChevronLeft, ChevronRight, Filter, Instagram, Share2, Check, Link } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { InstagramReelsViewer } from "@/components/home/InstagramReelsViewer";
+import { toast } from "sonner";
+import { useSearchParams } from "react-router-dom";
 
 // Video items with categories
 const portfolioItems = [
@@ -33,6 +36,23 @@ export default function Portfolio() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [reelsOpen, setReelsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const [searchParams] = useSearchParams();
+
+  // Handle deep linking to specific video
+  useEffect(() => {
+    const videoId = searchParams.get('video');
+    if (videoId) {
+      const index = portfolioItems.findIndex(item => item.id === parseInt(videoId));
+      if (index !== -1) {
+        setSelectedIndex(index);
+        if (isMobile) {
+          setReelsOpen(true);
+        } else {
+          setGalleryOpen(true);
+        }
+      }
+    }
+  }, [searchParams, isMobile]);
 
   const filteredItems = selectedCategory === "all" 
     ? portfolioItems 
@@ -47,6 +67,17 @@ export default function Portfolio() {
       setGalleryOpen(true);
     }
   };
+
+  const handleShare = useCallback((videoId: number) => {
+    const url = `${window.location.origin}/portfolio?video=${videoId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success("Link copied to clipboard!", {
+        description: "Share this link to show this specific video",
+      });
+    }).catch(() => {
+      toast.error("Failed to copy link");
+    });
+  }, []);
 
   return (
     <Layout>
@@ -100,10 +131,12 @@ export default function Portfolio() {
             {filteredItems.map((item, index) => (
               <PortfolioVideoCard
                 key={item.id}
+                id={item.id}
                 src={item.src}
                 title={item.title}
                 category={item.category}
                 onClick={() => handleVideoClick(index)}
+                onShare={() => handleShare(item.id)}
                 isMobile={isMobile}
               />
             ))}
@@ -146,6 +179,7 @@ export default function Portfolio() {
           isOpen={galleryOpen}
           onClose={() => setGalleryOpen(false)}
           onNavigate={setSelectedIndex}
+          onShare={handleShare}
         />
       )}
 
@@ -160,24 +194,50 @@ export default function Portfolio() {
   );
 }
 
-// Video Card with intersection observer autoplay
+// Video Card with intersection observer autoplay and lazy loading
 interface PortfolioVideoCardProps {
+  id: number;
   src: string;
   title: string;
   category: string;
   onClick: () => void;
+  onShare: () => void;
   isMobile: boolean;
 }
 
-function PortfolioVideoCard({ src, title, category, onClick, isMobile }: PortfolioVideoCardProps) {
+function PortfolioVideoCard({ id, src, title, category, onClick, onShare, isMobile }: PortfolioVideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInView, setIsInView] = useState(false);
+  const [showShareConfirm, setShowShareConfirm] = useState(false);
 
-  // Intersection observer for autoplay
+  // Lazy loading: Only load video when in viewport
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "100px" }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  // Autoplay when visible (after video is loaded)
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !isInView || isLoading) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -196,7 +256,11 @@ function PortfolioVideoCard({ src, title, category, onClick, isMobile }: Portfol
 
     observer.observe(video);
     return () => observer.disconnect();
-  }, []);
+  }, [isInView, isLoading]);
+
+  const handleVideoLoaded = () => {
+    setIsLoading(false);
+  };
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -206,8 +270,16 @@ function PortfolioVideoCard({ src, title, category, onClick, isMobile }: Portfol
     }
   };
 
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onShare();
+    setShowShareConfirm(true);
+    setTimeout(() => setShowShareConfirm(false), 2000);
+  };
+
   return (
     <div
+      ref={containerRef}
       className={cn(
         "relative group rounded-2xl overflow-hidden aspect-[9/16] bg-muted border border-border shadow-2xl transition-all duration-500 cursor-pointer",
         isMobile 
@@ -216,14 +288,35 @@ function PortfolioVideoCard({ src, title, category, onClick, isMobile }: Portfol
       )}
       onClick={onClick}
     >
-      <video
-        ref={videoRef}
-        src={src}
-        className="w-full h-full object-cover"
-        loop
-        muted={isMuted}
-        playsInline
-      />
+      {/* Skeleton loader */}
+      {isLoading && (
+        <div className="absolute inset-0 z-10">
+          <Skeleton className="w-full h-full rounded-2xl" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-muted-foreground/20 animate-pulse flex items-center justify-center">
+              <Play className="w-5 h-5 text-muted-foreground/50" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lazy loaded video */}
+      {isInView && (
+        <video
+          ref={videoRef}
+          src={src}
+          className={cn(
+            "w-full h-full object-cover transition-opacity duration-300",
+            isLoading ? "opacity-0" : "opacity-100"
+          )}
+          loop
+          muted={isMuted}
+          playsInline
+          preload="metadata"
+          onLoadedData={handleVideoLoaded}
+          onCanPlay={handleVideoLoaded}
+        />
+      )}
 
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
@@ -231,14 +324,31 @@ function PortfolioVideoCard({ src, title, category, onClick, isMobile }: Portfol
       {/* Category badge */}
       <Badge 
         variant="secondary" 
-        className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm text-foreground capitalize"
+        className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm text-foreground capitalize z-20"
       >
         {category}
       </Badge>
 
+      {/* Share button */}
+      <button
+        onClick={handleShareClick}
+        className={cn(
+          "absolute top-3 right-3 z-20 p-2 rounded-full backdrop-blur-sm border border-white/10 transition-all",
+          showShareConfirm 
+            ? "bg-green-500/80 text-white" 
+            : "bg-black/50 text-white hover:bg-black/70"
+        )}
+      >
+        {showShareConfirm ? (
+          <Check className="w-4 h-4" />
+        ) : (
+          <Share2 className="w-4 h-4" />
+        )}
+      </button>
+
       {/* Instagram Reels icon for mobile */}
-      {isMobile && (
-        <div className="absolute top-3 right-3 z-10">
+      {isMobile && !showShareConfirm && (
+        <div className="absolute top-12 right-3 z-10">
           <svg className="w-6 h-6 text-white drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
           </svg>
@@ -246,19 +356,21 @@ function PortfolioVideoCard({ src, title, category, onClick, isMobile }: Portfol
       )}
 
       {/* Play overlay when not playing */}
-      <div className={cn(
-        "absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300",
-        isPlaying ? "opacity-0 pointer-events-none" : "opacity-100"
-      )}>
-        <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-          <Play className="w-5 h-5 text-white fill-white" />
+      {!isLoading && (
+        <div className={cn(
+          "absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300",
+          isPlaying ? "opacity-0 pointer-events-none" : "opacity-100"
+        )}>
+          <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+            <Play className="w-5 h-5 text-white fill-white" />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Title and mute button */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+      <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between z-20">
         <p className="text-white font-medium text-sm truncate flex-1">{title}</p>
-        {!isMobile && (
+        {!isMobile && !isLoading && (
           <button
             onClick={toggleMute}
             className={cn(
@@ -281,18 +393,27 @@ interface FullScreenGalleryProps {
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (index: number) => void;
+  onShare: (videoId: number) => void;
 }
 
-function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate }: FullScreenGalleryProps) {
+function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, onShare }: FullScreenGalleryProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showShareConfirm, setShowShareConfirm] = useState(false);
 
   useEffect(() => {
-    if (isOpen && videoRef.current) {
-      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+    if (isOpen) {
+      setIsLoading(true);
     }
   }, [isOpen, currentIndex]);
+
+  useEffect(() => {
+    if (isOpen && videoRef.current && !isLoading) {
+      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+    }
+  }, [isOpen, currentIndex, isLoading]);
 
   useEffect(() => {
     if (isOpen) {
@@ -311,6 +432,10 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate }
       };
     }
   }, [isOpen, currentIndex, videos.length, onClose, onNavigate]);
+
+  const handleVideoLoaded = () => {
+    setIsLoading(false);
+  };
 
   const togglePlayPause = () => {
     if (videoRef.current) {
@@ -331,6 +456,13 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate }
     }
   };
 
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onShare(currentVideo.id);
+    setShowShareConfirm(true);
+    setTimeout(() => setShowShareConfirm(false), 2000);
+  };
+
   if (!isOpen) return null;
 
   const currentVideo = videos[currentIndex];
@@ -343,6 +475,29 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate }
         className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-20"
       >
         <X className="w-6 h-6 text-white" />
+      </button>
+
+      {/* Share button */}
+      <button
+        onClick={handleShareClick}
+        className={cn(
+          "absolute top-6 right-20 p-3 rounded-full transition-all z-20 flex items-center gap-2",
+          showShareConfirm 
+            ? "bg-green-500/80 text-white" 
+            : "bg-white/10 hover:bg-white/20 text-white"
+        )}
+      >
+        {showShareConfirm ? (
+          <>
+            <Check className="w-5 h-5" />
+            <span className="text-sm font-medium">Copied!</span>
+          </>
+        ) : (
+          <>
+            <Link className="w-5 h-5" />
+            <span className="text-sm font-medium">Share</span>
+          </>
+        )}
       </button>
 
       {/* Navigation arrows */}
@@ -368,18 +523,35 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate }
         className="relative max-w-4xl max-h-[90vh] aspect-[9/16] cursor-pointer"
         onClick={togglePlayPause}
       >
+        {/* Loading skeleton */}
+        {isLoading && (
+          <div className="absolute inset-0 z-10 rounded-2xl overflow-hidden">
+            <Skeleton className="w-full h-full" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-white/10 animate-pulse flex items-center justify-center">
+                <Play className="w-10 h-10 text-white/50" />
+              </div>
+            </div>
+          </div>
+        )}
+
         <video
           ref={videoRef}
           src={currentVideo.src}
-          className="w-full h-full object-contain rounded-2xl"
+          className={cn(
+            "w-full h-full object-contain rounded-2xl transition-opacity duration-300",
+            isLoading ? "opacity-0" : "opacity-100"
+          )}
           loop
           muted={isMuted}
           playsInline
           autoPlay
+          onLoadedData={handleVideoLoaded}
+          onCanPlay={handleVideoLoaded}
         />
 
         {/* Play/Pause overlay */}
-        {!isPlaying && (
+        {!isPlaying && !isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-2xl">
             <div className="w-20 h-20 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center">
               <Play className="w-10 h-10 text-white fill-white ml-1" />
@@ -429,6 +601,7 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate }
               className="w-full h-full object-cover"
               muted
               playsInline
+              preload="metadata"
             />
           </button>
         ))}
