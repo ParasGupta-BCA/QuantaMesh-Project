@@ -104,7 +104,7 @@ export function InstagramReelsViewer({ videos, initialIndex, isOpen, onClose }: 
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black"
+      className="fixed inset-0 z-[70] bg-black"
       ref={containerRef}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
