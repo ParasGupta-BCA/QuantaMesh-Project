@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users, BarChart3 } from "lucide-react";
+import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users, BarChart3, Video } from "lucide-react";
 import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminOrders } from "@/components/admin/AdminOrders";
@@ -16,8 +16,21 @@ import { AdminMessages } from "@/components/admin/AdminMessages";
 import { AdminReviews } from "@/components/admin/AdminReviews";
 import { AdminLeads } from "@/components/admin/AdminLeads";
 import { AdminEmailAnalytics } from "@/components/admin/AdminEmailAnalytics";
+import { AdminVideos } from "@/components/admin/AdminVideos";
 import { Order, ContactMessage, Review } from "@/types/admin";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
+
+interface AdminVideo {
+  id: string;
+  title: string;
+  description: string | null;
+  video_path: string;
+  thumbnail_path: string | null;
+  category: string;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+}
 
 interface Lead {
   id: string;
@@ -53,6 +66,7 @@ export default function Admin() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [emailSequences, setEmailSequences] = useState<EmailSequence[]>([]);
+  const [adminVideos, setAdminVideos] = useState<AdminVideo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -71,12 +85,13 @@ export default function Admin() {
     if (!isAdmin) return;
 
     try {
-      const [ordersResult, messagesResult, reviewsResult, leadsResult, emailsResult] = await Promise.all([
+      const [ordersResult, messagesResult, reviewsResult, leadsResult, emailsResult, videosResult] = await Promise.all([
         supabase.from("orders").select("*").order("created_at", { ascending: false }),
         supabase.from("contact_messages").select("*").order("created_at", { ascending: false }),
         supabase.from("reviews").select("*").order("created_at", { ascending: false }),
         supabase.from("leads").select("*").order("created_at", { ascending: false }),
         supabase.from("email_sequences").select("*").order("sent_at", { ascending: false }),
+        supabase.from("admin_videos").select("*").order("display_order", { ascending: true }),
       ]);
 
       if (ordersResult.data) setOrders(ordersResult.data);
@@ -84,6 +99,7 @@ export default function Admin() {
       if (reviewsResult.data) setReviews(reviewsResult.data as Review[]);
       if (leadsResult.data) setLeads(leadsResult.data as Lead[]);
       if (emailsResult.data) setEmailSequences(emailsResult.data as EmailSequence[]);
+      if (videosResult.data) setAdminVideos(videosResult.data as AdminVideo[]);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -301,6 +317,13 @@ export default function Admin() {
                   <BarChart3 className="h-4 w-4" />
                   Email Analytics
                 </TabsTrigger>
+                <TabsTrigger 
+                  value="videos" 
+                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
+                >
+                  <Video className="h-4 w-4" />
+                  Videos <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{adminVideos.length}</Badge>
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -345,6 +368,13 @@ export default function Admin() {
 
             <TabsContent value="email-analytics" className="outline-none focus:ring-0 animate-slide-up">
               <AdminEmailAnalytics emailSequences={emailSequences} />
+            </TabsContent>
+
+            <TabsContent value="videos" className="outline-none focus:ring-0 animate-slide-up">
+              <AdminVideos
+                videos={adminVideos}
+                onVideosChange={fetchData}
+              />
             </TabsContent>
           </Tabs>
         </div>

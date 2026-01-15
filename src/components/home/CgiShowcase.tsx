@@ -1,24 +1,40 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Play, Volume2, VolumeX, Instagram } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { InstagramReelsViewer } from "./InstagramReelsViewer";
+import { useAdminVideos } from "@/hooks/useAdminVideos";
 
-const items = [
-  { id: 1, type: "video", src: "/CGI Ads/1.mp4" },
-  { id: 2, type: "video", src: "/CGI Ads/2.mp4" },
-  { id: 3, type: "video", src: "/CGI Ads/3.mp4" },
-  { id: 4, type: "video", src: "/CGI Ads/4.mp4" },
-  { id: 5, type: "video", src: "/CGI Ads/5.mp4" },
-  { id: 6, type: "video", src: "/CGI Ads/6.mp4" },
-  { id: 7, type: "video", src: "/CGI Ads/7.mp4" },
-  { id: 8, type: "video", src: "/CGI Ads/8.mp4" },
+// Static videos as fallback
+const staticItems = [
+  { id: "static-1", type: "video", src: "/CGI Ads/1.mp4" },
+  { id: "static-2", type: "video", src: "/CGI Ads/2.mp4" },
+  { id: "static-3", type: "video", src: "/CGI Ads/3.mp4" },
+  { id: "static-4", type: "video", src: "/CGI Ads/4.mp4" },
+  { id: "static-5", type: "video", src: "/CGI Ads/5.mp4" },
+  { id: "static-6", type: "video", src: "/CGI Ads/6.mp4" },
+  { id: "static-7", type: "video", src: "/CGI Ads/7.mp4" },
+  { id: "static-8", type: "video", src: "/CGI Ads/8.mp4" },
 ];
 
 export function CgiShowcase() {
   const [reelsOpen, setReelsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const isMobile = useIsMobile();
+  const { videos: adminVideos, loading, getVideoUrl } = useAdminVideos();
+
+  // Combine admin-uploaded videos with static videos
+  const items = useMemo(() => {
+    const adminItems = adminVideos.map((video) => ({
+      id: video.id,
+      type: "video" as const,
+      src: getVideoUrl(video.video_path),
+      title: video.title,
+    }));
+    
+    // Show admin videos first, then static ones
+    return adminItems.length > 0 ? [...adminItems, ...staticItems] : staticItems;
+  }, [adminVideos, getVideoUrl]);
 
   const handleVideoClick = (index: number) => {
     if (isMobile) {
