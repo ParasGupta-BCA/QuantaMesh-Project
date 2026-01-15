@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ReelViewerProps {
-  videos: { id: number; src: string }[];
+  videos: { id: string | number; src: string; title?: string }[];
   initialIndex: number;
   isOpen: boolean;
   onClose: () => void;

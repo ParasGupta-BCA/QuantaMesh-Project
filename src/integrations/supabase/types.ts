@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_videos: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean | null
+          thumbnail_path: string | null
+          title: string
+          updated_at: string
+          video_path: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          thumbnail_path?: string | null
+          title: string
+          updated_at?: string
+          video_path: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean | null
+          thumbnail_path?: string | null
+          title?: string
+          updated_at?: string
+          video_path?: string
+        }
+        Relationships: []
+      }
       ai_generated_leads: {
         Row: {
           created_at: string
