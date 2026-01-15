@@ -213,6 +213,7 @@ function PortfolioVideoCard({ id, src, title, category, onClick, onShare, isMobi
   const [isLoading, setIsLoading] = useState(true);
   const [isInView, setIsInView] = useState(false);
   const [showShareConfirm, setShowShareConfirm] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   // Lazy loading: Only load video when in viewport
   useEffect(() => {
@@ -248,6 +249,7 @@ function PortfolioVideoCard({ id, src, title, category, onClick, onShare, isMobi
             video.pause();
             video.currentTime = 0;
             setIsPlaying(false);
+            setProgress(0);
           }
         });
       },
@@ -257,6 +259,21 @@ function PortfolioVideoCard({ id, src, title, category, onClick, onShare, isMobi
     observer.observe(video);
     return () => observer.disconnect();
   }, [isInView, isLoading]);
+
+  // Update progress bar
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const updateProgress = () => {
+      if (video.duration) {
+        setProgress((video.currentTime / video.duration) * 100);
+      }
+    };
+
+    video.addEventListener('timeupdate', updateProgress);
+    return () => video.removeEventListener('timeupdate', updateProgress);
+  }, [isInView]);
 
   const handleVideoLoaded = () => {
     setIsLoading(false);
@@ -367,6 +384,18 @@ function PortfolioVideoCard({ id, src, title, category, onClick, onShare, isMobi
         </div>
       )}
 
+      {/* Progress bar */}
+      {!isLoading && isPlaying && (
+        <div className="absolute bottom-12 left-3 right-3 z-20">
+          <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary rounded-full transition-all duration-100 ease-linear"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Title and mute button */}
       <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between z-20">
         <p className="text-white font-medium text-sm truncate flex-1">{title}</p>
@@ -398,14 +427,18 @@ interface FullScreenGalleryProps {
 
 function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, onShare }: FullScreenGalleryProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [showShareConfirm, setShowShareConfirm] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsLoading(true);
+      setProgress(0);
     }
   }, [isOpen, currentIndex]);
 
@@ -432,6 +465,21 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, 
       };
     }
   }, [isOpen, currentIndex, videos.length, onClose, onNavigate]);
+
+  // Update progress bar
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isOpen) return;
+
+    const updateProgress = () => {
+      if (video.duration && !isDragging) {
+        setProgress((video.currentTime / video.duration) * 100);
+      }
+    };
+
+    video.addEventListener('timeupdate', updateProgress);
+    return () => video.removeEventListener('timeupdate', updateProgress);
+  }, [isOpen, isDragging]);
 
   const handleVideoLoaded = () => {
     setIsLoading(false);
@@ -461,6 +509,27 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, 
     onShare(currentVideo.id);
     setShowShareConfirm(true);
     setTimeout(() => setShowShareConfirm(false), 2000);
+  };
+
+  const handleProgressClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!progressRef.current || !videoRef.current) return;
+    
+    const rect = progressRef.current.getBoundingClientRect();
+    const clickPosition = (e.clientX - rect.left) / rect.width;
+    const newTime = clickPosition * videoRef.current.duration;
+    videoRef.current.currentTime = newTime;
+    setProgress(clickPosition * 100);
+  };
+
+  const handleProgressDrag = (e: React.MouseEvent) => {
+    if (!isDragging || !progressRef.current || !videoRef.current) return;
+    
+    const rect = progressRef.current.getBoundingClientRect();
+    const dragPosition = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const newTime = dragPosition * videoRef.current.duration;
+    videoRef.current.currentTime = newTime;
+    setProgress(dragPosition * 100);
   };
 
   if (!isOpen) return null;
@@ -555,6 +624,29 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, 
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-2xl">
             <div className="w-20 h-20 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center">
               <Play className="w-10 h-10 text-white fill-white ml-1" />
+            </div>
+          </div>
+        )}
+
+        {/* Progress bar */}
+        {!isLoading && (
+          <div 
+            ref={progressRef}
+            className="absolute bottom-20 left-4 right-4 z-30 cursor-pointer group"
+            onClick={handleProgressClick}
+            onMouseDown={() => setIsDragging(true)}
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
+            onMouseMove={handleProgressDrag}
+          >
+            <div className="h-1.5 bg-white/20 rounded-full overflow-hidden group-hover:h-2 transition-all">
+              <div 
+                className="h-full bg-primary rounded-full transition-all duration-100 ease-linear relative"
+                style={{ width: `${progress}%` }}
+              >
+                {/* Scrubber handle */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
+              </div>
             </div>
           </div>
         )}
