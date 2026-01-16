@@ -9,6 +9,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Upload, Trash2, Video, Loader2, Eye, EyeOff, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { cn } from '@/lib/utils';
 
 interface AdminVideo {
   id: string;
@@ -34,9 +52,120 @@ const CATEGORIES = [
   { value: 'general', label: 'General' },
 ];
 
+// Sortable video item component
+function SortableVideoItem({ 
+  video, 
+  onDelete, 
+  onToggleActive, 
+  deleting, 
+  getVideoUrl 
+}: { 
+  video: AdminVideo; 
+  onDelete: (video: AdminVideo) => void;
+  onToggleActive: (video: AdminVideo) => void;
+  deleting: string | null;
+  getVideoUrl: (path: string) => string;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: video.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "flex flex-col md:flex-row gap-4 p-4 rounded-lg border border-border/50 bg-background/50 transition-all",
+        isDragging && "opacity-50 shadow-lg ring-2 ring-primary"
+      )}
+    >
+      {/* Drag Handle */}
+      <div 
+        className="flex items-center justify-center md:self-center cursor-grab active:cursor-grabbing touch-none"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+      </div>
+
+      {/* Video Preview */}
+      <div className="w-full md:w-48 flex-shrink-0">
+        <video
+          src={getVideoUrl(video.video_path)}
+          className="w-full h-32 object-cover rounded-lg bg-muted"
+          muted
+          preload="metadata"
+        />
+      </div>
+
+      {/* Video Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h4 className="font-medium truncate">{video.title}</h4>
+            {video.description && (
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {video.description}
+              </p>
+            )}
+          </div>
+          <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary capitalize flex-shrink-0">
+            {video.category}
+          </span>
+        </div>
+        <div className="flex items-center gap-4 mt-3">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={video.is_active}
+              onCheckedChange={() => onToggleActive(video)}
+            />
+            <span className="text-sm text-muted-foreground">
+              {video.is_active ? (
+                <span className="flex items-center gap-1">
+                  <Eye className="h-3 w-3" /> Visible
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <EyeOff className="h-3 w-3" /> Hidden
+                </span>
+              )}
+            </span>
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => onDelete(video)}
+            disabled={deleting === video.id}
+          >
+            {deleting === video.id ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2">
+          Order: {video.display_order + 1} • Uploaded: {new Date(video.created_at).toLocaleDateString()}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function AdminVideos({ videos, onVideosChange }: AdminVideosProps) {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [reordering, setReordering] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -44,6 +173,13 @@ export function AdminVideos({ videos, onVideosChange }: AdminVideosProps) {
   });
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -179,10 +315,44 @@ export function AdminVideos({ videos, onVideosChange }: AdminVideosProps) {
     }
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = videos.findIndex((v) => v.id === active.id);
+      const newIndex = videos.findIndex((v) => v.id === over.id);
+      
+      const newOrder = arrayMove(videos, oldIndex, newIndex);
+      
+      setReordering(true);
+      try {
+        // Update display_order for all affected videos
+        const updates = newOrder.map((video, index) => 
+          supabase
+            .from('admin_videos')
+            .update({ display_order: index })
+            .eq('id', video.id)
+        );
+
+        await Promise.all(updates);
+        toast.success('Video order updated');
+        onVideosChange();
+      } catch (error: any) {
+        console.error('Reorder error:', error);
+        toast.error('Failed to update video order');
+      } finally {
+        setReordering(false);
+      }
+    }
+  };
+
   const getVideoUrl = (path: string) => {
     const { data } = supabase.storage.from('admin-videos').getPublicUrl(path);
     return data.publicUrl;
   };
+
+  // Sort videos by display_order for display
+  const sortedVideos = [...videos].sort((a, b) => a.display_order - b.display_order);
 
   return (
     <div className="space-y-6">
@@ -292,10 +462,24 @@ export function AdminVideos({ videos, onVideosChange }: AdminVideosProps) {
       {/* Videos List */}
       <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Video className="h-5 w-5" />
-            Uploaded Videos ({videos.length})
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Video className="h-5 w-5" />
+              Uploaded Videos ({videos.length})
+            </span>
+            {reordering && (
+              <span className="text-sm text-muted-foreground flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Saving order...
+              </span>
+            )}
           </CardTitle>
+          {videos.length > 1 && (
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <GripVertical className="h-4 w-4" />
+              Drag and drop to reorder videos
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           {videos.length === 0 ? (
@@ -303,75 +487,29 @@ export function AdminVideos({ videos, onVideosChange }: AdminVideosProps) {
               No videos uploaded yet. Upload your first video above.
             </p>
           ) : (
-            <div className="space-y-4">
-              {videos.map((video) => (
-                <div
-                  key={video.id}
-                  className="flex flex-col md:flex-row gap-4 p-4 rounded-lg border border-border/50 bg-background/50"
-                >
-                  {/* Video Preview */}
-                  <div className="w-full md:w-48 flex-shrink-0">
-                    <video
-                      src={getVideoUrl(video.video_path)}
-                      className="w-full h-32 object-cover rounded-lg bg-muted"
-                      muted
-                      preload="metadata"
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={sortedVideos.map(v => v.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-4">
+                  {sortedVideos.map((video) => (
+                    <SortableVideoItem
+                      key={video.id}
+                      video={video}
+                      onDelete={handleDelete}
+                      onToggleActive={toggleActive}
+                      deleting={deleting}
+                      getVideoUrl={getVideoUrl}
                     />
-                  </div>
-
-                  {/* Video Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <h4 className="font-medium truncate">{video.title}</h4>
-                        {video.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {video.description}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary capitalize flex-shrink-0">
-                        {video.category}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-3">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={video.is_active}
-                          onCheckedChange={() => toggleActive(video)}
-                        />
-                        <span className="text-sm text-muted-foreground">
-                          {video.is_active ? (
-                            <span className="flex items-center gap-1">
-                              <Eye className="h-3 w-3" /> Visible
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1">
-                              <EyeOff className="h-3 w-3" /> Hidden
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(video)}
-                        disabled={deleting === video.id}
-                      >
-                        {deleting === video.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Uploaded: {new Date(video.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
           )}
         </CardContent>
       </Card>
