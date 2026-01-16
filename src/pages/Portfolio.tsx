@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import { Play, Volume2, VolumeX, X, ChevronLeft, ChevronRight, Filter, Instagram, Share2, Check, Link } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,17 +10,18 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { InstagramReelsViewer } from "@/components/home/InstagramReelsViewer";
 import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
+import { useAdminVideos } from "@/hooks/useAdminVideos";
 
-// Video items with categories
-const portfolioItems = [
-  { id: 1, src: "/CGI Ads/1.mp4", category: "product", title: "Product Showcase" },
-  { id: 2, src: "/CGI Ads/2.mp4", category: "brand", title: "Brand Identity" },
-  { id: 3, src: "/CGI Ads/3.mp4", category: "product", title: "3D Product Ad" },
-  { id: 4, src: "/CGI Ads/4.mp4", category: "motion", title: "Motion Graphics" },
-  { id: 5, src: "/CGI Ads/5.mp4", category: "brand", title: "Brand Campaign" },
-  { id: 6, src: "/CGI Ads/6.mp4", category: "motion", title: "Animated Promo" },
-  { id: 7, src: "/CGI Ads/7.mp4", category: "product", title: "Product Launch" },
-  { id: 8, src: "/CGI Ads/8.mp4", category: "brand", title: "Visual Identity" },
+// Static video items with categories
+const staticPortfolioItems = [
+  { id: "static-1", src: "/CGI Ads/1.mp4", category: "product", title: "Product Showcase" },
+  { id: "static-2", src: "/CGI Ads/2.mp4", category: "brand", title: "Brand Identity" },
+  { id: "static-3", src: "/CGI Ads/3.mp4", category: "product", title: "3D Product Ad" },
+  { id: "static-4", src: "/CGI Ads/4.mp4", category: "motion", title: "Motion Graphics" },
+  { id: "static-5", src: "/CGI Ads/5.mp4", category: "brand", title: "Brand Campaign" },
+  { id: "static-6", src: "/CGI Ads/6.mp4", category: "motion", title: "Animated Promo" },
+  { id: "static-7", src: "/CGI Ads/7.mp4", category: "product", title: "Product Launch" },
+  { id: "static-8", src: "/CGI Ads/8.mp4", category: "brand", title: "Visual Identity" },
 ];
 
 const categories = [
@@ -28,6 +29,7 @@ const categories = [
   { id: "product", label: "Product" },
   { id: "brand", label: "Brand" },
   { id: "motion", label: "Motion" },
+  { id: "general", label: "General" },
 ];
 
 export default function Portfolio() {
@@ -37,12 +39,26 @@ export default function Portfolio() {
   const [reelsOpen, setReelsOpen] = useState(false);
   const isMobile = useIsMobile();
   const [searchParams] = useSearchParams();
+  const { videos: adminVideos, loading: adminVideosLoading, getVideoUrl } = useAdminVideos();
+
+  // Combine admin videos with static videos
+  const portfolioItems = useMemo(() => {
+    const adminItems = adminVideos.map((video) => ({
+      id: video.id,
+      src: getVideoUrl(video.video_path),
+      category: video.category || 'general',
+      title: video.title,
+    }));
+    
+    // Show admin videos first, then static ones
+    return [...adminItems, ...staticPortfolioItems];
+  }, [adminVideos, getVideoUrl]);
 
   // Handle deep linking to specific video
   useEffect(() => {
     const videoId = searchParams.get('video');
-    if (videoId) {
-      const index = portfolioItems.findIndex(item => item.id === parseInt(videoId));
+    if (videoId && portfolioItems.length > 0) {
+      const index = portfolioItems.findIndex(item => item.id === videoId || item.id === `static-${videoId}`);
       if (index !== -1) {
         setSelectedIndex(index);
         if (isMobile) {
@@ -52,7 +68,7 @@ export default function Portfolio() {
         }
       }
     }
-  }, [searchParams, isMobile]);
+  }, [searchParams, isMobile, portfolioItems]);
 
   const filteredItems = selectedCategory === "all" 
     ? portfolioItems 
@@ -68,7 +84,7 @@ export default function Portfolio() {
     }
   };
 
-  const handleShare = useCallback((videoId: number) => {
+  const handleShare = useCallback((videoId: string) => {
     const url = `${window.location.origin}/portfolio?video=${videoId}`;
     navigator.clipboard.writeText(url).then(() => {
       toast.success("Link copied to clipboard!", {
@@ -128,18 +144,27 @@ export default function Portfolio() {
 
           {/* Video Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {filteredItems.map((item, index) => (
-              <PortfolioVideoCard
-                key={item.id}
-                id={item.id}
-                src={item.src}
-                title={item.title}
-                category={item.category}
-                onClick={() => handleVideoClick(index)}
-                onShare={() => handleShare(item.id)}
-                isMobile={isMobile}
-              />
-            ))}
+            {adminVideosLoading ? (
+              // Show skeletons while loading
+              Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="aspect-[9/16] rounded-2xl overflow-hidden">
+                  <Skeleton className="w-full h-full" />
+                </div>
+              ))
+            ) : (
+              filteredItems.map((item, index) => (
+                <PortfolioVideoCard
+                  key={item.id}
+                  id={item.id}
+                  src={item.src}
+                  title={item.title}
+                  category={item.category}
+                  onClick={() => handleVideoClick(index)}
+                  onShare={() => handleShare(item.id)}
+                  isMobile={isMobile}
+                />
+              ))
+            )}
           </div>
 
           {/* Empty state */}
@@ -196,7 +221,7 @@ export default function Portfolio() {
 
 // Video Card with intersection observer autoplay and lazy loading
 interface PortfolioVideoCardProps {
-  id: number;
+  id: string;
   src: string;
   title: string;
   category: string;
@@ -417,12 +442,12 @@ function PortfolioVideoCard({ id, src, title, category, onClick, onShare, isMobi
 
 // Full-Screen Gallery Component (Desktop)
 interface FullScreenGalleryProps {
-  videos: { id: number; src: string; title?: string; category?: string }[];
+  videos: { id: string; src: string; title?: string; category?: string }[];
   currentIndex: number;
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (index: number) => void;
-  onShare: (videoId: number) => void;
+  onShare: (videoId: string) => void;
 }
 
 function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, onShare }: FullScreenGalleryProps) {
