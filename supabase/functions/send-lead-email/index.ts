@@ -58,12 +58,13 @@ function extractErrorInfo(error: unknown): ExtractedErrorInfo {
 }
 
 async function generateEmailWithAI(name: string, sequenceType: string): Promise<{ subject: string; content: string }> {
-  const prompts: Record<string, string> = {
+const prompts: Record<string, string> = {
     welcome: `Write a friendly, professional welcome email for a new lead named "${name}" who just signed up on Quanta Mesh - an Android app publishing service. 
     
 Key points to include:
 - Thank them for signing up
-- Mention they got $5 off their first app publish (normally $25, now $20)
+- Mention they got $5 off their first app publish using discount code "FIRSTAPP" (normally $25, now $20)
+- Make sure to highlight the discount code FIRSTAPP prominently
 - Briefly explain our service (we publish Android apps to Google Play for developers)
 - Create urgency but stay friendly
 - Include a call-to-action to publish their first app
@@ -73,7 +74,7 @@ Keep it under 150 words. Be personable and enthusiastic.`,
     follow_up: `Write a follow-up email for a lead named "${name}" who signed up for Quanta Mesh but hasn't ordered yet.
 
 Key points:
-- Gently remind them of their $5 discount
+- Gently remind them of their $5 discount with code "FIRSTAPP"
 - Ask if they have any questions about the service
 - Mention we handle everything: metadata, screenshots, policy compliance
 - Share that 500+ developers trust us
@@ -86,16 +87,16 @@ Keep it under 120 words. Be helpful, not pushy.`,
 Key points:
 - Share a quick success story or benefit
 - Remind them publishing without us costs $25 for Google's developer account alone
-- Our service is just $25 (or $20 with their discount) and we do all the work
+- Our service is just $25 (or $20 with their discount code FIRSTAPP) and we do all the work
 - Limited time offer expires soon
-- Final reminder about the discount
+- Final reminder about the discount code FIRSTAPP
 
 Keep it under 100 words. Create mild urgency.`,
 
     follow_up_3: `Write a final follow-up email for "${name}" about Quanta Mesh.
 
 Key points:
-- This is their last chance for the $5 discount
+- This is their last chance for the $5 discount with code "FIRSTAPP"
 - Simple, direct message
 - One clear call-to-action
 - Thank them for their time if they're not interested
@@ -227,6 +228,8 @@ Return ONLY valid JSON in this exact format:
 Thanks for joining Quanta Mesh! We're excited to have you.
 
 As a welcome gift, you've got $5 OFF your first app publish - just $20 instead of $25.
+
+**Use code: FIRSTAPP** at checkout!
 
 We handle everything:
 ✓ App upload to Google Play
@@ -400,13 +403,29 @@ function generateAppleStyleEmail(content: string, name: string, emailId: string,
           <tr>
             <td style="padding: 0 24px 32px; text-align: center;">
               
-              <!-- Discount Badge -->
+              <!-- Discount Badge with Code -->
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
-                  <td align="center" style="padding-bottom: 20px;">
+                  <td align="center" style="padding-bottom: 12px;">
                     <span style="display: inline-block; background: linear-gradient(135deg, #af52de 0%, #5e5ce6 100%); color: #ffffff; font-size: 13px; font-weight: 600; padding: 10px 24px; border-radius: 50px;">
                       🎁 $5 OFF — Your Exclusive Offer
                     </span>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Discount Code Box -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom: 20px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background-color: #f5f5f7; border: 2px dashed #5e5ce6; border-radius: 8px; padding: 12px 24px; text-align: center;" class="dark-feature">
+                          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #86868b; display: block; margin-bottom: 4px;">Use Code</span>
+                          <span style="font-size: 22px; font-weight: 700; color: #5e5ce6; letter-spacing: 2px;">FIRSTAPP</span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
