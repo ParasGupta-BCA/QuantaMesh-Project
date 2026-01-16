@@ -140,8 +140,36 @@ export default function Order() {
     screenshots: []
   });
 
+  // Discount code state
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountError, setDiscountError] = useState("");
+
   const basePrice = 25;
-  const totalPrice = basePrice;
+  const discountAmount = discountApplied ? 5 : 0;
+  const totalPrice = basePrice - discountAmount;
+
+  const handleApplyDiscount = () => {
+    setDiscountError("");
+    if (discountCode.trim().toUpperCase() === "FIRSTAPP") {
+      setDiscountApplied(true);
+      toast({
+        title: "Discount Applied! 🎉",
+        description: "You saved $5 on your order!",
+      });
+    } else if (discountCode.trim() === "") {
+      setDiscountError("Please enter a discount code");
+    } else {
+      setDiscountError("Invalid discount code");
+      setDiscountApplied(false);
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    setDiscountCode("");
+    setDiscountApplied(false);
+    setDiscountError("");
+  };
 
   useEffect(() => {
     if (user) {
@@ -1024,6 +1052,55 @@ export default function Order() {
                               </div>
                             </div>
 
+                            {/* Discount Code */}
+                            <div className="glass-card rounded-xl p-4 border-dashed border-2 border-primary/30 bg-primary/5">
+                              <Label className="text-sm font-medium mb-3 block">Have a discount code?</Label>
+                              {discountApplied ? (
+                                <div className="flex items-center justify-between gap-4 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle className="h-5 w-5 text-green-500" />
+                                    <span className="font-semibold text-green-400">FIRSTAPP</span>
+                                    <span className="text-sm text-muted-foreground">(-$5.00)</span>
+                                  </div>
+                                  <Button 
+                                    type="button" 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={handleRemoveDiscount}
+                                    className="text-muted-foreground hover:text-destructive"
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  <div className="flex gap-2">
+                                    <Input
+                                      value={discountCode}
+                                      onChange={(e) => {
+                                        setDiscountCode(e.target.value.toUpperCase());
+                                        setDiscountError("");
+                                      }}
+                                      placeholder="Enter code (e.g., FIRSTAPP)"
+                                      className="flex-1 uppercase"
+                                      maxLength={20}
+                                    />
+                                    <Button 
+                                      type="button" 
+                                      variant="outline" 
+                                      onClick={handleApplyDiscount}
+                                      className="shrink-0"
+                                    >
+                                      Apply
+                                    </Button>
+                                  </div>
+                                  {discountError && (
+                                    <p className="text-xs text-destructive">{discountError}</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
                             {/* Order Summary */}
                             <div className="glass-card rounded-xl p-6">
                               <h3 className="font-semibold mb-4">Order Summary</h3>
@@ -1032,12 +1109,23 @@ export default function Order() {
                                   <span className="text-muted-foreground">Base Package</span>
                                   <span>$25.00</span>
                                 </div>
+                                {discountApplied && (
+                                  <div className="flex justify-between text-green-400">
+                                    <span>Discount (FIRSTAPP)</span>
+                                    <span>-$5.00</span>
+                                  </div>
+                                )}
                                 <div className="text-xs text-primary mt-2">
                                   + All premium features included
                                 </div>
                                 <div className="border-t border-border pt-2 mt-2 flex justify-between font-bold text-lg">
                                   <span>Total</span>
-                                  <span className="gradient-text">${totalPrice}.00</span>
+                                  <div className="text-right">
+                                    {discountApplied && (
+                                      <span className="text-sm text-muted-foreground line-through mr-2">$25.00</span>
+                                    )}
+                                    <span className="gradient-text">${totalPrice}.00</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
