@@ -208,11 +208,58 @@ export default function Contact() {
     }
   ];
 
+  // Structured data for Contact page
+  const contactStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ContactPage",
+        "url": "https://www.quantamesh.store/contact",
+        "name": "Contact Quanta Mesh",
+        "description": "Get in touch with Quanta Mesh for Android app publishing and CGI video production inquiries.",
+        "mainEntity": {
+          "@type": "Organization",
+          "name": "Quanta Mesh",
+          "url": "https://www.quantamesh.store",
+          "email": "parasgupta4494@gmail.com",
+          "contactPoint": [
+            {
+              "@type": "ContactPoint",
+              "contactType": "customer service",
+              "email": "parasgupta4494@gmail.com",
+              "availableLanguage": ["English", "Hindi"]
+            },
+            {
+              "@type": "ContactPoint",
+              "contactType": "sales",
+              "email": "Sanchitsaggi07@gmail.com",
+              "availableLanguage": ["English", "Hindi"]
+            }
+          ],
+          "sameAs": ["https://www.instagram.com/quantamesh/"]
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.quantamesh.store"},
+          {"@type": "ListItem", "position": 2, "name": "Contact", "item": "https://www.quantamesh.store/contact"}
+        ]
+      }
+    ]
+  };
+
   return (
     <Layout>
       <Helmet>
-        <title>Contact Us - Quanta Mesh</title>
-        <meta name="description" content="Get in touch with Quanta Mesh. We're here to help with your Android app publishing needs. Response within 24 hours." />
+        <title>Contact Us - Get Help with App Publishing | Quanta Mesh</title>
+        <meta name="description" content="Contact Quanta Mesh for Android app publishing and CGI video production inquiries. We respond within 24 hours. Email, Instagram, or use our contact form." />
+        <meta name="keywords" content="contact quanta mesh, app publishing help, android app support, CGI video inquiry" />
+        <link rel="canonical" href="https://www.quantamesh.store/contact" />
+        <meta name="robots" content="index, follow" />
+        <script type="application/ld+json">
+          {JSON.stringify(contactStructuredData)}
+        </script>
       </Helmet>
 
       <section className="pt-20 pb-16 md:pt-32 md:pb-24">
