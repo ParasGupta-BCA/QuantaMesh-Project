@@ -73,13 +73,109 @@ const addOns = [
 ];
 
 export default function Services() {
+  // Comprehensive structured data for Services page
+  const servicesStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": "https://www.quantamesh.store/services#app-publishing",
+        "name": "Android App Publishing Service",
+        "serviceType": "Mobile App Publishing",
+        "description": "Complete Google Play Store app publishing service. We handle metadata entry, screenshot uploads, keyword optimization, policy compliance, and post-publish support. Perfect for developers who want professional help launching their Android apps.",
+        "provider": {
+          "@type": "Organization",
+          "name": "Quanta Mesh",
+          "url": "https://www.quantamesh.store"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "25.00",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "priceValidUntil": "2025-12-31",
+          "itemCondition": "https://schema.org/NewCondition"
+        },
+        "areaServed": "Worldwide",
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "What's Included",
+          "itemListElement": [
+            "App submission to Google Play Console",
+            "Metadata entry (title, descriptions, category)",
+            "Keyword optimization for discoverability",
+            "Screenshot and graphics upload",
+            "App icon setup (all required sizes)",
+            "Content rating questionnaire completion",
+            "Privacy policy linkage",
+            "Pre-submission policy compliance check",
+            "48-hour post-publish support"
+          ]
+        },
+        "termsOfService": "https://www.quantamesh.store/terms-of-service"
+      },
+      {
+        "@type": "Service",
+        "@id": "https://www.quantamesh.store/services#cgi-ads",
+        "name": "CGI Video Ads Production",
+        "serviceType": "Video Production",
+        "description": "Hyper-realistic 3D CGI video advertisements for social media marketing. We create viral-ready content that blends the real world with extraordinary visual effects to capture attention and drive engagement.",
+        "provider": {
+          "@type": "Organization",
+          "name": "Quanta Mesh",
+          "url": "https://www.quantamesh.store"
+        },
+        "offers": {
+          "@type": "Offer",
+          "priceSpecification": {
+            "@type": "PriceSpecification",
+            "price": "Contact for quote",
+            "priceCurrency": "USD"
+          }
+        },
+        "areaServed": "Worldwide"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.quantamesh.store"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Services",
+            "item": "https://www.quantamesh.store/services"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "url": "https://www.quantamesh.store/services",
+        "name": "Android App Publishing Services - Fast & Secure | Quanta Mesh",
+        "description": "Get your Android app published on Google Play Store for just $25. Complete service includes metadata optimization, icon setup, and policy compliance. 24-48h delivery.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "url": "https://www.quantamesh.store"
+        }
+      }
+    ]
+  };
+
   return (
     <Layout>
       <Helmet>
         <title>Android App Publishing Services - Fast & Secure | Quanta Mesh</title>
-        <meta name="description" content="Get your Android app published on Google Play Store for just $25. Complete service includes metadata optimization, icon setup, and policy compliance. 24-48h delivery." />
-        <meta name="keywords" content="android app publishing services, play store upload service, google play console help, app launch service" />
+        <meta name="description" content="Get your Android app published on Google Play Store for just $25. Complete service includes metadata optimization, icon setup, policy compliance, and 48-hour post-publish support. Trusted by 100+ developers worldwide." />
+        <meta name="keywords" content="android app publishing services, play store upload service, google play console help, app launch service, publish app without developer account, app store optimization, ASO service, mobile app publishing" />
         <link rel="canonical" href="https://www.quantamesh.store/services" />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <script type="application/ld+json">
+          {JSON.stringify(servicesStructuredData)}
+        </script>
       </Helmet>
 
       {/* Hero Section */}

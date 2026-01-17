@@ -41,6 +41,44 @@ export default function Portfolio() {
   const [searchParams] = useSearchParams();
   const { videos: adminVideos, loading: adminVideosLoading, getVideoUrl } = useAdminVideos();
 
+  // Structured data for Portfolio page
+  const portfolioStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "url": "https://www.quantamesh.store/portfolio",
+        "name": "CGI Video Portfolio - Quanta Mesh",
+        "description": "Explore our portfolio of hyper-realistic CGI video advertisements. Product showcases, brand campaigns, and motion graphics created by Quanta Mesh.",
+        "about": {
+          "@type": "CreativeWork",
+          "name": "CGI Video Ads Collection",
+          "creator": {
+            "@type": "Organization",
+            "name": "Quanta Mesh"
+          }
+        }
+      },
+      {
+        "@type": "ImageGallery",
+        "name": "Quanta Mesh CGI Portfolio",
+        "description": "Collection of professional CGI video advertisements showcasing product visualizations, brand campaigns, and motion graphics",
+        "author": {
+          "@type": "Organization",
+          "name": "Quanta Mesh",
+          "url": "https://www.quantamesh.store"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.quantamesh.store"},
+          {"@type": "ListItem", "position": 2, "name": "Portfolio", "item": "https://www.quantamesh.store/portfolio"}
+        ]
+      }
+    ]
+  };
+
   // Combine admin videos with static videos
   const portfolioItems = useMemo(() => {
     const adminItems = adminVideos.map((video) => ({
@@ -98,8 +136,13 @@ export default function Portfolio() {
   return (
     <Layout>
       <Helmet>
-        <title>CGI Portfolio | Quanta Mesh - Premium 3D Advertisements</title>
-        <meta name="description" content="Explore our collection of hyper-realistic CGI advertisements. From product showcases to brand campaigns, see how we bring ideas to life in stunning 3D." />
+        <title>CGI Portfolio | Quanta Mesh - Premium 3D Video Advertisements</title>
+        <meta name="description" content="Explore our portfolio of hyper-realistic CGI video advertisements. Product showcases, brand campaigns, and motion graphics created by Quanta Mesh professionals." />
+        <meta name="keywords" content="CGI portfolio, 3D video ads, product visualization, brand video, motion graphics, visual effects, Quanta Mesh" />
+        <link rel="canonical" href="https://www.quantamesh.store/portfolio" />
+        <script type="application/ld+json">
+          {JSON.stringify(portfolioStructuredData)}
+        </script>
       </Helmet>
 
       <section className="min-h-screen bg-background pt-24 pb-16">
