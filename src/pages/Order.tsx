@@ -28,7 +28,9 @@ import {
   XCircle,
   RefreshCw,
   Zap,
-  Star
+  Star,
+  Sparkles,
+  Copy
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -141,34 +143,18 @@ export default function Order() {
   });
 
   // Discount code state
-  const [discountCode, setDiscountCode] = useState("");
-  const [discountApplied, setDiscountApplied] = useState(false);
-  const [discountError, setDiscountError] = useState("");
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const basePrice = 25;
-  const discountAmount = discountApplied ? 5 : 0;
-  const totalPrice = basePrice - discountAmount;
 
-  const handleApplyDiscount = () => {
-    setDiscountError("");
-    if (discountCode.trim().toUpperCase() === "FIRSTAPP") {
-      setDiscountApplied(true);
-      toast({
-        title: "Discount Applied! 🎉",
-        description: "You saved $5 on your order!",
-      });
-    } else if (discountCode.trim() === "") {
-      setDiscountError("Please enter a discount code");
-    } else {
-      setDiscountError("Invalid discount code");
-      setDiscountApplied(false);
-    }
-  };
-
-  const handleRemoveDiscount = () => {
-    setDiscountCode("");
-    setDiscountApplied(false);
-    setDiscountError("");
+  const handleCopyDiscountCode = () => {
+    navigator.clipboard.writeText("FIRSTAPP");
+    setCodeCopied(true);
+    toast({
+      title: "Code Copied! 🎉",
+      description: "Use FIRSTAPP at checkout to save $5 on your first app!",
+    });
+    setTimeout(() => setCodeCopied(false), 3000);
   };
 
   useEffect(() => {
@@ -373,7 +359,7 @@ export default function Order() {
         privacy_policy_url: 'privacyPolicyUrl' in validatedData ? validatedData.privacyPolicyUrl || null : null,
         support_url: 'supportUrl' in validatedData ? validatedData.supportUrl || null : null,
         add_ons: [],
-        total_price: serviceType === 'publishing' ? totalPrice : 0,
+        total_price: serviceType === 'publishing' ? basePrice : 0,
         status: 'pending',
         apk_file_path: apkFilePath,
         icon_file_path: iconFilePath,
@@ -1052,53 +1038,43 @@ export default function Order() {
                               </div>
                             </div>
 
-                            {/* Discount Code */}
+                            {/* Discount Code - First App Only */}
                             <div className="glass-card rounded-xl p-4 border-dashed border-2 border-primary/30 bg-primary/5">
-                              <Label className="text-sm font-medium mb-3 block">Have a discount code?</Label>
-                              {discountApplied ? (
-                                <div className="flex items-center justify-between gap-4 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
-                                  <div className="flex items-center gap-2">
-                                    <CheckCircle className="h-5 w-5 text-green-500" />
-                                    <span className="font-semibold text-green-400">FIRSTAPP</span>
-                                    <span className="text-sm text-muted-foreground">(-$5.00)</span>
-                                  </div>
-                                  <Button 
-                                    type="button" 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={handleRemoveDiscount}
-                                    className="text-muted-foreground hover:text-destructive"
-                                  >
-                                    Remove
-                                  </Button>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Sparkles className="h-4 w-4 text-primary" />
+                                <Label className="text-sm font-medium">First-Time Discount!</Label>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-3">
+                                Publishing your first app? Use this code at checkout to save $5!
+                              </p>
+                              <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-background/50 border border-border">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono font-bold text-lg tracking-wider text-primary">FIRSTAPP</span>
+                                  <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-0.5 rounded-full">-$5.00</span>
                                 </div>
-                              ) : (
-                                <div className="space-y-2">
-                                  <div className="flex gap-2">
-                                    <Input
-                                      value={discountCode}
-                                      onChange={(e) => {
-                                        setDiscountCode(e.target.value.toUpperCase());
-                                        setDiscountError("");
-                                      }}
-                                      placeholder="Enter code (e.g., FIRSTAPP)"
-                                      className="flex-1 uppercase"
-                                      maxLength={20}
-                                    />
-                                    <Button 
-                                      type="button" 
-                                      variant="outline" 
-                                      onClick={handleApplyDiscount}
-                                      className="shrink-0"
-                                    >
-                                      Apply
-                                    </Button>
-                                  </div>
-                                  {discountError && (
-                                    <p className="text-xs text-destructive">{discountError}</p>
+                                <Button 
+                                  type="button" 
+                                  variant={codeCopied ? "secondary" : "outline"}
+                                  size="sm" 
+                                  onClick={handleCopyDiscountCode}
+                                  className="shrink-0 gap-2"
+                                >
+                                  {codeCopied ? (
+                                    <>
+                                      <CheckCircle className="h-4 w-4" />
+                                      Copied!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="h-4 w-4" />
+                                      Copy Code
+                                    </>
                                   )}
-                                </div>
-                              )}
+                                </Button>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-2 italic">
+                                *Valid for your first app only. Apply at payment checkout.
+                              </p>
                             </div>
 
                             {/* Order Summary */}
@@ -1109,24 +1085,16 @@ export default function Order() {
                                   <span className="text-muted-foreground">Base Package</span>
                                   <span>$25.00</span>
                                 </div>
-                                {discountApplied && (
-                                  <div className="flex justify-between text-green-400">
-                                    <span>Discount (FIRSTAPP)</span>
-                                    <span>-$5.00</span>
-                                  </div>
-                                )}
                                 <div className="text-xs text-primary mt-2">
                                   + All premium features included
                                 </div>
                                 <div className="border-t border-border pt-2 mt-2 flex justify-between font-bold text-lg">
                                   <span>Total</span>
-                                  <div className="text-right">
-                                    {discountApplied && (
-                                      <span className="text-sm text-muted-foreground line-through mr-2">$25.00</span>
-                                    )}
-                                    <span className="gradient-text">${totalPrice}.00</span>
-                                  </div>
+                                  <span className="gradient-text">${basePrice}.00</span>
                                 </div>
+                                <p className="text-xs text-muted-foreground text-center mt-2">
+                                  First-time users: Apply FIRSTAPP at checkout for $5 off!
+                                </p>
                               </div>
                             </div>
 
@@ -1162,7 +1130,7 @@ export default function Order() {
                                 disabled={!isStep2Valid || isSubmitting}
                                 className="flex-1"
                               >
-                                {isSubmitting ? "Submitting..." : `Submit Order - $${totalPrice}`}
+                                {isSubmitting ? "Submitting..." : `Submit Order - $${basePrice}`}
                               </Button>
                             </div>
                           </div>
