@@ -14,6 +14,8 @@ import Chat from "./pages/Chat";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import Portfolio from "./pages/Portfolio";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
@@ -35,6 +37,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
