@@ -83,4 +83,12 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  
+  <!-- Blog Section -->
+  <url>
+    <loc>https://www.quantamesh.store/blog</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
