@@ -16,10 +16,10 @@ const navLinks = [
   { name: "Home", path: "/" },
   { name: "Services", path: "/services" },
   { name: "Portfolio", path: "/portfolio" },
-  { name: "Blog", path: "/blog", badge: "New" },
+  { name: "Blog", path: "/blog" },
   { name: "Order", path: "/order" },
   { name: "Contact", path: "/contact" },
-  { name: "Chat", path: "/chat" },
+  { name: "Chat", path: "/chat", badge: "New" },
 ];
 
 interface NavbarProps {
