@@ -83,8 +83,8 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
             to="/"
             className="flex items-center gap-2 text-xl font-bold flex-shrink-0 group"
           >
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-              <span className="text-primary text-lg">Q</span>
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg group-hover:bg-primary/10 transition-colors overflow-hidden">
+              <img src="/logo.png" alt="QuantaMesh" className="w-full h-full object-cover" />
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-foreground font-bold tracking-tight">Quanta</span>
@@ -191,8 +191,8 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
               <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 border-r border-border/10 bg-background/95 backdrop-blur-xl">
                 <SheetHeader className="p-6 border-b border-border/10">
                   <SheetTitle className="flex items-center gap-2">
-                    <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
-                      <span className="text-primary text-lg font-bold">Q</span>
+                    <div className="relative flex items-center justify-center w-8 h-8 rounded-lg overflow-hidden">
+                      <img src="/logo.png" alt="QuantaMesh" className="w-full h-full object-cover" />
                     </div>
                     <span className="font-bold text-foreground">Quanta Mesh</span>
                   </SheetTitle>
