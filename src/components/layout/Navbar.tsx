@@ -59,8 +59,8 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
         "fixed left-0 right-0 z-50 transition-all duration-300",
         isBannerVisible ? "top-10 md:top-12" : "top-0",
         scrolled || isOpen
-          ? "bg-background/80 backdrop-blur-md shadow-sm"
-          : "bg-background/80 backdrop-blur-md shadow-sm lg:bg-transparent lg:backdrop-blur-none lg:shadow-none"
+          ? "bg-background/95 backdrop-blur-md shadow-sm border-b border-border/10"
+          : "bg-background/95 backdrop-blur-md shadow-sm border-b border-border/10 lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:border-none"
       )}
     >
       <div className="container mx-auto px-4 lg:px-6">
