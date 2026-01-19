@@ -182,13 +182,13 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
                   <Menu size={24} className="text-foreground" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 border-l border-border/10 bg-background/95 backdrop-blur-xl">
+              <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 border-r border-border/10 bg-background/95 backdrop-blur-xl">
                 <SheetHeader className="p-6 border-b border-border/10">
                   <SheetTitle className="flex items-center gap-2">
                     <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
                       <span className="text-primary text-lg font-bold">Q</span>
                     </div>
-                    <span className="font-bold">QuantaMesh</span>
+                    <span className="font-bold text-foreground">QuantaMesh</span>
                   </SheetTitle>
                 </SheetHeader>
 
