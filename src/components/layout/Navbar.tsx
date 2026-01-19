@@ -32,9 +32,10 @@ const navLinks = [
 
 interface NavbarProps {
   isBannerVisible?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
-export function Navbar({ isBannerVisible = false }: NavbarProps) {
+export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -49,6 +50,11 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Sync open state with parent
+  useEffect(() => {
+    onOpenChange?.(isOpen);
+  }, [isOpen, onOpenChange]);
 
   // Close mobile menu on route change
   useEffect(() => {

@@ -14,10 +14,11 @@ interface LayoutProps {
 
 export function Layout({ children, hideFooter = false, showChatWidget = true, hideAnnouncement = false }: LayoutProps) {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Hide announcement bar on portfolio page or when explicitly hidden
-  const shouldShowBanner = isBannerVisible && !hideAnnouncement && location.pathname !== '/portfolio';
+  // Hide announcement bar on portfolio page, when explicitly hidden, or when mobile menu is open
+  const shouldShowBanner = isBannerVisible && !hideAnnouncement && location.pathname !== '/portfolio' && !isMobileMenuOpen;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -26,7 +27,7 @@ export function Layout({ children, hideFooter = false, showChatWidget = true, hi
           <AnnouncementBar onDismiss={() => setIsBannerVisible(false)} />
         </div>
       )}
-      <Navbar isBannerVisible={shouldShowBanner} />
+      <Navbar isBannerVisible={shouldShowBanner} onOpenChange={setIsMobileMenuOpen} />
       <main className={`flex-1 transition-all duration-300 ${shouldShowBanner ? "pt-28 lg:pt-32" : "pt-16 lg:pt-20"}`}>
         {children}
       </main>
