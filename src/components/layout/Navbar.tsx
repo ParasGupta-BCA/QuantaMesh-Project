@@ -180,9 +180,9 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
       {/* Mobile Navigation Menu - Full Screen Overlay approach for better UX */}
       <div
         className={cn(
-          "fixed inset-0 top-[64px] z-40 bg-background/95 backdrop-blur-xl transition-all duration-300 lg:hidden flex flex-col pointer-events-none opacity-0",
-          isOpen && "pointer-events-auto opacity-100",
-          isBannerVisible && "top-[104px] md:top-[112px]"
+          "fixed inset-0 top-0 z-[49] bg-black/95 backdrop-blur-xl transition-all duration-300 lg:hidden flex flex-col pt-24", // Use z-[49] to be just below navbar z-50
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+          isBannerVisible ? "pt-32" : "pt-20" // Add padding top instead of moving the top position to ensure full coverage
         )}
       >
         <div className="container mx-auto px-4 py-6 flex flex-col h-full overflow-y-auto">
