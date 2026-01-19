@@ -25,7 +25,7 @@ const Index = () => {
           "width": 512,
           "height": 512
         },
-        "image": "https://www.quantamesh.store/Service%201.png",
+        "image": "https://www.quantamesh.store/service-hero.png",
         "description": "Quanta Mesh is a trusted professional service specializing in Android app publishing to Google Play Store and CGI video production. We help developers and businesses launch their apps without needing their own developer console account, offering fast, affordable, and policy-compliant submissions.",
         "priceRange": "$20-$100",
         "currenciesAccepted": "USD",
@@ -197,7 +197,7 @@ const Index = () => {
         "about": {"@id": "https://www.quantamesh.store/#organization"},
         "primaryImageOfPage": {
           "@type": "ImageObject",
-          "url": "https://www.quantamesh.store/Service%201.png"
+          "url": "https://www.quantamesh.store/service-hero.png"
         },
         "breadcrumb": {
           "@type": "BreadcrumbList",

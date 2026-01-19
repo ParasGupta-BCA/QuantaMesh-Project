@@ -36,7 +36,7 @@ export default function BlogPost() {
     "@type": "BlogPosting",
     "headline": post.title,
     "description": post.meta_description || post.excerpt,
-    "image": post.featured_image || "https://www.quantamesh.store/Service%201.png",
+    "image": post.featured_image || "https://www.quantamesh.store/service-hero.png",
     "url": `https://www.quantamesh.store/blog/${post.slug}`,
     "datePublished": post.published_at,
     "dateModified": post.updated_at,
@@ -86,7 +86,7 @@ export default function BlogPost() {
         <meta property="og:title" content={post?.title || ""} />
         <meta property="og:description" content={post?.excerpt || ""} />
         <meta property="og:url" content={`https://www.quantamesh.store/blog/${slug}`} />
-        <meta property="og:image" content={post?.featured_image || "https://www.quantamesh.store/Service%201.png"} />
+        <meta property="og:image" content={post?.featured_image || "https://www.quantamesh.store/service-hero.png"} />
         <meta property="article:published_time" content={post?.published_at || ""} />
         <meta property="article:modified_time" content={post?.updated_at || ""} />
         <meta property="article:section" content={categoryLabel} />
@@ -95,7 +95,7 @@ export default function BlogPost() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post?.title || ""} />
         <meta name="twitter:description" content={post?.excerpt || ""} />
-        <meta name="twitter:image" content={post?.featured_image || "https://www.quantamesh.store/Service%201.png"} />
+        <meta name="twitter:image" content={post?.featured_image || "https://www.quantamesh.store/service-hero.png"} />
 
         {structuredData && (
           <script type="application/ld+json">
