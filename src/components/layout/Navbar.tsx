@@ -56,6 +56,9 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
   // Sync open state with parent
   useEffect(() => {
     onOpenChange?.(isOpen);
+    if (!isOpen) {
+      setTimeout(() => setIsUserMenuOpen(false), 300); // Wait for sheet close animation
+    }
   }, [isOpen, onOpenChange]);
 
   // Close mobile menu on route change
