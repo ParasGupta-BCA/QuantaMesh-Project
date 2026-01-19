@@ -194,7 +194,7 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
                     <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
                       <span className="text-primary text-lg font-bold">Q</span>
                     </div>
-                    <span className="font-bold text-foreground">QuantaMesh</span>
+                    <span className="font-bold text-foreground">Quanta Mesh</span>
                   </SheetTitle>
                 </SheetHeader>
 
