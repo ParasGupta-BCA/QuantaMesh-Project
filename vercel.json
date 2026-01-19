@@ -1,6 +1,10 @@
 {
     "rewrites": [
         {
+            "source": "/blog-sitemap.xml",
+            "destination": "https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/generate-blog-sitemap"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
