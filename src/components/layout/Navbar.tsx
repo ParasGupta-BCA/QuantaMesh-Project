@@ -58,7 +58,9 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
       className={cn(
         "fixed left-0 right-0 z-50 transition-all duration-300",
         isBannerVisible ? "top-10 md:top-12" : "top-0",
-        scrolled || isOpen ? "bg-background/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+        scrolled || isOpen
+          ? "bg-background/80 backdrop-blur-md shadow-sm"
+          : "bg-background/80 backdrop-blur-md shadow-sm lg:bg-transparent lg:backdrop-blur-none lg:shadow-none"
       )}
     >
       <div className="container mx-auto px-4 lg:px-6">
@@ -176,7 +178,7 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
       </div>
 
       {/* Mobile Navigation Menu - Full Screen Overlay approach for better UX */}
-      <div 
+      <div
         className={cn(
           "fixed inset-0 top-[64px] z-40 bg-background/95 backdrop-blur-xl transition-all duration-300 lg:hidden flex flex-col pointer-events-none opacity-0",
           isOpen && "pointer-events-auto opacity-100",
@@ -223,7 +225,7 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
                         <p className="text-xs text-muted-foreground">Logged in</p>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-2">
                       {isAdmin && (
                         <Link
@@ -268,7 +270,7 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
                 <ChevronRight size={18} />
               </Link>
             </Button>
-            
+
             <p className="text-center text-xs text-muted-foreground pt-4 pb-8">
               © {new Date().getFullYear()} QuantaMesh. All rights reserved.
             </p>
