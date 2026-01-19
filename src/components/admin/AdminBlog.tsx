@@ -7,11 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Eye, EyeOff, Calendar, ExternalLink } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Calendar, ExternalLink, Sparkles, Wand2, Bot, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import { blogCategories } from "@/hooks/useBlogPosts";
 
@@ -53,6 +53,9 @@ export function AdminBlog() {
   const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tagsInput, setTagsInput] = useState("");
+  const [aiTopic, setAiTopic] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isAutoPublishing, setIsAutoPublishing] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: posts, isLoading } = useQuery({
@@ -183,8 +186,178 @@ export function AdminBlog() {
     saveMutation.mutate({ ...editingPost, tags });
   };
 
+  // AI-powered blog generation
+  const generateWithAI = async (topic?: string, autoPublish: boolean = false) => {
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-blog-post", {
+        body: { 
+          topic: topic || aiTopic || undefined,
+          category: editingPost?.category,
+          autoPublish,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        if (data.error.includes("Rate limit")) {
+          toast({ title: "Rate limited", description: "Please wait a moment and try again.", variant: "destructive" });
+        } else if (data.error.includes("credits")) {
+          toast({ title: "AI credits exhausted", description: "Please add funds to continue using AI.", variant: "destructive" });
+        } else {
+          throw new Error(data.error);
+        }
+        return;
+      }
+
+      if (autoPublish) {
+        queryClient.invalidateQueries({ queryKey: ["admin-blog-posts"] });
+        queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
+        toast({ 
+          title: "Blog post published!", 
+          description: `"${data.post.title}" has been auto-published.` 
+        });
+      } else {
+        // Fill the form with generated content
+        setEditingPost({
+          ...defaultPost,
+          ...data.post,
+        });
+        setTagsInput(data.post.tags?.join(", ") || "");
+        setIsDialogOpen(true);
+        toast({ title: "Content generated!", description: "Review and edit before publishing." });
+      }
+    } catch (error: any) {
+      console.error("AI generation error:", error);
+      toast({ 
+        title: "Generation failed", 
+        description: error.message || "Failed to generate content", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Trigger auto-publish check
+  const triggerAutoPublish = async () => {
+    setIsAutoPublishing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("auto-publish-blog");
+
+      if (error) throw error;
+
+      if (data.message?.includes("already published")) {
+        toast({ 
+          title: "Already published today", 
+          description: `Post: ${data.existingPost || "exists"}` 
+        });
+      } else if (data.success) {
+        queryClient.invalidateQueries({ queryKey: ["admin-blog-posts"] });
+        queryClient.invalidateQueries({ queryKey: ["blog-posts"] });
+        toast({ 
+          title: "Auto-published!", 
+          description: `"${data.post?.title}" has been published.` 
+        });
+      }
+    } catch (error: any) {
+      toast({ 
+        title: "Auto-publish failed", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsAutoPublishing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* AI Automation Card */}
+      <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Bot className="w-5 h-5 text-primary" />
+            AI Blog Automation
+          </CardTitle>
+          <CardDescription>
+            Let AI help you create blog content or automatically publish daily posts
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 flex gap-2">
+              <Input
+                placeholder="Enter a topic (optional - AI will choose if empty)"
+                value={aiTopic}
+                onChange={(e) => setAiTopic(e.target.value)}
+                className="flex-1"
+              />
+              <Button 
+                onClick={() => generateWithAI(aiTopic, false)}
+                disabled={isGenerating}
+                variant="outline"
+              >
+                {isGenerating ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Wand2 className="w-4 h-4 mr-2" />
+                )}
+                Generate Draft
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => generateWithAI(aiTopic, true)}
+                disabled={isGenerating}
+                className="bg-primary"
+              >
+                {isGenerating ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4 mr-2" />
+                )}
+                Generate & Publish
+              </Button>
+              <Button 
+                onClick={triggerAutoPublish}
+                disabled={isAutoPublishing}
+                variant="secondary"
+              >
+                {isAutoPublishing ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Bot className="w-4 h-4 mr-2" />
+                )}
+                Check Auto-Publish
+              </Button>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            💡 Auto-publish runs daily at 9 AM UTC. If no blog is published that day, AI will automatically create and publish one.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Blog Sitemap Info */}
+      <Card className="border-muted">
+        <CardContent className="py-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Blog Sitemap URL:</span>
+            <a 
+              href={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-blog-sitemap`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline flex items-center gap-1"
+            >
+              {import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-blog-sitemap
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Blog Posts</h2>
@@ -199,7 +372,24 @@ export function AdminBlog() {
           </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingPost?.id ? "Edit Post" : "Create New Post"}</DialogTitle>
+              <DialogTitle className="flex items-center justify-between">
+                <span>{editingPost?.id ? "Edit Post" : "Create New Post"}</span>
+                {!editingPost?.id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => generateWithAI()}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Wand2 className="w-4 h-4 mr-2" />
+                    )}
+                    Generate with AI
+                  </Button>
+                )}
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
@@ -335,7 +525,13 @@ export function AdminBlog() {
         <Card className="py-10 text-center">
           <CardContent>
             <p className="text-muted-foreground mb-4">No blog posts yet</p>
-            <Button onClick={handleCreate}>Create your first post</Button>
+            <div className="flex justify-center gap-3">
+              <Button onClick={handleCreate}>Create manually</Button>
+              <Button variant="outline" onClick={() => generateWithAI(undefined, false)} disabled={isGenerating}>
+                <Sparkles className="w-4 h-4 mr-2" />
+                Generate with AI
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
