@@ -83,13 +83,10 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
             to="/"
             className="flex items-center gap-2 text-xl font-bold flex-shrink-0 group"
           >
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg group-hover:bg-primary/10 transition-colors overflow-hidden">
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg overflow-hidden shrink-0">
               <img src="/logo.png" alt="QuantaMesh" className="w-full h-full object-cover" />
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-foreground font-bold tracking-tight">Quanta</span>
-              <span className="text-muted-foreground text-xs font-medium tracking-widest">MESH</span>
-            </div>
+            <span className="text-foreground text-xl font-bold tracking-tight">Quanta Mesh</span>
           </Link>
 
           {/* Desktop Navigation */}
