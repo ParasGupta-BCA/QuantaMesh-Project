@@ -38,7 +38,7 @@ Allow: /
 
 # Sitemap locations
 Sitemap: https://www.quantamesh.store/sitemap.xml
-Sitemap: https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/generate-blog-sitemap
+Sitemap: https://www.quantamesh.store/blog-sitemap.xml
 
 # Crawl delay for politeness
 Crawl-delay: 1
