@@ -200,7 +200,7 @@ export default function Services() {
             <div className="relative animate-fade-in mx-auto w-full max-w-md lg:max-w-full">
               <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-border/50 bg-card/50 backdrop-blur-sm transform hover:scale-[1.02] transition-transform duration-500">
                 <img
-                  src="/Service 1.png"
+                  src="/service-hero.png"
                   alt="App Publishing Service Overview"
                   className="w-full h-auto object-cover"
                 />

@@ -21,7 +21,7 @@ export function SEOHead({
   description,
   keywords,
   canonicalUrl,
-  ogImage = "https://www.quantamesh.store/Service%201.png",
+  ogImage = "https://www.quantamesh.store/service-hero.png",
   ogType = "website",
   structuredData,
   noindex = false,
