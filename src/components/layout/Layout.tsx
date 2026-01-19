@@ -15,7 +15,7 @@ interface LayoutProps {
 export function Layout({ children, hideFooter = false, showChatWidget = true, hideAnnouncement = false }: LayoutProps) {
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const location = useLocation();
-  
+
   // Hide announcement bar on portfolio page or when explicitly hidden
   const shouldShowBanner = isBannerVisible && !hideAnnouncement && location.pathname !== '/portfolio';
 
@@ -27,7 +27,7 @@ export function Layout({ children, hideFooter = false, showChatWidget = true, hi
         </div>
       )}
       <Navbar isBannerVisible={shouldShowBanner} />
-      <main className={`flex-1 transition-all duration-300 ${shouldShowBanner ? "pt-28 md:pt-32" : "pt-16 md:pt-20"}`}>
+      <main className={`flex-1 transition-all duration-300 ${shouldShowBanner ? "pt-28 lg:pt-32" : "pt-16 lg:pt-20"}`}>
         {children}
       </main>
       {!hideFooter && <Footer />}
