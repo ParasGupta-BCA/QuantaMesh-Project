@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, LogOut, User, LogIn, UserPlus, Shield, ChevronRight } from "lucide-react";
+import { Menu, LogOut, User, LogIn, UserPlus, Shield, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import {
@@ -11,6 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -58,9 +65,9 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
       className={cn(
         "fixed left-0 right-0 z-50 transition-all duration-300",
         isBannerVisible ? "top-10 md:top-12" : "top-0",
-        scrolled || isOpen
-          ? "bg-background/95 backdrop-blur-md shadow-sm border-b border-border/10"
-          : "bg-background/95 backdrop-blur-md shadow-sm border-b border-border/10 lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:border-none"
+        scrolled
+          ? "bg-background/80 backdrop-blur-md shadow-sm"
+          : "bg-transparent"
       )}
     >
       <div className="container mx-auto px-4 lg:px-6">
@@ -164,116 +171,119 @@ export function Navbar({ isBannerVisible = false }: NavbarProps) {
             </Button>
           </div>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Menu (Sheet) */}
           <div className="flex lg:hidden items-center gap-2">
-            <button
-              className="p-2 rounded-full hover:bg-secondary/80 transition-colors active:scale-95 duration-200"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X size={24} className="text-foreground" /> : <Menu size={24} className="text-foreground" />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Navigation Menu - Full Screen Overlay approach for better UX */}
-      <div
-        className={cn(
-          "fixed inset-0 top-0 z-[49] bg-black/95 backdrop-blur-xl transition-all duration-300 lg:hidden flex flex-col pt-24", // Use z-[49] to be just below navbar z-50
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
-          isBannerVisible ? "pt-32" : "pt-20" // Add padding top instead of moving the top position to ensure full coverage
-        )}
-      >
-        <div className="container mx-auto px-4 py-6 flex flex-col h-full overflow-y-auto">
-          {/* Mobile Links */}
-          <div className="flex flex-col space-y-2 mb-8">
-            {navLinks.map((link, idx) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                style={{ transitionDelay: `${idx * 50}ms` }}
-                className={cn(
-                  "flex items-center justify-between p-4 rounded-xl text-lg font-medium transition-all duration-300 transform translate-y-4 opacity-0",
-                  isOpen && "translate-y-0 opacity-100",
-                  location.pathname === link.path
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-secondary/50 text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <span>{link.name}</span>
-                {link.badge && (
-                  <span className="text-xs font-bold bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                    {link.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
-          </div>
-
-          <div className={cn("mt-auto space-y-4 transition-all duration-500 delay-300 transform translate-y-8 opacity-0", isOpen && "translate-y-0 opacity-100")}>
-            {!loading && (
-              <div className="p-4 rounded-2xl bg-secondary/30 border border-border/50">
-                {user ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <User size={20} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{user.email}</p>
-                        <p className="text-xs text-muted-foreground">Logged in</p>
-                      </div>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <button
+                  className="p-2 rounded-full hover:bg-secondary/80 transition-colors active:scale-95 duration-200"
+                  aria-label="Toggle menu"
+                >
+                  <Menu size={24} className="text-foreground" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 border-l border-border/10 bg-background/95 backdrop-blur-xl">
+                <SheetHeader className="p-6 border-b border-border/10">
+                  <SheetTitle className="flex items-center gap-2">
+                    <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
+                      <span className="text-primary text-lg font-bold">Q</span>
                     </div>
+                    <span className="font-bold">QuantaMesh</span>
+                  </SheetTitle>
+                </SheetHeader>
 
-                    <div className="grid grid-cols-1 gap-2">
-                      {isAdmin && (
-                        <Link
-                          to="/admin"
-                          className="flex items-center justify-center gap-2 w-full p-2.5 rounded-lg text-sm font-medium bg-background border border-border/50 shadow-sm hover:bg-secondary/80 transition-colors"
-                        >
-                          <Shield size={16} />
-                          Admin Panel
-                        </Link>
-                      )}
-                      <button
-                        onClick={handleSignOut}
-                        className="flex items-center justify-center gap-2 w-full p-2.5 rounded-lg text-sm font-medium text-destructive bg-destructive/5 hover:bg-destructive/10 transition-colors"
+                <div className="flex flex-col h-[calc(100vh-80px)] overflow-y-auto">
+                  <div className="flex flex-col p-4 space-y-1">
+                    {navLinks.map((link) => (
+                      <Link
+                        key={link.path}
+                        to={link.path}
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center justify-between p-3 rounded-xl text-base font-medium transition-all duration-200",
+                          location.pathname === link.path
+                            ? "bg-primary/10 text-primary"
+                            : "hover:bg-secondary/50 text-muted-foreground hover:text-foreground"
+                        )}
                       >
-                        <LogOut size={16} />
-                        Sign Out
-                      </button>
-                    </div>
+                        <span>{link.name}</span>
+                        {link.badge && (
+                          <span className="text-[10px] font-bold bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                            {link.badge}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
                   </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button variant="outline" className="w-full gap-2 rounded-xl h-11" asChild>
-                      <Link to="/auth">
-                        <LogIn size={18} />
-                        Sign In
+
+                  <div className="mt-auto p-4 space-y-4 border-t border-border/10 bg-secondary/5">
+                    {!loading && (
+                      <div className="space-y-4">
+                        {user ? (
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <User size={20} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{user.email}</p>
+                                <p className="text-xs text-muted-foreground">Logged in</p>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-2">
+                              {isAdmin && (
+                                <Link
+                                  to="/admin"
+                                  onClick={() => setIsOpen(false)}
+                                  className="flex items-center justify-center gap-2 w-full p-2.5 rounded-xl text-sm font-medium bg-background border border-border/50 shadow-sm hover:bg-secondary/80 transition-colors"
+                                >
+                                  <Shield size={16} />
+                                  Admin Panel
+                                </Link>
+                              )}
+                              <button
+                                onClick={handleSignOut}
+                                className="flex items-center justify-center gap-2 w-full p-2.5 rounded-xl text-sm font-medium text-destructive bg-destructive/5 hover:bg-destructive/10 transition-colors"
+                              >
+                                <LogOut size={16} />
+                                Sign Out
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-2 gap-3">
+                            <Button variant="outline" className="w-full gap-2 rounded-xl h-11" asChild>
+                              <Link to="/auth" onClick={() => setIsOpen(false)}>
+                                <LogIn size={18} />
+                                Sign In
+                              </Link>
+                            </Button>
+                            <Button className="w-full gap-2 rounded-xl h-11" asChild>
+                              <Link to="/auth?signup=true" onClick={() => setIsOpen(false)}>
+                                <UserPlus size={18} />
+                                Sign Up
+                              </Link>
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <Button size="lg" className="w-full rounded-xl gap-2 font-semibold shadow-lg shadow-primary/20" asChild>
+                      <Link to="/order" onClick={() => setIsOpen(false)}>
+                        Publish My App
+                        <ChevronRight size={18} />
                       </Link>
                     </Button>
-                    <Button className="w-full gap-2 rounded-xl h-11" asChild>
-                      <Link to="/auth?signup=true">
-                        <UserPlus size={18} />
-                        Sign Up
-                      </Link>
-                    </Button>
+
+                    <p className="text-center text-xs text-muted-foreground">
+                      © {new Date().getFullYear()} QuantaMesh
+                    </p>
                   </div>
-                )}
-              </div>
-            )}
-
-            <Button size="lg" className="w-full rounded-xl gap-2 font-semibold shadow-lg shadow-primary/20" asChild>
-              <Link to="/order">
-                Publish My App
-                <ChevronRight size={18} />
-              </Link>
-            </Button>
-
-            <p className="text-center text-xs text-muted-foreground pt-4 pb-8">
-              © {new Date().getFullYear()} QuantaMesh. All rights reserved.
-            </p>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
