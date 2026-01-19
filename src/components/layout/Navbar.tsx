@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut, User, LogIn, UserPlus, Shield, ChevronRight } from "lucide-react";
+import { Menu, LogOut, User, LogIn, UserPlus, Shield, ChevronRight, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +39,7 @@ interface NavbarProps {
 export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
   const { user, signOut, loading } = useAuth();
   const { isAdmin } = useAdmin();
@@ -223,8 +225,11 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
                     {!loading && (
                       <div className="space-y-4">
                         {user ? (
-                          <div className="space-y-4">
-                            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+                          <div className="space-y-2">
+                            <div
+                              className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 cursor-pointer active:scale-95 transition-all"
+                              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                            >
                               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                                 <User size={20} />
                               </div>
@@ -232,27 +237,43 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
                                 <p className="text-sm font-medium text-foreground truncate">{user.email}</p>
                                 <p className="text-xs text-muted-foreground">Logged in</p>
                               </div>
+                              <ChevronDown
+                                size={16}
+                                className={cn("text-muted-foreground transition-transform duration-300", isUserMenuOpen && "rotate-180")}
+                              />
                             </div>
 
-                            <div className="grid grid-cols-1 gap-2">
-                              {isAdmin && (
-                                <Link
-                                  to="/admin"
-                                  onClick={() => setIsOpen(false)}
-                                  className="flex items-center justify-center gap-2 w-full p-2.5 rounded-xl text-sm font-medium bg-background border border-border/50 shadow-sm hover:bg-secondary/80 transition-colors"
+                            <AnimatePresence>
+                              {isUserMenuOpen && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="overflow-hidden"
                                 >
-                                  <Shield size={16} />
-                                  Admin Panel
-                                </Link>
+                                  <div className="grid grid-cols-1 gap-2 pl-2">
+                                    {isAdmin && (
+                                      <Link
+                                        to="/admin"
+                                        onClick={() => setIsOpen(false)}
+                                        className="flex items-center justify-center gap-2 w-full p-2.5 rounded-xl text-sm font-medium bg-background border border-border/50 shadow-sm hover:bg-secondary/80 transition-colors"
+                                      >
+                                        <Shield size={16} />
+                                        Admin Panel
+                                      </Link>
+                                    )}
+                                    <button
+                                      onClick={handleSignOut}
+                                      className="flex items-center justify-center gap-2 w-full p-2.5 rounded-xl text-sm font-medium text-destructive bg-destructive/5 hover:bg-destructive/10 transition-colors"
+                                    >
+                                      <LogOut size={16} />
+                                      Sign Out
+                                    </button>
+                                  </div>
+                                </motion.div>
                               )}
-                              <button
-                                onClick={handleSignOut}
-                                className="flex items-center justify-center gap-2 w-full p-2.5 rounded-xl text-sm font-medium text-destructive bg-destructive/5 hover:bg-destructive/10 transition-colors"
-                              >
-                                <LogOut size={16} />
-                                Sign Out
-                              </button>
-                            </div>
+                            </AnimatePresence>
                           </div>
                         ) : (
                           <div className="grid grid-cols-2 gap-3">
