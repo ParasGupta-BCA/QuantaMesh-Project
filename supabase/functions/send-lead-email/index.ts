@@ -258,13 +258,83 @@ function formatContentToHtml(content: string): string {
     .replace(/\n/g, '<br>');
 }
 
+// Get the appropriate banner image based on email sequence type
+function getBannerForSequenceType(sequenceType: string): { banner: string; headline: string; subheadline: string } {
+  const banners: Record<string, { banner: string; headline: string; subheadline: string }> = {
+    welcome: {
+      banner: `${BASE_URL}/email-welcome-banner.png`,
+      headline: "Welcome to<br>Quanta Mesh!",
+      subheadline: "Your app publishing journey starts here."
+    },
+    follow_up: {
+      banner: `${BASE_URL}/email-launch-banner.png`,
+      headline: "Your app deserves<br>to be live.",
+      subheadline: "We handle everything. You focus on building."
+    },
+    follow_up_2: {
+      banner: `${BASE_URL}/email-special-offer-banner.png`,
+      headline: "Don't miss out<br>on your discount!",
+      subheadline: "Limited time offer - act now."
+    },
+    follow_up_3: {
+      banner: `${BASE_URL}/email-special-offer-banner.png`,
+      headline: "Last chance<br>for $5 off!",
+      subheadline: "Your discount expires soon."
+    },
+    tip_aso: {
+      banner: `${BASE_URL}/email-aso-tips-banner.png`,
+      headline: "ASO Tips<br>& Tricks",
+      subheadline: "Boost your app's visibility on Google Play."
+    },
+    tip_screenshots: {
+      banner: `${BASE_URL}/email-screenshots-guide-banner.png`,
+      headline: "Perfect<br>Screenshots",
+      subheadline: "Create visuals that convert downloads."
+    },
+    tip_description: {
+      banner: `${BASE_URL}/email-aso-tips-banner.png`,
+      headline: "Writing Great<br>Descriptions",
+      subheadline: "Words that drive downloads."
+    },
+    tip_keywords: {
+      banner: `${BASE_URL}/email-aso-tips-banner.png`,
+      headline: "Keyword<br>Optimization",
+      subheadline: "Get discovered by the right users."
+    },
+    tip_updates: {
+      banner: `${BASE_URL}/email-launch-banner.png`,
+      headline: "App Update<br>Strategies",
+      subheadline: "Keep your users engaged."
+    },
+    tip_reviews: {
+      banner: `${BASE_URL}/email-launch-banner.png`,
+      headline: "Getting Great<br>Reviews",
+      subheadline: "Build trust with positive feedback."
+    },
+    tip_monetization: {
+      banner: `${BASE_URL}/email-launch-banner.png`,
+      headline: "Monetization<br>Strategies",
+      subheadline: "Turn your app into revenue."
+    },
+  };
+
+  return banners[sequenceType] || {
+    banner: `${BASE_URL}/email-hero-banner.png`,
+    headline: "Your app deserves<br>to be live.",
+    subheadline: "We handle everything. You focus on building."
+  };
+}
+
 // Apple-inspired email template with mobile-first inline styles
-function generateAppleStyleEmail(content: string, name: string, emailId: string, leadId: string): string {
+function generateAppleStyleEmail(content: string, name: string, emailId: string, leadId: string, sequenceType: string = "welcome"): string {
   const trackingBaseUrl = `${SUPABASE_URL}/functions/v1/track-email`;
   const unsubscribeUrl = `${SUPABASE_URL}/functions/v1/unsubscribe?id=${leadId}`;
   
   // Format content - convert markdown to HTML
   const formattedContent = formatContentToHtml(content);
+  
+  // Get appropriate banner and headlines for this email type
+  const { banner, headline, subheadline } = getBannerForSequenceType(sequenceType);
   
   // Create tracked URLs
   const orderUrl = `${trackingBaseUrl}?id=${emailId}&action=click&redirect=${encodeURIComponent("https://www.quantamesh.store/order")}`;
@@ -328,7 +398,7 @@ function generateAppleStyleEmail(content: string, name: string, emailId: string,
           <!-- Hero Image -->
           <tr>
             <td>
-              <img src="${BASE_URL}/email-hero-banner.png" alt="Quanta Mesh" width="600" style="width: 100%; max-width: 600px; height: auto; display: block;">
+              <img src="${banner}" alt="Quanta Mesh" width="600" style="width: 100%; max-width: 600px; height: auto; display: block;">
             </td>
           </tr>
           
@@ -343,12 +413,12 @@ function generateAppleStyleEmail(content: string, name: string, emailId: string,
               
               <!-- Headline -->
               <h1 style="margin: 0 0 12px; font-size: 28px; font-weight: 700; line-height: 1.15; color: #1d1d1f; letter-spacing: -0.5px;" class="dark-text">
-                Your app deserves<br>to be live.
+                ${headline}
               </h1>
               
               <!-- Subheadline -->
               <p style="margin: 0 0 24px; font-size: 16px; font-weight: 400; line-height: 1.4; color: #86868b;">
-                We handle everything. You focus on building.
+                ${subheadline}
               </p>
               
               <!-- Body Text -->
@@ -565,7 +635,8 @@ serve(async (req) => {
       emailContent.content, 
       name, 
       emailSequenceId || "unknown",
-      actualLeadId || "unknown"
+      actualLeadId || "unknown",
+      sequenceType
     );
 
     console.log(`Sending email to ${email}`);
