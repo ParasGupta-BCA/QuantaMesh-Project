@@ -676,7 +676,7 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, 
           ref={videoRef}
           src={currentVideo.src}
           className={cn(
-            "w-full h-full object-contain rounded-2xl transition-opacity duration-300",
+            "w-full h-full object-cover rounded-2xl transition-opacity duration-300",
             isLoading ? "opacity-0" : "opacity-100"
           )}
           loop
