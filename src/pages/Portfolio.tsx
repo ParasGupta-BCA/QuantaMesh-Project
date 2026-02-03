@@ -655,9 +655,10 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, 
         </button>
       )}
 
-      {/* Video container - Reels format (9:16 aspect ratio) */}
+      {/* Video container - Reels format (9:16 aspect ratio) - fixed height, width derived from aspect ratio */}
       <div 
-        className="relative h-[85vh] max-h-[900px] aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl border border-white/10 cursor-pointer"
+        className="relative h-[90vh] max-h-[95vh] w-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 cursor-pointer"
+        style={{ aspectRatio: '9/16' }}
         onClick={togglePlayPause}
       >
         {/* Loading skeleton */}
