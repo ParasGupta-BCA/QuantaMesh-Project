@@ -655,9 +655,9 @@ function FullScreenGallery({ videos, currentIndex, isOpen, onClose, onNavigate, 
         </button>
       )}
 
-      {/* Video container */}
+      {/* Video container - Reels format (9:16 aspect ratio) */}
       <div 
-        className="relative max-w-4xl max-h-[90vh] aspect-[9/16] cursor-pointer"
+        className="relative h-[85vh] max-h-[900px] aspect-[9/16] rounded-2xl overflow-hidden shadow-2xl border border-white/10 cursor-pointer"
         onClick={togglePlayPause}
       >
         {/* Loading skeleton */}
