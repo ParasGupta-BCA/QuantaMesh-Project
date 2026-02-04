@@ -189,16 +189,6 @@ export function LeadCapturePopup() {
             transition={{ duration: 0.3 }}
             className="relative z-10 p-5 sm:p-6"
           >
-            {/* Close button - only for dialog on desktop */}
-            {!isMobile && (
-              <button
-                onClick={handleDismiss}
-                className="absolute right-4 top-4 rounded-full p-2 bg-muted/50 opacity-70 transition-all hover:opacity-100 hover:bg-muted focus:outline-none z-20"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </button>
-            )}
 
             {/* Header with animated icon */}
             <div className="text-center space-y-3 mb-6">
