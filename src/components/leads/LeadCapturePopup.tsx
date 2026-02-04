@@ -159,6 +159,17 @@ export function LeadCapturePopup() {
 
   const PopupContent = () => (
     <div className="relative overflow-hidden">
+      {/* Custom close button with high z-index */}
+      {!isMobile && !submitted && (
+        <button
+          onClick={handleDismiss}
+          className="absolute right-4 top-4 z-50 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+      
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -387,7 +398,7 @@ export function LeadCapturePopup() {
         setOpen(true);
       }
     }}>
-      <DialogContent className="sm:max-w-md border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-md border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-0 overflow-hidden [&>button]:hidden">
         <PopupContent />
       </DialogContent>
     </Dialog>
