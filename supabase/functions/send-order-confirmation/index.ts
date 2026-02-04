@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,17 +8,26 @@ const corsHeaders = {
 };
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 // Base URL for hosted images
 const BASE_URL = "https://www.quantamesh.store";
 
 interface OrderConfirmationRequest {
-  email: string;
-  customerName: string;
-  appName: string;
   orderId: string;
-  totalPrice: number;
-  addOns?: string[];
+}
+
+// Helper to escape HTML special characters
+function escapeHtml(text: string): string {
+  const htmlEntities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return text.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
 }
 
 function generateOrderConfirmationEmail(
@@ -27,10 +37,15 @@ function generateOrderConfirmationEmail(
   totalPrice: number,
   addOns: string[] = []
 ): string {
+  // Escape all user-provided content
+  const safeCustomerName = escapeHtml(customerName);
+  const safeAppName = escapeHtml(appName);
+  const safeOrderId = escapeHtml(orderId);
+  
   const addOnsHtml = addOns.length > 0
     ? addOns.map(addon => `
       <tr>
-        <td style="padding: 8px 0; font-size: 14px; color: #86868b;">• ${addon}</td>
+        <td style="padding: 8px 0; font-size: 14px; color: #86868b;">• ${escapeHtml(addon)}</td>
       </tr>
     `).join('')
     : '';
@@ -112,7 +127,7 @@ function generateOrderConfirmationEmail(
               
               <!-- Headline -->
               <h1 style="margin: 0 0 12px; font-size: 26px; font-weight: 700; line-height: 1.15; color: #1d1d1f; letter-spacing: -0.5px;" class="dark-text">
-                Thank you, ${customerName}!
+                Thank you, ${safeCustomerName}!
               </h1>
               
               <!-- Subheadline -->
@@ -138,7 +153,7 @@ function generateOrderConfirmationEmail(
                           Order Details
                         </td>
                         <td align="right" style="font-size: 12px; font-weight: 500; color: #1d1d1f; font-family: 'SF Mono', Monaco, Consolas, monospace;" class="dark-text">
-                          #${orderId.slice(0, 8).toUpperCase()}
+                          #${safeOrderId.slice(0, 8).toUpperCase()}
                         </td>
                       </tr>
                     </table>
@@ -160,7 +175,7 @@ function generateOrderConfirmationEmail(
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 12px;">
                       <tr>
                         <td style="font-size: 14px; color: #86868b; width: 40%;">App Name</td>
-                        <td align="right" style="font-size: 14px; font-weight: 500; color: #1d1d1f;" class="dark-text">${appName}</td>
+                        <td align="right" style="font-size: 14px; font-weight: 500; color: #1d1d1f;" class="dark-text">${safeAppName}</td>
                       </tr>
                     </table>
                     
@@ -350,30 +365,88 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, customerName, appName, orderId, totalPrice, addOns }: OrderConfirmationRequest = await req.json();
+    // Extract the authorization header
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      console.error("Missing authorization header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Create Supabase client with user's JWT
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    // Verify the user is authenticated
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error("Auth error:", authError);
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { orderId }: OrderConfirmationRequest = await req.json();
 
     // Validate required fields
-    if (!email || !customerName || !appName || !orderId) {
+    if (!orderId) {
       return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
+        JSON.stringify({ error: "Missing order ID" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Sending order confirmation to ${email} for order ${orderId}`);
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(orderId)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid order ID format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Fetch the order from database - RLS will ensure user can only access their own orders
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
+      .single();
+
+    if (orderError || !order) {
+      console.error("Order fetch error:", orderError);
+      return new Response(
+        JSON.stringify({ error: "Order not found or access denied" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Verify the user owns this order
+    if (order.user_id !== user.id) {
+      console.error("User does not own this order");
+      return new Response(
+        JSON.stringify({ error: "Access denied" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`Sending order confirmation to ${order.email} for order ${orderId}`);
 
     const emailHtml = generateOrderConfirmationEmail(
-      customerName,
-      appName,
+      order.customer_name,
+      order.app_name,
       orderId,
-      totalPrice || 25,
-      addOns
+      order.total_price || 25,
+      order.add_ons || []
     );
 
     const emailResponse = await resend.emails.send({
       from: "Quanta Mesh <noreply@quantamesh.store>",
-      to: [email],
-      subject: `Order Confirmed! Your app "${appName}" is being processed 🚀`,
+      to: [order.email],
+      subject: `Order Confirmed! Your app "${order.app_name}" is being processed 🚀`,
       html: emailHtml,
     });
 

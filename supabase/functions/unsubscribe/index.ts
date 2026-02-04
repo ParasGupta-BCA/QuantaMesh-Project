@@ -8,6 +8,72 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const UNSUBSCRIBE_SECRET = Deno.env.get("UNSUBSCRIBE_SECRET") || SUPABASE_SERVICE_ROLE_KEY;
+
+// Helper to convert ArrayBuffer to hex string
+function bufferToHex(buffer: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+// Generate HMAC signature for unsubscribe tokens
+async function generateSignature(data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(UNSUBSCRIBE_SECRET);
+  const messageData = encoder.encode(data);
+  
+  const key = await crypto.subtle.importKey(
+    "raw",
+    keyData,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  
+  const signature = await crypto.subtle.sign("HMAC", key, messageData);
+  return bufferToHex(signature);
+}
+
+// Verify HMAC signature
+async function verifySignature(data: string, signature: string): Promise<boolean> {
+  try {
+    const expectedSignature = await generateSignature(data);
+    return signature === expectedSignature;
+  } catch {
+    return false;
+  }
+}
+
+// Verify and decode unsubscribe token
+async function verifyUnsubscribeToken(token: string): Promise<{ leadId: string; timestamp: number } | null> {
+  try {
+    // Decode base64 token
+    const decoded = atob(token);
+    const parts = decoded.split(":");
+    if (parts.length !== 3) return null;
+    
+    const [leadId, timestampStr, signature] = parts;
+    const timestamp = parseInt(timestampStr, 10);
+    
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(leadId)) return null;
+    
+    // Check token expiration (30 days)
+    const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+    if (Date.now() - timestamp > maxAge) return null;
+    
+    // Verify signature
+    const data = `${leadId}:${timestampStr}`;
+    const isValid = await verifySignature(data, signature);
+    if (!isValid) return null;
+    
+    return { leadId, timestamp };
+  } catch {
+    return null;
+  }
+}
 
 serve(async (req) => {
   // Handle CORS
@@ -16,12 +82,29 @@ serve(async (req) => {
   }
 
   const url = new URL(req.url);
-  const leadId = url.searchParams.get("id");
-  const email = url.searchParams.get("email");
-  const action = url.searchParams.get("action") || "unsubscribe"; // unsubscribe or resubscribe
+  const token = url.searchParams.get("token");
+  const action = url.searchParams.get("action") || "unsubscribe";
 
-  if (!leadId && !email) {
-    return new Response(generateHTML("error", action, "Invalid link"), {
+  // Validate action parameter
+  if (action !== "unsubscribe" && action !== "resubscribe") {
+    return new Response(generateHTML("error", "unsubscribe", "Invalid action"), {
+      status: 400,
+      headers: { "Content-Type": "text/html", ...corsHeaders },
+    });
+  }
+
+  if (!token) {
+    return new Response(generateHTML("error", action, "Invalid or expired link"), {
+      status: 400,
+      headers: { "Content-Type": "text/html", ...corsHeaders },
+    });
+  }
+
+  // Verify the token
+  const tokenData = await verifyUnsubscribeToken(token);
+  if (!tokenData) {
+    console.error("Invalid or expired unsubscribe token");
+    return new Response(generateHTML("error", action, "Invalid or expired link. Please contact support."), {
       status: 400,
       headers: { "Content-Type": "text/html", ...corsHeaders },
     });
@@ -32,29 +115,24 @@ serve(async (req) => {
 
     const newStatus = action === "resubscribe" ? "new" : "unsubscribed";
     
-    // Update lead status
-    let query = supabase.from("leads").update({ 
-      status: newStatus,
-      updated_at: new Date().toISOString()
-    });
-
-    if (leadId) {
-      query = query.eq("id", leadId);
-    } else if (email) {
-      query = query.eq("email", email);
-    }
-
-    const { error } = await query;
+    // Update lead status using verified leadId
+    const { error, count } = await supabase
+      .from("leads")
+      .update({ 
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", tokenData.leadId);
 
     if (error) {
       console.error(`Error ${action}:`, error);
       throw error;
     }
 
-    console.log(`${action}: leadId=${leadId}, email=${email}`);
+    console.log(`${action}: leadId=${tokenData.leadId}, count=${count}`);
 
     // Return a styled HTML page
-    return new Response(generateHTML("success", action, undefined, leadId, email), {
+    return new Response(generateHTML("success", action, undefined, token), {
       status: 200,
       headers: { "Content-Type": "text/html", ...corsHeaders },
     });
@@ -71,17 +149,15 @@ function generateHTML(
   status: "success" | "error", 
   action: string,
   errorMessage?: string,
-  leadId?: string | null,
-  email?: string | null
+  token?: string | null
 ): string {
   const isSuccess = status === "success";
   const isResubscribe = action === "resubscribe";
   
-  // Build the opposite action URL
+  // Build the opposite action URL using the same token
   const baseUrl = `https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/unsubscribe`;
-  const params = leadId ? `id=${leadId}` : `email=${encodeURIComponent(email || '')}`;
   const oppositeAction = isResubscribe ? "unsubscribe" : "resubscribe";
-  const toggleUrl = `${baseUrl}?${params}&action=${oppositeAction}`;
+  const toggleUrl = token ? `${baseUrl}?token=${encodeURIComponent(token)}&action=${oppositeAction}` : "";
   
   return `
 <!DOCTYPE html>
@@ -200,7 +276,7 @@ function generateHTML(
     <a href="https://www.quantamesh.store" class="button">
       ${isSuccess ? "Visit Website" : "Go Home"}
     </a>
-    ${isSuccess ? `
+    ${isSuccess && toggleUrl ? `
     <br>
     <a href="${toggleUrl}" class="toggle-link">
       ${isResubscribe ? "Changed your mind? Unsubscribe" : "Changed your mind? Re-subscribe"}
