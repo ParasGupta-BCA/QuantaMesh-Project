@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.generate-leads]
 verify_jwt = true
+
+[functions.track-email]
+verify_jwt = false
+
+[functions.unsubscribe]
+verify_jwt = false
