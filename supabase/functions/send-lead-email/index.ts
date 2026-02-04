@@ -12,8 +12,8 @@ const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// Base URL for hosted images
-const BASE_URL = "https://www.quantamesh.store";
+// Base URL for hosted images - using published Lovable URL where images are served
+const BASE_URL = "https://quantamesh.lovable.app";
 
 interface EmailRequest {
   leadId?: string;
