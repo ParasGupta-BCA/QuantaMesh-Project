@@ -380,7 +380,13 @@ export function LeadCapturePopup() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        handleDismiss();
+      } else {
+        setOpen(true);
+      }
+    }}>
       <DialogContent className="sm:max-w-md border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-0 overflow-hidden">
         <PopupContent />
       </DialogContent>
