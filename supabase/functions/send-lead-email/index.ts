@@ -110,9 +110,9 @@ Key points:
 - Share 2-3 practical ASO tips for Google Play
 - Explain how good ASO increases downloads
 - Mention that we optimize listings as part of our service
-- Soft CTA to publish with us
+- Soft CTA to learn more about our services (no discount code in this email)
 
-Keep it under 100 words. Be educational and valuable.`,
+Keep it under 100 words. Be educational and valuable. Do NOT mention any discount codes or special offers.`,
 
     tip_screenshots: `Write a helpful email for "${name}" about app screenshots.
 
@@ -122,7 +122,7 @@ Key points:
 - Explain screenshots impact on conversion rates
 - We create feature graphics as an add-on
 
-Keep it under 100 words. Be practical and helpful.`,
+Keep it under 100 words. Be practical and helpful. Do NOT mention any discount codes or special offers.`,
 
     tip_description: `Write a helpful email for "${name}" about writing app descriptions.
 
@@ -132,7 +132,7 @@ Key points:
 - Using bullet points and emojis strategically
 - We help optimize descriptions in our service
 
-Keep it under 100 words. Be actionable.`,
+Keep it under 100 words. Be actionable. Do NOT mention any discount codes or special offers.`,
 
     tip_keywords: `Write a helpful email for "${name}" about keyword optimization.
 
@@ -142,7 +142,7 @@ Key points:
 - Long-tail vs competitive keywords
 - We help with keyword research
 
-Keep it under 100 words. Be educational.`,
+Keep it under 100 words. Be educational. Do NOT mention any discount codes or special offers.`,
 
     tip_updates: `Write a helpful email for "${name}" about app update strategies.
 
@@ -152,7 +152,7 @@ Key points:
 - How updates affect user retention
 - We can help with future updates too
 
-Keep it under 100 words. Be strategic.`,
+Keep it under 100 words. Be strategic. Do NOT mention any discount codes or special offers.`,
 
     tip_reviews: `Write a helpful email for "${name}" about getting app reviews.
 
@@ -162,7 +162,7 @@ Key points:
 - How to respond to negative feedback
 - Good reviews = more downloads
 
-Keep it under 100 words. Be practical.`,
+Keep it under 100 words. Be practical. Do NOT mention any discount codes or special offers.`,
 
     tip_monetization: `Write a helpful email for "${name}" about app monetization.
 
@@ -172,7 +172,7 @@ Key points:
 - Setting up monetization on Google Play
 - We ensure proper monetization setup
 
-Keep it under 100 words. Be informative.`,
+Keep it under 100 words. Be informative. Do NOT mention any discount codes or special offers.`,
   };
 
   try {
@@ -325,6 +325,13 @@ function getBannerForSequenceType(sequenceType: string): { banner: string; headl
   };
 }
 
+// Check if email type should show discount code
+function shouldShowDiscountCode(sequenceType: string): boolean {
+  // Only show discount code in welcome and follow-up emails (sales-focused)
+  const discountEmailTypes = ["welcome", "follow_up", "follow_up_2", "follow_up_3"];
+  return discountEmailTypes.includes(sequenceType);
+}
+
 // Apple-inspired email template with mobile-first inline styles
 function generateAppleStyleEmail(content: string, name: string, emailId: string, leadId: string, sequenceType: string = "welcome"): string {
   const trackingBaseUrl = `${SUPABASE_URL}/functions/v1/track-email`;
@@ -335,6 +342,9 @@ function generateAppleStyleEmail(content: string, name: string, emailId: string,
   
   // Get appropriate banner and headlines for this email type
   const { banner, headline, subheadline } = getBannerForSequenceType(sequenceType);
+  
+  // Determine if we should show discount code for this email type
+  const showDiscountCode = shouldShowDiscountCode(sequenceType);
   
   // Create tracked URLs
   const orderUrl = `${trackingBaseUrl}?id=${emailId}&action=click&redirect=${encodeURIComponent("https://www.quantamesh.store/order")}`;
@@ -473,6 +483,7 @@ function generateAppleStyleEmail(content: string, name: string, emailId: string,
           <tr>
             <td style="padding: 0 24px 32px; text-align: center;">
               
+              ${showDiscountCode ? `
               <!-- Discount Badge with Code -->
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <tr>
@@ -499,6 +510,7 @@ function generateAppleStyleEmail(content: string, name: string, emailId: string,
                   </td>
                 </tr>
               </table>
+              ` : ''}
               
               <!-- Primary CTA Button -->
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
