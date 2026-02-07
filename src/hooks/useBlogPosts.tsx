@@ -83,5 +83,7 @@ export const blogCategories = [
   { value: "google-play", label: "Google Play Policies" },
   { value: "cgi-ads", label: "CGI & Video Ads" },
   { value: "industry-updates", label: "Industry Updates" },
-  { value: "tutorials", label: "Tutorials" },
+  { value: "tutorials", label: "Tutorials & ASO" },
+  { value: "app-monetization", label: "App Monetization" },
+  { value: "app-security", label: "App Security" },
 ];

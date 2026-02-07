@@ -29,21 +29,67 @@ interface UnsplashImage {
 }
 
 const BLOG_TOPICS = [
-  { topic: "How to optimize your Android app listing for better visibility", category: "app-publishing" },
-  { topic: "Understanding Google Play Store policy updates for 2025", category: "google-play" },
-  { topic: "Top 5 mistakes developers make when publishing apps", category: "app-publishing" },
-  { topic: "CGI advertising trends that are dominating social media", category: "cgi-ads" },
-  { topic: "How to write compelling app descriptions that convert", category: "tutorials" },
-  { topic: "The importance of app screenshots and feature graphics", category: "tutorials" },
-  { topic: "Google Play Console alternatives for indie developers", category: "app-publishing" },
-  { topic: "Why your app might get rejected and how to fix it", category: "google-play" },
-  { topic: "Latest mobile app marketing strategies for 2025", category: "industry-updates" },
+  // App Publishing
+  { topic: "How to optimize your Android app listing for better visibility in 2026", category: "app-publishing" },
+  { topic: "Top 5 mistakes developers make when publishing apps on Google Play", category: "app-publishing" },
+  { topic: "Google Play Console alternatives for indie developers in 2026", category: "app-publishing" },
+  { topic: "How to publish your first Android app: a complete 2026 guide", category: "app-publishing" },
+  { topic: "Monetization strategies for Android apps in 2026", category: "app-publishing" },
+  { topic: "Why hiring an app publishing service saves time and money", category: "app-publishing" },
+  { topic: "Common reasons apps get suspended and how to avoid them", category: "app-publishing" },
+  { topic: "How to handle app updates and version management on Play Store", category: "app-publishing" },
+
+  // Google Play Policies
+  { topic: "Understanding Google Play Store policy updates for 2026", category: "google-play" },
+  { topic: "Why your app might get rejected and how to fix it in 2026", category: "google-play" },
+  { topic: "Understanding content ratings and age restrictions on Google Play", category: "google-play" },
+  { topic: "Google Play data safety section: everything you need to know in 2026", category: "google-play" },
+  { topic: "How to comply with Google Play's new developer verification requirements", category: "google-play" },
+  { topic: "Target API level requirements for Google Play in 2026", category: "google-play" },
+  { topic: "Google Play's AI-generated content policies explained", category: "google-play" },
+
+  // CGI & Video Ads
+  { topic: "CGI advertising trends that are dominating social media in 2026", category: "cgi-ads" },
   { topic: "How CGI ads are revolutionizing brand marketing", category: "cgi-ads" },
-  { topic: "Step-by-step guide to preparing your app for Play Store", category: "tutorials" },
-  { topic: "Understanding content ratings and age restrictions", category: "google-play" },
-  { topic: "App Store Optimization (ASO) tips for beginners", category: "tutorials" },
+  { topic: "Top 10 viral CGI ad campaigns of 2026 and what made them work", category: "cgi-ads" },
+  { topic: "CGI vs traditional video ads: cost comparison and ROI analysis", category: "cgi-ads" },
+  { topic: "How to create scroll-stopping CGI ads for Instagram and TikTok", category: "cgi-ads" },
+  { topic: "Behind the scenes: how professional CGI ads are made", category: "cgi-ads" },
+  { topic: "AI-powered CGI: the future of video advertising in 2026", category: "cgi-ads" },
+  { topic: "Why small businesses should invest in CGI video ads", category: "cgi-ads" },
+
+  // Industry Updates
+  { topic: "Latest mobile app marketing strategies for 2026", category: "industry-updates" },
+  { topic: "The future of app publishing: trends to watch in 2026", category: "industry-updates" },
+  { topic: "How AI is transforming the app development industry in 2026", category: "industry-updates" },
+  { topic: "Mobile app revenue statistics and trends for 2026", category: "industry-updates" },
+  { topic: "The rise of super apps: what it means for indie developers", category: "industry-updates" },
+  { topic: "Cross-platform vs native development: the 2026 debate", category: "industry-updates" },
+  { topic: "Web3 and blockchain apps: are they still relevant in 2026?", category: "industry-updates" },
+  { topic: "The impact of AI regulations on app developers in 2026", category: "industry-updates" },
+
+  // Tutorials & ASO
+  { topic: "How to write compelling app descriptions that convert users", category: "tutorials" },
+  { topic: "The importance of app screenshots and feature graphics for conversions", category: "tutorials" },
+  { topic: "Step-by-step guide to preparing your app for Play Store submission", category: "tutorials" },
+  { topic: "App Store Optimization (ASO) tips for beginners in 2026", category: "tutorials" },
   { topic: "How to create a privacy policy for your Android app", category: "tutorials" },
-  { topic: "The future of app publishing: trends to watch", category: "industry-updates" },
+  { topic: "How to design the perfect app icon that stands out", category: "tutorials" },
+  { topic: "A/B testing your Play Store listing for better conversion rates", category: "tutorials" },
+  { topic: "How to respond to negative app reviews professionally", category: "tutorials" },
+  { topic: "Keyword research for ASO: tools and techniques for 2026", category: "tutorials" },
+  { topic: "How to create an effective app preview video", category: "tutorials" },
+
+  // App Monetization (new category)
+  { topic: "Best ad networks for Android apps in 2026", category: "app-monetization" },
+  { topic: "In-app purchases vs subscriptions: which model works best?", category: "app-monetization" },
+  { topic: "How to price your Android app for maximum revenue", category: "app-monetization" },
+  { topic: "Freemium model best practices for mobile apps in 2026", category: "app-monetization" },
+
+  // App Security (new category)
+  { topic: "Essential security practices every Android developer should follow", category: "app-security" },
+  { topic: "How to protect your app from piracy and reverse engineering", category: "app-security" },
+  { topic: "GDPR and data privacy compliance for mobile apps in 2026", category: "app-security" },
 ];
 
 function generateSlug(title: string): string {
@@ -81,6 +127,8 @@ function getSearchTermsForCategory(category: string, topic: string): string {
     "cgi-ads": "3d render,cgi,digital art,advertising",
     "industry-updates": "technology,business,innovation",
     "tutorials": "coding,developer,computer,workspace",
+    "app-monetization": "money,revenue,business,mobile app",
+    "app-security": "security,lock,shield,cybersecurity",
   };
   
   const baseTerms = categoryTerms[category] || "technology,digital";
@@ -139,6 +187,8 @@ function generateImagePrompt(topic: string, category: string): string {
     "cgi-ads": "A stunning CGI product shot with dramatic lighting, floating geometric shapes, and vibrant neon accents. Cinematic quality.",
     "industry-updates": "Abstract technology visualization with connected nodes, data streams, and futuristic elements. Blue and cyan color palette.",
     "tutorials": "A clean developer workspace with code on screens, surrounded by floating UI elements and icons. Warm, inviting lighting.",
+    "app-monetization": "A modern illustration of coins and charts flowing from a smartphone, representing app revenue and monetization. Gold and green tones.",
+    "app-security": "A digital shield protecting a smartphone with lock icons and encrypted data streams. Dark blue and silver color scheme.",
   };
   
   const categoryStyle = categoryStyles[category] || "Modern technology concept with abstract digital elements and professional aesthetic.";
@@ -448,7 +498,7 @@ Requirements:
 - Include practical tips and actionable advice in a <div class="highlight-box">
 - End with a brief mention of how Quanta Mesh can help (if relevant)
 - Wrap the final call-to-action in a <div class="cta-box">
-- Make it current and relevant for 2025
+- Make it current and relevant for 2026 (we are in February 2026)
 - Use <strong> for important terms and <blockquote> for key insights
 
 Return ONLY valid JSON, no markdown code blocks.`;
