@@ -8,8 +8,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChat, ReplyTo } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, FileIcon, Reply } from 'lucide-react';
+import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, FileIcon, Reply, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
 import { FileAttachment } from '@/components/chat/FileAttachment';
 import { ReplyPreview } from '@/components/chat/ReplyPreview';
 export default function Chat() {
@@ -250,8 +252,9 @@ export default function Chat() {
             ) : (
               <div className="space-y-6 pb-4">
                 {messages.map((message, index) => {
-                  const isClient = message.sender_type === 'client';
-                  const replyToMessage = message.reply_to_id ? messagesMap.get(message.reply_to_id) : null;
+                    const isClient = message.sender_type === 'client';
+                    const isAI = message.sender_id === AI_SENDER_ID;
+                    const replyToMessage = message.reply_to_id ? messagesMap.get(message.reply_to_id) : null;
                   
                   return (
                     <div
@@ -260,6 +263,11 @@ export default function Chat() {
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <div className={`flex flex-col gap-1 max-w-[85%] md:max-w-[70%] ${isClient ? 'items-end' : 'items-start'}`}>
+                        {!isClient && (
+                          <span className="text-[11px] text-muted-foreground/80 px-1 flex items-center gap-1">
+                            {isAI ? <><Bot className="h-3 w-3" /> AI Assistant</> : 'Quanta Mesh Team'}
+                          </span>
+                        )}
                         <div
                           className={`rounded-2xl px-5 py-3 shadow-sm text-[15px] leading-relaxed relative ${isClient
                             ? 'bg-primary text-primary-foreground rounded-br-sm'
