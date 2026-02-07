@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Image as ImageIcon, Reply } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Image as ImageIcon, Reply, Bot } from 'lucide-react';
+
+const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -232,6 +234,11 @@ export function ClientChatWidget() {
                             : 'bg-secondary text-secondary-foreground rounded-bl-md'
                             }`}
                         >
+                          {message.sender_type !== 'client' && (
+                            <p className="text-[10px] font-medium mb-1 flex items-center gap-1 opacity-70">
+                              {message.sender_id === AI_SENDER_ID ? <><Bot className="h-3 w-3" /> AI Assistant</> : 'Quanta Mesh Team'}
+                            </p>
+                          )}
                           {/* Reply context */}
                           {replyToMessage && (
                             <ReplyPreview

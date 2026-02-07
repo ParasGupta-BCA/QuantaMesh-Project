@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
+const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
+
 export interface Message {
   id: string;
   conversation_id: string;
@@ -144,7 +146,7 @@ export function useChat() {
     }
 
     try {
-      const { error } = await supabase.from('messages').insert({
+      const messageData = {
         conversation_id: conversation.id,
         sender_id: user.id,
         sender_type: 'client',
@@ -156,12 +158,44 @@ export function useChat() {
           file_type: fileData.file_type,
           file_size: fileData.file_size
         })
-      });
+      };
 
+      const { error } = await supabase.from('messages').insert(messageData);
       if (error) throw error;
+
+      // Trigger AI response + email notifications in the background
+      triggerAIResponse(conversation.id, messageData.content);
     } catch (error) {
       console.error('Error sending message:', error);
       throw error;
+    }
+  };
+
+  // Trigger AI response in background (non-blocking)
+  const triggerAIResponse = async (conversationId: string, messageContent: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-ai-respond`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ conversationId, messageContent }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error('AI respond error:', response.status);
+      }
+    } catch (error) {
+      console.error('Failed to trigger AI response:', error);
+      // Non-blocking - don't throw
     }
   };
 
