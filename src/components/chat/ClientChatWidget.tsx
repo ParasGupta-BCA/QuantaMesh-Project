@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Image as ImageIcon, Reply, Bot } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Paperclip, FileIcon, Image as ImageIcon, Reply, Bot, User } from 'lucide-react';
 
 const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { FileAttachment } from './FileAttachment';
 import { ReplyPreview } from './ReplyPreview';
+import { TypingIndicator } from './TypingIndicator';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
@@ -24,7 +25,7 @@ const isImageFile = (type: string) => type?.startsWith('image/');
 
 export function ClientChatWidget() {
   const { user } = useAuth();
-  const { conversation, messages, loading, unreadCount, uploading, sendMessage, markAsRead } = useChat();
+  const { conversation, messages, loading, unreadCount, uploading, aiTyping, sendMessage, markAsRead } = useChat();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -236,7 +237,7 @@ export function ClientChatWidget() {
                         >
                           {message.sender_type !== 'client' && (
                             <p className="text-[10px] font-medium mb-1 flex items-center gap-1 opacity-70">
-                              {message.sender_id === AI_SENDER_ID ? <><Bot className="h-3 w-3" /> AI Assistant</> : 'Quanta Mesh Team'}
+                              {message.sender_id === AI_SENDER_ID ? <><Bot className="h-3 w-3" /> AI Assistant</> : <><User className="h-3 w-3" /> {message.admin_name || 'Quanta Mesh Team'}</>}
                             </p>
                           )}
                           {/* Reply context */}
@@ -277,6 +278,18 @@ export function ClientChatWidget() {
                       </div>
                     );
                   })}
+                  {aiTyping && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[80%] rounded-2xl px-4 py-2 bg-secondary text-secondary-foreground rounded-bl-md">
+                        <p className="text-[10px] font-medium mb-1 flex items-center gap-1 opacity-70"><Bot className="h-3 w-3" /> AI Assistant</p>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </ScrollArea>

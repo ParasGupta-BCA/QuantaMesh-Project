@@ -8,15 +8,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChat, ReplyTo } from '@/hooks/useChat';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
-import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, FileIcon, Reply, Bot } from 'lucide-react';
+import { Send, Loader2, MessageCircle, LogIn, UserPlus, Paperclip, X, FileIcon, Reply, Bot, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
 import { FileAttachment } from '@/components/chat/FileAttachment';
 import { ReplyPreview } from '@/components/chat/ReplyPreview';
+import { TypingIndicator } from '@/components/chat/TypingIndicator';
 export default function Chat() {
   const { user, loading: authLoading } = useAuth();
-  const { conversation, messages, loading, sendMessage, markAsRead, uploading } = useChat();
+  const { conversation, messages, loading, sendMessage, markAsRead, uploading, aiTyping } = useChat();
   const { toast } = useToast();
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
@@ -265,7 +266,7 @@ export default function Chat() {
                       <div className={`flex flex-col gap-1 max-w-[85%] md:max-w-[70%] ${isClient ? 'items-end' : 'items-start'}`}>
                         {!isClient && (
                           <span className="text-[11px] text-muted-foreground/80 px-1 flex items-center gap-1">
-                            {isAI ? <><Bot className="h-3 w-3" /> AI Assistant</> : 'Quanta Mesh Team'}
+                            {isAI ? <><Bot className="h-3 w-3" /> AI Assistant</> : <><User className="h-3 w-3" /> {message.admin_name || 'Quanta Mesh Team'}</>}
                           </span>
                         )}
                         <div
@@ -303,9 +304,10 @@ export default function Chat() {
                         </span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                  {aiTyping && <TypingIndicator />}
+                </div>
             )}
           </ScrollArea>
 
