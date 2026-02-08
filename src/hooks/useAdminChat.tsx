@@ -134,12 +134,22 @@ export function useAdminChat() {
     }
 
     try {
+      // Get admin's profile name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+
+      const adminName = profile?.full_name || user.email || 'Admin';
+
       const { error } = await supabase.from('messages').insert({
         conversation_id: selectedConversation.id,
         sender_id: user.id,
         sender_type: 'admin',
         content: content || (fileData ? `Shared a file: ${fileData.file_name}` : ''),
         reply_to_id: replyToId || null,
+        admin_name: adminName,
         ...(fileData && {
           file_url: fileData.file_url,
           file_name: fileData.file_name,

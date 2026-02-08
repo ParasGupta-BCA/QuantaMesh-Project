@@ -77,6 +77,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_settings: {
+        Row: {
+          greeting_message: string
+          id: string
+          is_active: boolean
+          knowledge_base: string
+          max_response_length: number
+          personality: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          greeting_message?: string
+          id?: string
+          is_active?: boolean
+          knowledge_base?: string
+          max_response_length?: number
+          personality?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          greeting_message?: string
+          id?: string
+          is_active?: boolean
+          knowledge_base?: string
+          max_response_length?: number
+          personality?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_name: string
@@ -285,6 +318,7 @@ export type Database = {
       }
       messages: {
         Row: {
+          admin_name: string | null
           content: string
           conversation_id: string
           created_at: string
@@ -299,6 +333,7 @@ export type Database = {
           sender_type: string
         }
         Insert: {
+          admin_name?: string | null
           content: string
           conversation_id: string
           created_at?: string
@@ -313,6 +348,7 @@ export type Database = {
           sender_type: string
         }
         Update: {
+          admin_name?: string | null
           content?: string
           conversation_id?: string
           created_at?: string

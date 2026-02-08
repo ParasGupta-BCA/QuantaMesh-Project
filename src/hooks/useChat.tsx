@@ -17,6 +17,7 @@ export interface Message {
   file_type?: string | null;
   file_size?: number | null;
   reply_to_id?: string | null;
+  admin_name?: string | null;
 }
 
 export interface ReplyTo {
@@ -43,6 +44,7 @@ export function useChat() {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [aiTyping, setAiTyping] = useState(false);
 
   // Fetch or create conversation for client
   const fetchOrCreateConversation = useCallback(async () => {
@@ -164,7 +166,8 @@ export function useChat() {
       if (error) throw error;
 
       // Trigger AI response + email notifications in the background
-      triggerAIResponse(conversation.id, messageData.content);
+      setAiTyping(true);
+      triggerAIResponse(conversation.id, messageData.content).finally(() => setAiTyping(false));
     } catch (error) {
       console.error('Error sending message:', error);
       throw error;
@@ -275,6 +278,7 @@ export function useChat() {
     loading,
     unreadCount,
     uploading,
+    aiTyping,
     sendMessage,
     markAsRead,
   };
