@@ -35,6 +35,7 @@ interface ColdProspect {
   status: string;
   emails_sent: number;
   last_sent_at: string | null;
+  opened_at: string | null;
   added_by: string | null;
   created_at: string;
 }
@@ -192,8 +193,8 @@ export function AdminColdOutreach() {
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-purple-500/10"><Building2 className="h-5 w-5 text-purple-500" /></div>
               <div>
-                <p className="text-2xl font-bold">{prospects.filter((p) => p.status === "replied").length}</p>
-                <p className="text-xs text-muted-foreground">Replied</p>
+                <p className="text-2xl font-bold">{prospects.filter((p) => p.opened_at).length}</p>
+                <p className="text-xs text-muted-foreground">Opened</p>
               </div>
             </div>
           </CardContent>
@@ -329,7 +330,10 @@ export function AdminColdOutreach() {
                       <TableCell className="hidden md:table-cell">
                         <div className="text-sm">
                           <span className="font-medium">{prospect.emails_sent}</span>
-                          {prospect.last_sent_at && (
+                          {prospect.opened_at && (
+                            <p className="text-xs text-green-500">Opened: {format(new Date(prospect.opened_at), "MMM d, h:mm a")}</p>
+                          )}
+                          {prospect.last_sent_at && !prospect.opened_at && (
                             <p className="text-xs text-muted-foreground">Last: {format(new Date(prospect.last_sent_at), "MMM d")}</p>
                           )}
                         </div>

@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -107,6 +107,7 @@ serve(async (req) => {
   const emailId = url.searchParams.get("id");
   const action = url.searchParams.get("action"); // "open" or "click"
   const redirect = url.searchParams.get("redirect");
+  const source = url.searchParams.get("source"); // "cold" for cold outreach emails
   
   // Get client IP for rate limiting
   const clientIP = getClientIP(req);
@@ -159,13 +160,21 @@ serve(async (req) => {
 
     if (action === "open") {
       // Track email open
-      await supabase
-        .from("email_sequences")
-        .update({ opened_at: now })
-        .eq("id", emailId)
-        .is("opened_at", null); // Only update if not already opened
-
-      console.log(`Email opened: ${emailId}`);
+      if (source === "cold") {
+        await supabase
+          .from("cold_outreach")
+          .update({ opened_at: now, status: "opened" })
+          .eq("id", emailId)
+          .is("opened_at", null);
+        console.log(`Cold email opened: ${emailId}`);
+      } else {
+        await supabase
+          .from("email_sequences")
+          .update({ opened_at: now })
+          .eq("id", emailId)
+          .is("opened_at", null);
+        console.log(`Email opened: ${emailId}`);
+      }
 
       // Return tracking pixel
       return new Response(TRACKING_PIXEL, {

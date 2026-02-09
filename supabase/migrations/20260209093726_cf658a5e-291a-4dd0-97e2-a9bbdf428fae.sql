@@ -1,0 +1,1 @@
+ALTER TABLE public.cold_outreach ADD COLUMN IF NOT EXISTS opened_at timestamptz;
