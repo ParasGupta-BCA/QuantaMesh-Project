@@ -38,3 +38,9 @@ verify_jwt = false
 
 [functions.verify-recaptcha]
 verify_jwt = false
+
+[functions.send-cold-email]
+verify_jwt = false
+
+[functions.auto-send-cold-emails]
+verify_jwt = false

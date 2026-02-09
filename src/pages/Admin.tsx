@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users, BarChart3, Video, FileText, Bot } from "lucide-react";
+import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users, BarChart3, Video, FileText, Bot, Mail } from "lucide-react";
 import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminOrders } from "@/components/admin/AdminOrders";
@@ -19,6 +19,7 @@ import { AdminEmailAnalytics } from "@/components/admin/AdminEmailAnalytics";
 import { AdminVideos } from "@/components/admin/AdminVideos";
 import { AdminBlog } from "@/components/admin/AdminBlog";
 import { AdminAISettings } from "@/components/admin/AdminAISettings";
+import { AdminColdOutreach } from "@/components/admin/AdminColdOutreach";
 import { Order, ContactMessage, Review } from "@/types/admin";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 
@@ -334,6 +335,13 @@ export default function Admin() {
                   Blog
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="cold-outreach" 
+                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
+                >
+                  <Mail className="h-4 w-4" />
+                  Cold Outreach
+                </TabsTrigger>
+                <TabsTrigger 
                   value="ai-settings" 
                   className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
                 >
@@ -395,6 +403,10 @@ export default function Admin() {
 
             <TabsContent value="blog" className="outline-none focus:ring-0 animate-slide-up">
               <AdminBlog />
+            </TabsContent>
+
+            <TabsContent value="cold-outreach" className="outline-none focus:ring-0 animate-slide-up">
+              <AdminColdOutreach />
             </TabsContent>
 
             <TabsContent value="ai-settings" className="outline-none focus:ring-0 animate-slide-up">
