@@ -167,6 +167,48 @@ export type Database = {
         }
         Relationships: []
       }
+      cold_outreach: {
+        Row: {
+          added_by: string | null
+          client_name: string
+          company_name: string
+          created_at: string
+          email: string
+          emails_sent: number
+          id: string
+          job_title: string
+          last_sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          added_by?: string | null
+          client_name: string
+          company_name: string
+          created_at?: string
+          email: string
+          emails_sent?: number
+          id?: string
+          job_title: string
+          last_sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string | null
+          client_name?: string
+          company_name?: string
+          created_at?: string
+          email?: string
+          emails_sent?: number
+          id?: string
+          job_title?: string
+          last_sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
