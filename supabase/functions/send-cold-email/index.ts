@@ -9,30 +9,42 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const TRACK_BASE = `${SUPABASE_URL}/functions/v1/track-email`;
 
-const ADMIN_TEAM = [
-  { name: "Paras Gupta", role: "Founder & Lead Developer" },
-  { name: "Sanchit Saggi", role: "Co-Founder & Business Strategist" },
-];
+interface PortfolioItem { name: string; desc: string; }
+interface TeamMember { name: string; role: string; }
+interface EmailSettings {
+  portfolio_items: PortfolioItem[];
+  team_members: TeamMember[];
+  cta_text: string;
+  cta_url: string;
+  tagline: string;
+}
 
-const PORTFOLIO_ITEMS = [
-  { name: "Play Store App Publishing", desc: "End-to-end app listing optimization & publishing on Google Play Store" },
-  { name: "ASO Optimization", desc: "Keyword research, screenshot design & listing optimization for maximum visibility" },
-  { name: "CGI Ad Creation", desc: "High-quality CGI advertisements that drive engagement & conversions" },
-  { name: "App Store Strategy", desc: "Complete strategy for app growth, ratings & user acquisition" },
-];
+const DEFAULT_SETTINGS: EmailSettings = {
+  portfolio_items: [
+    { name: "Play Store App Publishing", desc: "End-to-end app listing optimization & publishing on Google Play Store" },
+    { name: "ASO Optimization", desc: "Keyword research, screenshot design & listing optimization for maximum visibility" },
+    { name: "CGI Ad Creation", desc: "High-quality CGI advertisements that drive engagement & conversions" },
+    { name: "App Store Strategy", desc: "Complete strategy for app growth, ratings & user acquisition" },
+  ],
+  team_members: [
+    { name: "Paras Gupta", role: "Founder & Lead Developer" },
+    { name: "Sanchit Saggi", role: "Co-Founder & Business Strategist" },
+  ],
+  cta_text: "Let's Talk Growth →",
+  cta_url: "https://quantamesh.lovable.app/contact",
+  tagline: "DIGITAL GROWTH PARTNER",
+};
 
-function buildColdEmailHtml(prospect: {
-  client_name: string;
-  job_title: string;
-  company_name: string;
-}, emailNumber: number, prospectId: string): string {
-  const trackingPixelUrl = `https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/track-email?id=${prospectId}&action=open&source=cold`;
-  const subject = emailNumber <= 1
-    ? `Elevate ${prospect.company_name}'s Digital Presence`
-    : emailNumber === 2
-    ? `Quick follow-up for ${prospect.company_name}`
-    : `Last chance: Exclusive offer for ${prospect.company_name}`;
+function buildColdEmailHtml(
+  prospect: { client_name: string; job_title: string; company_name: string },
+  emailNumber: number,
+  prospectId: string,
+  settings: EmailSettings,
+): string {
+  const trackingPixelUrl = `${TRACK_BASE}?id=${prospectId}&action=open&source=cold`;
+  const clickTrackUrl = `${TRACK_BASE}?id=${prospectId}&action=click&source=cold&redirect=${encodeURIComponent(settings.cta_url)}`;
 
   const greeting = emailNumber <= 1
     ? `I noticed ${prospect.company_name} and wanted to reach out personally.`
@@ -40,7 +52,7 @@ function buildColdEmailHtml(prospect: {
     ? `I wanted to follow up on my previous email about helping ${prospect.company_name} grow.`
     : `This is my final follow-up — I truly believe we can make a difference for ${prospect.company_name}.`;
 
-  const portfolioHtml = PORTFOLIO_ITEMS.map(item => `
+  const portfolioHtml = settings.portfolio_items.map(item => `
     <tr>
       <td style="padding:12px 20px;border-bottom:1px solid #f0f0f0;">
         <table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -58,7 +70,7 @@ function buildColdEmailHtml(prospect: {
     </tr>
   `).join("");
 
-  const teamHtml = ADMIN_TEAM.map(admin => `
+  const teamHtml = settings.team_members.map(admin => `
     <tr>
       <td style="padding:8px 20px;">
         <table cellpadding="0" cellspacing="0" border="0">
@@ -125,7 +137,7 @@ function buildColdEmailHtml(prospect: {
           </tr>
         </table>
         <h1 style="margin:0;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">QuantaMesh</h1>
-        <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">DIGITAL GROWTH PARTNER</p>
+        <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">${settings.tagline}</p>
       </td>
     </tr>
   </table>
@@ -165,8 +177,8 @@ function buildColdEmailHtml(prospect: {
   <table cellpadding="0" cellspacing="0" border="0">
     <tr>
       <td align="center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;">
-        <a href="https://quantamesh.lovable.app/contact" target="_blank" class="cta-button" style="display:inline-block;padding:14px 40px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;letter-spacing:0.3px;">
-          Let's Talk Growth →
+        <a href="${clickTrackUrl}" target="_blank" class="cta-button" style="display:inline-block;padding:14px 40px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;letter-spacing:0.3px;">
+          ${settings.cta_text}
         </a>
       </td>
     </tr>
@@ -197,7 +209,7 @@ function buildColdEmailHtml(prospect: {
   <p style="margin:0;font-size:13px;color:#94a3b8;">Warm regards,</p>
   <p style="margin:4px 0 0;font-size:15px;font-weight:600;color:#1a1a2e;">The QuantaMesh Team</p>
   <p style="margin:16px 0 0;font-size:11px;color:#cbd5e1;">
-    QuantaMesh • Digital Growth Partner<br/>
+    QuantaMesh • ${settings.tagline}<br/>
     <a href="https://quantamesh.lovable.app" style="color:#6366f1;text-decoration:none;">quantamesh.lovable.app</a>
   </p>
   <p style="margin:12px 0 0;font-size:10px;color:#cbd5e1;">
@@ -233,23 +245,35 @@ serve(async (req) => {
       throw new Error("prospectId is required");
     }
 
-    const { data: prospect, error: fetchError } = await supabase
-      .from("cold_outreach")
-      .select("*")
-      .eq("id", prospectId)
-      .single();
+    // Fetch prospect and email settings in parallel
+    const [prospectRes, settingsRes] = await Promise.all([
+      supabase.from("cold_outreach").select("*").eq("id", prospectId).single(),
+      supabase.from("cold_email_settings").select("*").limit(1).single(),
+    ]);
 
-    if (fetchError || !prospect) {
+    if (prospectRes.error || !prospectRes.data) {
       throw new Error("Prospect not found");
     }
+    const prospect = prospectRes.data;
 
     if (prospect.status === "unsubscribed") {
       throw new Error("Prospect has unsubscribed");
     }
 
+    // Use DB settings or fall back to defaults
+    const settings: EmailSettings = settingsRes.data
+      ? {
+          portfolio_items: settingsRes.data.portfolio_items as unknown as PortfolioItem[],
+          team_members: settingsRes.data.team_members as unknown as TeamMember[],
+          cta_text: settingsRes.data.cta_text,
+          cta_url: settingsRes.data.cta_url,
+          tagline: settingsRes.data.tagline,
+        }
+      : DEFAULT_SETTINGS;
+
     const emailNumber = (prospect.emails_sent || 0) + 1;
     const subject = getSubject(prospect, emailNumber);
-    const html = buildColdEmailHtml(prospect, emailNumber, prospectId);
+    const html = buildColdEmailHtml(prospect, emailNumber, prospectId, settings);
 
     if (!RESEND_API_KEY) {
       throw new Error("RESEND_API_KEY not configured");
@@ -280,7 +304,6 @@ serve(async (req) => {
     const emailResult = await emailRes.json();
     console.log("Email sent successfully:", emailResult);
 
-    // Update prospect
     await supabase
       .from("cold_outreach")
       .update({

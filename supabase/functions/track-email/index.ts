@@ -199,13 +199,21 @@ serve(async (req) => {
       }
       
       // Track email click
-      await supabase
-        .from("email_sequences")
-        .update({ clicked_at: now })
-        .eq("id", emailId)
-        .is("clicked_at", null); // Only update if not already clicked
-
-      console.log(`Email clicked: ${emailId}, redirecting to: ${redirect}`);
+      if (source === "cold") {
+        await supabase
+          .from("cold_outreach")
+          .update({ clicked_at: now })
+          .eq("id", emailId)
+          .is("clicked_at", null);
+        console.log(`Cold email clicked: ${emailId}, redirecting to: ${redirect}`);
+      } else {
+        await supabase
+          .from("email_sequences")
+          .update({ clicked_at: now })
+          .eq("id", emailId)
+          .is("clicked_at", null);
+        console.log(`Email clicked: ${emailId}, redirecting to: ${redirect}`);
+      }
 
       // Redirect to the actual URL
       return new Response(null, {

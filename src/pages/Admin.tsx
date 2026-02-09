@@ -20,6 +20,7 @@ import { AdminVideos } from "@/components/admin/AdminVideos";
 import { AdminBlog } from "@/components/admin/AdminBlog";
 import { AdminAISettings } from "@/components/admin/AdminAISettings";
 import { AdminColdOutreach } from "@/components/admin/AdminColdOutreach";
+import { AdminColdEmailSettings } from "@/components/admin/AdminColdEmailSettings";
 import { Order, ContactMessage, Review } from "@/types/admin";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 
@@ -405,8 +406,9 @@ export default function Admin() {
               <AdminBlog />
             </TabsContent>
 
-            <TabsContent value="cold-outreach" className="outline-none focus:ring-0 animate-slide-up">
+            <TabsContent value="cold-outreach" className="outline-none focus:ring-0 animate-slide-up space-y-8">
               <AdminColdOutreach />
+              <AdminColdEmailSettings />
             </TabsContent>
 
             <TabsContent value="ai-settings" className="outline-none focus:ring-0 animate-slide-up">

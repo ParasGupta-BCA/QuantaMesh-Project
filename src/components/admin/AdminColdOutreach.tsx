@@ -36,6 +36,7 @@ interface ColdProspect {
   emails_sent: number;
   last_sent_at: string | null;
   opened_at: string | null;
+  clicked_at: string | null;
   added_by: string | null;
   created_at: string;
 }
@@ -204,8 +205,8 @@ export function AdminColdOutreach() {
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-emerald-500/10"><Clock className="h-5 w-5 text-emerald-500" /></div>
               <div>
-                <p className="text-2xl font-bold">{prospects.filter((p) => p.status === "pending").length}</p>
-                <p className="text-xs text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold">{prospects.filter((p) => p.clicked_at).length}</p>
+                <p className="text-xs text-muted-foreground">Clicked CTA</p>
               </div>
             </div>
           </CardContent>
@@ -330,10 +331,13 @@ export function AdminColdOutreach() {
                       <TableCell className="hidden md:table-cell">
                         <div className="text-sm">
                           <span className="font-medium">{prospect.emails_sent}</span>
-                          {prospect.opened_at && (
+                          {prospect.clicked_at && (
+                            <p className="text-xs text-primary">Clicked: {format(new Date(prospect.clicked_at), "MMM d, h:mm a")}</p>
+                          )}
+                          {prospect.opened_at && !prospect.clicked_at && (
                             <p className="text-xs text-green-500">Opened: {format(new Date(prospect.opened_at), "MMM d, h:mm a")}</p>
                           )}
-                          {prospect.last_sent_at && !prospect.opened_at && (
+                          {prospect.last_sent_at && !prospect.opened_at && !prospect.clicked_at && (
                             <p className="text-xs text-muted-foreground">Last: {format(new Date(prospect.last_sent_at), "MMM d")}</p>
                           )}
                         </div>
