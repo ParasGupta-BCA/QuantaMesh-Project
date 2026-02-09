@@ -167,9 +167,43 @@ export type Database = {
         }
         Relationships: []
       }
+      cold_email_settings: {
+        Row: {
+          cta_text: string
+          cta_url: string
+          id: string
+          portfolio_items: Json
+          tagline: string
+          team_members: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cta_text?: string
+          cta_url?: string
+          id?: string
+          portfolio_items?: Json
+          tagline?: string
+          team_members?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cta_text?: string
+          cta_url?: string
+          id?: string
+          portfolio_items?: Json
+          tagline?: string
+          team_members?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       cold_outreach: {
         Row: {
           added_by: string | null
+          clicked_at: string | null
           client_name: string
           company_name: string
           created_at: string
@@ -184,6 +218,7 @@ export type Database = {
         }
         Insert: {
           added_by?: string | null
+          clicked_at?: string | null
           client_name: string
           company_name: string
           created_at?: string
@@ -198,6 +233,7 @@ export type Database = {
         }
         Update: {
           added_by?: string | null
+          clicked_at?: string | null
           client_name?: string
           company_name?: string
           created_at?: string
