@@ -178,6 +178,7 @@ export type Database = {
           id: string
           job_title: string
           last_sent_at: string | null
+          opened_at: string | null
           status: string
           updated_at: string
         }
@@ -191,6 +192,7 @@ export type Database = {
           id?: string
           job_title: string
           last_sent_at?: string | null
+          opened_at?: string | null
           status?: string
           updated_at?: string
         }
@@ -204,6 +206,7 @@ export type Database = {
           id?: string
           job_title?: string
           last_sent_at?: string | null
+          opened_at?: string | null
           status?: string
           updated_at?: string
         }

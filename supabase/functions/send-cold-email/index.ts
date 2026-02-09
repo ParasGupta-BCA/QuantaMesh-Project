@@ -26,7 +26,8 @@ function buildColdEmailHtml(prospect: {
   client_name: string;
   job_title: string;
   company_name: string;
-}, emailNumber: number): string {
+}, emailNumber: number, prospectId: string): string {
+  const trackingPixelUrl = `https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/track-email?id=${prospectId}&action=open&source=cold`;
   const subject = emailNumber <= 1
     ? `Elevate ${prospect.company_name}'s Digital Presence`
     : emailNumber === 2
@@ -208,6 +209,7 @@ function buildColdEmailHtml(prospect: {
 </table>
 </td></tr>
 </table>
+<img src="${trackingPixelUrl}" width="1" height="1" alt="" style="display:none;width:1px;height:1px;border:0;" />
 </body>
 </html>`;
 }
@@ -247,7 +249,7 @@ serve(async (req) => {
 
     const emailNumber = (prospect.emails_sent || 0) + 1;
     const subject = getSubject(prospect, emailNumber);
-    const html = buildColdEmailHtml(prospect, emailNumber);
+    const html = buildColdEmailHtml(prospect, emailNumber, prospectId);
 
     if (!RESEND_API_KEY) {
       throw new Error("RESEND_API_KEY not configured");
