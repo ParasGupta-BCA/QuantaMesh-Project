@@ -116,9 +116,13 @@ function buildColdEmailHtml(prospect: {
   <table cellpadding="0" cellspacing="0" border="0" width="100%">
     <tr>
       <td align="center">
-        <div style="width:56px;height:56px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;">
-          <img src="https://quantamesh.lovable.app/logo.png" alt="QuantaMesh" width="40" height="40" style="display:block;border-radius:10px;" />
-        </div>
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px;" align="center">
+          <tr>
+            <td style="width:56px;height:56px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;text-align:center;vertical-align:middle;">
+              <img src="https://quantamesh.lovable.app/logo.png" alt="QuantaMesh" width="40" height="40" style="display:block;margin:0 auto;border-radius:10px;" />
+            </td>
+          </tr>
+        </table>
         <h1 style="margin:0;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">QuantaMesh</h1>
         <p style="margin:6px 0 0;font-size:13px;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">DIGITAL GROWTH PARTNER</p>
       </td>
