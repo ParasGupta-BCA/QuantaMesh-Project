@@ -115,20 +115,22 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
 
     return (
         <div className={cn(
-            "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1 mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden",
+            "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-950 w-full flex-1 mx-auto overflow-hidden",
             "h-screen"
         )}>
             <Sidebar open={open} setOpen={setOpen}>
-                <SidebarBody className="justify-between gap-10">
+                <SidebarBody className="justify-between gap-10 bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800">
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                         <div className="flex flex-col">
                             <Link
                                 to="/"
                                 className="flex items-center gap-2 py-4 pl-1"
                             >
-                                <div className="h-7 w-7 rounded-lg bg-black dark:bg-white flex-shrink-0" />
+                                <div className="h-7 w-7 rounded-xl bg-primary flex items-center justify-center text-white flex-shrink-0">
+                                    <span className="font-bold text-lg select-none">Q</span>
+                                </div>
                                 <span className={cn(
-                                    "font-bold text-lg text-black dark:text-white whitespace-pre duration-200",
+                                    "font-bold text-xl text-neutral-800 dark:text-neutral-100 whitespace-pre duration-200",
                                     !open && "opacity-0 hidden"
                                 )}>
                                     QuantaMesh
@@ -140,30 +142,38 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                             {links.map((link, idx) => {
                                 const isActive = activeTab === link.value;
                                 return (
-                                    <div key={idx} onClick={link.onClick} className="cursor-pointer">
+                                    <div key={idx} onClick={link.onClick} className="cursor-pointer group">
                                         <SidebarLink
                                             link={{
                                                 label: link.label,
                                                 href: "#",
                                                 icon: (
-                                                    <div className={cn("relative", isActive ? "text-primary" : "text-neutral-700 dark:text-neutral-200")}>
+                                                    <div className={cn(
+                                                        "relative p-1 rounded-md transition-all duration-200",
+                                                        isActive ? "text-primary bg-primary/10" : "text-neutral-500 group-hover:text-neutral-700 dark:text-neutral-400 dark:group-hover:text-neutral-200"
+                                                    )}>
                                                         {link.icon}
                                                         {link.count !== undefined && link.count > 0 && !open && (
-                                                            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary" />
+                                                            <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary border-2 border-white dark:border-neutral-900" />
                                                         )}
                                                     </div>
                                                 ),
                                             }}
                                             className={cn(
-                                                "rounded-xl transition-all duration-200",
+                                                "rounded-xl transition-all duration-200 px-2 py-2.5",
                                                 isActive
-                                                    ? "bg-primary/10 text-primary"
-                                                    : "hover:bg-gray-100 dark:hover:bg-neutral-800"
+                                                    ? "bg-white dark:bg-neutral-800 shadow-sm border border-neutral-100 dark:border-neutral-700/50"
+                                                    : "hover:bg-gray-100 dark:hover:bg-neutral-800/50"
                                             )}
                                         />
-                                        {open && link.count !== undefined && link.count > 0 && isActive && (
-                                            <div className="ml-auto">
-                                                <Badge variant="secondary" className=" bg-primary/20 text-primary">{link.count}</Badge>
+                                        {open && link.count !== undefined && link.count > 0 && (
+                                            <div className="ml-auto flex items-center">
+                                                <Badge variant="secondary" className={cn(
+                                                    "ml-auto text-xs font-normal",
+                                                    isActive ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-neutral-800 text-neutral-500"
+                                                )}>
+                                                    {link.count}
+                                                </Badge>
                                             </div>
                                         )}
                                     </div>
@@ -173,24 +183,24 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                     </div>
 
                     <div>
-                        <div className="mt-4 flex flex-col gap-2 border-t border-neutral-200 dark:border-neutral-700 pt-4">
+                        <div className="mt-4 flex flex-col gap-2 border-t border-neutral-200 dark:border-neutral-800 pt-4">
                             <SidebarLink
                                 link={{
-                                    label: user?.email || "User",
+                                    label: user?.email ? user.email.split('@')[0] : "User",
                                     href: "#",
                                     icon: (
-                                        <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                                        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-purple-400 flex items-center justify-center text-white font-bold text-xs ring-2 ring-white dark:ring-neutral-800">
                                             {user?.email?.[0].toUpperCase()}
                                         </div>
                                     )
                                 }}
                             />
-                            <div onClick={() => signOut()} className="cursor-pointer">
+                            <div onClick={() => signOut()} className="cursor-pointer group">
                                 <SidebarLink
                                     link={{
                                         label: "Logout",
                                         href: "#",
-                                        icon: <LogOut className="h-5 w-5 flex-shrink-0 text-red-500" />
+                                        icon: <LogOut className="h-5 w-5 flex-shrink-0 text-neutral-400 group-hover:text-red-500 transition-colors" />
                                     }}
                                 />
                             </div>
@@ -199,7 +209,7 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                 </SidebarBody>
             </Sidebar>
             {/* Main Content Area */}
-            <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col overflow-hidden relative">
                 {children}
             </div>
         </div>

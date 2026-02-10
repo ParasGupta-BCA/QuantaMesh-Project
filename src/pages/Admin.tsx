@@ -270,28 +270,49 @@ export default function Admin() {
       >
         <AdminHeader title={activeTab === 'dashboard' ? 'Dashboard' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')} />
 
-        <div className="flex-1 overflow-y-auto p-4 md:p-10 scrollbar-hide">
-          <div className="mx-auto max-w-7xl space-y-8 pb-20">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide bg-gray-50/50 dark:bg-black/50">
+          <div className="mx-auto max-w-[1600px] space-y-6 pb-20">
 
             {/* Dashboard / Stats View */}
             {(activeTab === 'dashboard' || activeTab === 'orders') && (
               <>
                 {activeTab === 'dashboard' && (
-                  <div className="animate-fade-in">
+                  <div className="animate-fade-in space-y-6">
                     <AdminStats orders={orders} messages={messages} />
+                    {/* Dashboard Charts Placeholder */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-sm min-h-[300px]">
+                        <h3 className="font-semibold mb-4">Revenue Overview</h3>
+                        <div className="h-full flex items-center justify-center text-muted-foreground text-sm">Chart Placeholder</div>
+                      </div>
+                      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-sm min-h-[300px]">
+                        <h3 className="font-semibold mb-4">Recent Activity</h3>
+                        <div className="h-full flex items-center justify-center text-muted-foreground text-sm">Activity Feed Placeholder</div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {activeTab === 'orders' && (
                   <div className="animate-slide-up space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-bold">Recent Orders</h2>
+                    <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+                      <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
+                        <div>
+                          <h2 className="text-lg font-bold">All Orders</h2>
+                          <p className="text-sm text-muted-foreground">Manage and track your customer orders</p>
+                        </div>
+                        <Badge variant="outline" className="px-3 py-1">
+                          {orders.length} Total
+                        </Badge>
+                      </div>
+                      <div className="p-0">
+                        <AdminOrders
+                          orders={orders}
+                          updateOrderStatus={updateOrderStatus}
+                          loading={loadingData}
+                        />
+                      </div>
                     </div>
-                    <AdminOrders
-                      orders={orders}
-                      updateOrderStatus={updateOrderStatus}
-                      loading={loadingData}
-                    />
                   </div>
                 )}
               </>
@@ -299,55 +320,69 @@ export default function Admin() {
 
             {activeTab === 'messages' && (
               <div className="animate-slide-up">
-                <AdminMessages
-                  messages={messages}
-                  updateMessageStatus={updateMessageStatus}
-                  loading={loadingData}
-                />
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-0">
+                  <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+                    <h2 className="text-lg font-bold">Messages</h2>
+                    <p className="text-sm text-muted-foreground">Inquiries from customers</p>
+                  </div>
+                  <AdminMessages
+                    messages={messages}
+                    updateMessageStatus={updateMessageStatus}
+                    loading={loadingData}
+                  />
+                </div>
               </div>
             )}
 
             {activeTab === 'chat' && (
-              <div className="animate-slide-up h-[calc(100vh-200px)]">
+              <div className="animate-slide-up h-[calc(100vh-140px)] bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
                 <AdminChatPanel />
               </div>
             )}
 
             {activeTab === 'reviews' && (
               <div className="animate-slide-up">
-                <AdminReviews
-                  reviews={reviews}
-                  updateReviewApproval={updateReviewApproval}
-                  loading={loadingData}
-                />
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminReviews
+                    reviews={reviews}
+                    updateReviewApproval={updateReviewApproval}
+                    loading={loadingData}
+                  />
+                </div>
               </div>
             )}
 
             {activeTab === 'leads' && (
               <div className="animate-slide-up">
-                <AdminLeads
-                  leads={leads}
-                  emailSequences={emailSequences}
-                  loading={loadingData}
-                  onRefresh={fetchData}
-                  onUpdateStatus={updateLeadStatus}
-                  onDeleteLead={deleteLead}
-                />
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminLeads
+                    leads={leads}
+                    emailSequences={emailSequences}
+                    loading={loadingData}
+                    onRefresh={fetchData}
+                    onUpdateStatus={updateLeadStatus}
+                    onDeleteLead={deleteLead}
+                  />
+                </div>
               </div>
             )}
 
             {activeTab === 'email-analytics' && (
               <div className="animate-slide-up">
-                <AdminEmailAnalytics emailSequences={emailSequences} />
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminEmailAnalytics emailSequences={emailSequences} />
+                </div>
               </div>
             )}
 
             {activeTab === 'videos' && (
               <div className="animate-slide-up">
-                <AdminVideos
-                  videos={adminVideos}
-                  onVideosChange={fetchData}
-                />
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminVideos
+                    videos={adminVideos}
+                    onVideosChange={fetchData}
+                  />
+                </div>
               </div>
             )}
 
@@ -366,7 +401,9 @@ export default function Admin() {
 
             {activeTab === 'ai-settings' && (
               <div className="animate-slide-up">
-                <AdminAISettings />
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminAISettings />
+                </div>
               </div>
             )}
           </div>
