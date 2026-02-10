@@ -8,9 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Package, MessageSquare, MessagesSquare, LayoutDashboard, Star, Users, BarChart3, Video, FileText, Bot, Mail } from "lucide-react";
+import { Loader2, LayoutDashboard } from "lucide-react";
 import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
+import { AdminNavigation } from "@/components/admin/AdminNavigation";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminMessages } from "@/components/admin/AdminMessages";
 import { AdminReviews } from "@/components/admin/AdminReviews";
@@ -259,7 +260,7 @@ export default function Admin() {
 
       <div className="flex-1 w-full bg-background text-foreground py-6 md:py-10 pb-20">
         <div className="container mx-auto px-4 max-w-7xl space-y-8">
-          
+
           {/* Header Section */}
           <div className="flex flex-col gap-2 animate-fade-in relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 w-fit text-primary font-medium text-xs mb-2">
@@ -277,80 +278,15 @@ export default function Admin() {
           <AdminStats orders={orders} messages={messages} />
 
           <Tabs defaultValue="orders" className="space-y-6">
-            <div className="sticky top-[60px] z-30 bg-background/80 backdrop-blur-xl py-4 -mx-4 px-4 md:mx-0 md:px-0 border-b border-border/50 md:border-none md:static md:bg-transparent md:backdrop-blur-none transition-all">
-              <TabsList className="bg-secondary/40 p-1 rounded-2xl h-auto flex-nowrap w-full md:w-fit overflow-x-auto scrollbar-hide justify-start">
-                <TabsTrigger 
-                  value="orders" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <Package className="h-4 w-4" />
-                  Orders <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{orders.length}</Badge>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="messages" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Messages <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{messages.length}</Badge>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="chat" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <MessagesSquare className="h-4 w-4" />
-                  Live Chat
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="reviews" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <Star className="h-4 w-4" />
-                  Reviews <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{reviews.length}</Badge>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="leads" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <Users className="h-4 w-4" />
-                  Leads <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{leads.length}</Badge>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="email-analytics" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  Email Analytics
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="videos" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <Video className="h-4 w-4" />
-                  Videos <Badge variant="secondary" className="ml-1 h-5 px-1.5 min-w-[1.25rem] text-[10px] pointer-events-none bg-primary/10 text-primary border-none">{adminVideos.length}</Badge>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="blog" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <FileText className="h-4 w-4" />
-                  Blog
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="cold-outreach" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <Mail className="h-4 w-4" />
-                  Cold Outreach
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="ai-settings" 
-                  className="gap-2 rounded-xl px-4 py-2.5 flex-1 md:flex-none text-sm font-medium data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg transition-all duration-300"
-                >
-                  <Bot className="h-4 w-4" />
-                  AI Settings
-                </TabsTrigger>
-              </TabsList>
-            </div>
+            <AdminNavigation
+              counts={{
+                orders: orders.length,
+                messages: messages.length,
+                reviews: reviews.length,
+                leads: leads.length,
+                videos: adminVideos.length
+              }}
+            />
 
             <TabsContent value="orders" className="outline-none focus:ring-0 animate-slide-up">
               <AdminOrders
