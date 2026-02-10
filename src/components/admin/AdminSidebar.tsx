@@ -129,9 +129,11 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                                     open ? "justify-start gap-2 pl-1" : "justify-center"
                                 )}
                             >
-                                <div className="h-7 w-7 rounded-xl bg-primary flex items-center justify-center text-white flex-shrink-0">
-                                    <span className="font-bold text-lg select-none">Q</span>
-                                </div>
+                                <img
+                                    src="/logo.png"
+                                    className="h-7 w-7 flex-shrink-0"
+                                    alt="Q"
+                                />
                                 <span className={cn(
                                     "font-bold text-xl text-neutral-800 dark:text-neutral-100 whitespace-pre duration-200",
                                     !open && "opacity-0 hidden"
