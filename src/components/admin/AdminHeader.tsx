@@ -1,4 +1,3 @@
-```typescript
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,11 +34,8 @@ export function AdminHeader({ title = "Dashboard" }: AdminHeaderProps) {
                     <Button variant="ghost" size="icon" className="rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 hover:text-primary transition-colors">
                         <Bell className="h-5 w-5" />
                     </Button>
-
-                    {/* Profile trigger could go here if not in sidebar, but we put it in sidebar */}
                 </div>
             </div>
         </div>
     );
 }
-```
