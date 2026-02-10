@@ -114,11 +114,11 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
     ];
 
     return (
-        <div className={cn(
-            "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-950 w-full flex-1 mx-auto overflow-hidden",
-            "h-screen"
-        )}>
-            <Sidebar open={open} setOpen={setOpen}>
+        <SidebarProvider open={open} setOpen={setOpen} animate={true}>
+            <div className={cn(
+                "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-950 w-full flex-1 mx-auto overflow-hidden",
+                "h-screen"
+            )}>
                 <SidebarBody className="justify-between bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800">
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden thin-scrollbar pb-2">
                         <div className="flex flex-col">
@@ -217,11 +217,11 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                         </div>
                     </div>
                 </SidebarBody>
-            </Sidebar>
-            {/* Main Content Area */}
-            <div className="flex flex-1 flex-col overflow-hidden relative">
-                {children}
+                {/* Main Content Area */}
+                <div className="flex flex-1 flex-col overflow-hidden relative">
+                    {children}
+                </div>
             </div>
-        </div>
+        </SidebarProvider>
     );
 }
