@@ -39,7 +39,7 @@
     --glass: 240 10% 10% / 60%;
     --glass-border: 0 0% 100% / 10%;
     --glass-highlight: 0 0% 100% / 5%;
-    
+
     --gradient-primary: linear-gradient(135deg, hsl(270 95% 65%), hsl(290 95% 55%));
     --gradient-secondary: linear-gradient(135deg, hsl(200 95% 55%), hsl(270 95% 65%));
     --gradient-glow: radial-gradient(ellipse at center, hsl(270 95% 65% / 0.3), transparent 70%);
@@ -109,7 +109,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background-image: 
+    background-image:
       radial-gradient(ellipse 80% 50% at 50% -20%, hsl(270 95% 65% / 0.15), transparent),
       radial-gradient(ellipse 60% 40% at 80% 100%, hsl(200 95% 55% / 0.1), transparent);
   }
@@ -118,12 +118,10 @@
 @layer components {
   .glass-card {
     @apply bg-card/60 backdrop-blur-xl border border-border/50 shadow-xl;
-    background: linear-gradient(
-      135deg,
-      hsl(var(--glass)),
-      hsl(240 10% 8% / 80%)
-    );
-    box-shadow: 
+    background: linear-gradient(135deg,
+        hsl(var(--glass)),
+        hsl(240 10% 8% / 80%));
+    box-shadow:
       0 8px 32px hsl(0 0% 0% / 0.3),
       inset 0 1px 0 hsl(var(--glass-highlight));
   }
@@ -134,7 +132,7 @@
 
   .glass-card-hover:hover {
     @apply border-primary/30;
-    box-shadow: 
+    box-shadow:
       0 8px 32px hsl(270 95% 65% / 0.15),
       inset 0 1px 0 hsl(var(--glass-highlight));
     transform: translateY(-2px);
@@ -156,8 +154,8 @@
     border-radius: inherit;
     padding: 1px;
     background: var(--gradient-primary);
-    -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -197,30 +195,59 @@
   .text-balance {
     text-wrap: balance;
   }
-  
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.3);
+    /* gray-400/30 */
+    border-radius: 20px;
+  }
+
+  .dark .thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.5);
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px hsl(270 95% 65% / 0.3);
   }
+
   50% {
     box-shadow: 0 0 40px hsl(270 95% 65% / 0.5);
   }
@@ -231,6 +258,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -241,6 +269,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -251,6 +280,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -270,7 +300,8 @@
   box-shadow: 0 2.1px 1.3px rgba(0, 0, 0, 0.044),
     0 5.9px 4.2px rgba(0, 0, 0, 0.054), 0 12.6px 9.5px rgba(0, 0, 0, 0.061),
     0 25px 20px rgba(0, 0, 0, 0.1);
-  height: 60px; /* Adjusted size for better fit */
+  height: 60px;
+  /* Adjusted size for better fit */
   width: 60px;
   position: absolute;
   top: 0;
@@ -286,7 +317,8 @@
 .custom-chat-bubble {
   cursor: pointer;
   position: relative;
-  height: 60px; /* Match background */
+  height: 60px;
+  /* Match background */
   width: 60px;
   z-index: 10;
 }
