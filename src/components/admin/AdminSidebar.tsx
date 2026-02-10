@@ -142,7 +142,7 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                             {links.map((link, idx) => {
                                 const isActive = activeTab === link.value;
                                 return (
-                                    <div key={idx} onClick={link.onClick} className="cursor-pointer group">
+                                    <div key={idx} onClick={link.onClick} className="flex items-center justify-between w-full cursor-pointer group relative">
                                         <SidebarLink
                                             link={{
                                                 label: link.label,
@@ -160,17 +160,22 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                                                 ),
                                             }}
                                             className={cn(
-                                                "rounded-xl transition-all duration-200 px-2 py-2.5",
+                                                "rounded-xl transition-all duration-200 px-2 py-2.5 flex-1",
                                                 isActive
                                                     ? "bg-white dark:bg-neutral-800 shadow-sm border border-neutral-100 dark:border-neutral-700/50"
                                                     : "hover:bg-gray-100 dark:hover:bg-neutral-800/50"
                                             )}
                                         />
                                         {open && link.count !== undefined && link.count > 0 && (
-                                            <div className="ml-auto flex items-center">
+                                            <div className={cn(
+                                                "absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none",
+                                                isActive ? "text-primary" : "text-neutral-500"
+                                            )}>
                                                 <Badge variant="secondary" className={cn(
-                                                    "ml-auto text-xs font-normal",
-                                                    isActive ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-neutral-800 text-neutral-500"
+                                                    "rounded-full px-2.5 py-0.5 text-xs font-medium shadow-sm",
+                                                    isActive
+                                                        ? "bg-primary text-white border-transparent"
+                                                        : "bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border-transparent group-hover:bg-neutral-300 dark:group-hover:bg-neutral-600 transition-colors"
                                                 )}>
                                                     {link.count}
                                                 </Badge>
