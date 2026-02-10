@@ -44,7 +44,7 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
             label: "Dashboard",
             value: "dashboard", // Assuming there might be a dashboard home
             icon: <LayoutDashboard className="h-5 w-5 flex-shrink-0" />,
-            onClick: () => onTabChange("orders") // Default to orders or a specific dashboard tab if available
+            onClick: () => onTabChange("dashboard") // Default to orders or a specific dashboard tab if available
         },
         {
             label: "Orders",
