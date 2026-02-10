@@ -142,7 +142,12 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                             {links.map((link, idx) => {
                                 const isActive = activeTab === link.value;
                                 return (
-                                    <div key={idx} onClick={link.onClick} className="flex items-center justify-between w-full cursor-pointer group relative">
+                                    <div key={idx} onClick={() => {
+                                        link.onClick();
+                                        if (window.innerWidth < 768) {
+                                            setOpen(false);
+                                        }
+                                    }} className="flex items-center justify-between w-full cursor-pointer group relative">
                                         <SidebarLink
                                             link={{
                                                 label: link.label,
