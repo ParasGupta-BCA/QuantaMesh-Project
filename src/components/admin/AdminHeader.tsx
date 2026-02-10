@@ -1,15 +1,13 @@
-import { Bell, Search, Menu } from "lucide-react";
+```typescript
+import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useSidebar } from "@/components/ui/sidebar";
 
 interface AdminHeaderProps {
     title?: string;
 }
 
 export function AdminHeader({ title = "Dashboard" }: AdminHeaderProps) {
-    const { setOpen, open } = useSidebar();
-
     return (
         <div className="w-full flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-800/50 sticky top-0 z-20 transition-all duration-300">
             <div className="flex flex-col gap-0.5">
@@ -38,17 +36,10 @@ export function AdminHeader({ title = "Dashboard" }: AdminHeaderProps) {
                         <Bell className="h-5 w-5" />
                     </Button>
 
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="md:hidden rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 hover:text-primary transition-colors"
-                        onClick={() => setOpen(!open)}
-                    >
-                        <Menu className="h-5 w-5" />
-                    </Button>
                     {/* Profile trigger could go here if not in sidebar, but we put it in sidebar */}
                 </div>
             </div>
         </div>
     );
 }
+```
