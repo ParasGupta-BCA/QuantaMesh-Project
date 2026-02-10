@@ -40,4 +40,4 @@ export function AdminHeader({ title = "Dashboard" }: AdminHeaderProps) {
         </div>
     );
 }
-}
+

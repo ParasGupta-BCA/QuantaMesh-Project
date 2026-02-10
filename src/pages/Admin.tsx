@@ -11,6 +11,7 @@ import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { Badge } from "@/components/ui/badge";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminMessages } from "@/components/admin/AdminMessages";
 import { AdminReviews } from "@/components/admin/AdminReviews";
