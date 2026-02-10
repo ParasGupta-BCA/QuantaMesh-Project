@@ -5,13 +5,12 @@ import { Layout } from "@/components/layout/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, LayoutDashboard } from "lucide-react";
 import { AdminChatPanel } from "@/components/chat/AdminChatPanel";
 import { AdminStats } from "@/components/admin/AdminStats";
-import { AdminNavigation } from "@/components/admin/AdminNavigation";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminOrders } from "@/components/admin/AdminOrders";
 import { AdminMessages } from "@/components/admin/AdminMessages";
 import { AdminReviews } from "@/components/admin/AdminReviews";
@@ -73,6 +72,8 @@ export default function Admin() {
   const [emailSequences, setEmailSequences] = useState<EmailSequence[]>([]);
   const [adminVideos, setAdminVideos] = useState<AdminVideo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -231,11 +232,9 @@ export default function Admin() {
 
   if (authLoading || adminLoading) {
     return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </Layout>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 
@@ -252,107 +251,127 @@ export default function Admin() {
   }
 
   return (
-    <Layout>
+    <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900">
       <Helmet>
         <title>Admin Dashboard | QuantaMesh</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="flex-1 w-full bg-background text-foreground py-6 md:py-10 pb-20">
-        <div className="container mx-auto px-4 max-w-7xl space-y-8">
+      <AdminSidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        counts={{
+          orders: orders.length,
+          messages: messages.length,
+          reviews: reviews.length,
+          leads: leads.length,
+          videos: adminVideos.length
+        }}
+      >
+        <AdminHeader title={activeTab === 'dashboard' ? 'Dashboard' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')} />
 
-          {/* Header Section */}
-          <div className="flex flex-col gap-2 animate-fade-in relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 w-fit text-primary font-medium text-xs mb-2">
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>Admin Control Center</span>
-            </div>
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-foreground/70">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground text-sm md:text-base max-w-2xl">
-              Overview of your application's performance, orders, and customer messages.
-            </p>
+        <div className="flex-1 overflow-y-auto p-4 md:p-10 scrollbar-hide">
+          <div className="mx-auto max-w-7xl space-y-8 pb-20">
+
+            {/* Dashboard / Stats View */}
+            {(activeTab === 'dashboard' || activeTab === 'orders') && (
+              <>
+                {activeTab === 'dashboard' && (
+                  <div className="animate-fade-in">
+                    <AdminStats orders={orders} messages={messages} />
+                  </div>
+                )}
+
+                {activeTab === 'orders' && (
+                  <div className="animate-slide-up space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-bold">Recent Orders</h2>
+                    </div>
+                    <AdminOrders
+                      orders={orders}
+                      updateOrderStatus={updateOrderStatus}
+                      loading={loadingData}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            {activeTab === 'messages' && (
+              <div className="animate-slide-up">
+                <AdminMessages
+                  messages={messages}
+                  updateMessageStatus={updateMessageStatus}
+                  loading={loadingData}
+                />
+              </div>
+            )}
+
+            {activeTab === 'chat' && (
+              <div className="animate-slide-up h-[calc(100vh-200px)]">
+                <AdminChatPanel />
+              </div>
+            )}
+
+            {activeTab === 'reviews' && (
+              <div className="animate-slide-up">
+                <AdminReviews
+                  reviews={reviews}
+                  updateReviewApproval={updateReviewApproval}
+                  loading={loadingData}
+                />
+              </div>
+            )}
+
+            {activeTab === 'leads' && (
+              <div className="animate-slide-up">
+                <AdminLeads
+                  leads={leads}
+                  emailSequences={emailSequences}
+                  loading={loadingData}
+                  onRefresh={fetchData}
+                  onUpdateStatus={updateLeadStatus}
+                  onDeleteLead={deleteLead}
+                />
+              </div>
+            )}
+
+            {activeTab === 'email-analytics' && (
+              <div className="animate-slide-up">
+                <AdminEmailAnalytics emailSequences={emailSequences} />
+              </div>
+            )}
+
+            {activeTab === 'videos' && (
+              <div className="animate-slide-up">
+                <AdminVideos
+                  videos={adminVideos}
+                  onVideosChange={fetchData}
+                />
+              </div>
+            )}
+
+            {activeTab === 'blog' && (
+              <div className="animate-slide-up">
+                <AdminBlog />
+              </div>
+            )}
+
+            {activeTab === 'cold-outreach' && (
+              <div className="animate-slide-up space-y-8">
+                <AdminColdOutreach />
+                <AdminColdEmailSettings />
+              </div>
+            )}
+
+            {activeTab === 'ai-settings' && (
+              <div className="animate-slide-up">
+                <AdminAISettings />
+              </div>
+            )}
           </div>
-
-          <AdminStats orders={orders} messages={messages} />
-
-          <Tabs defaultValue="orders" className="space-y-6">
-            <AdminNavigation
-              counts={{
-                orders: orders.length,
-                messages: messages.length,
-                reviews: reviews.length,
-                leads: leads.length,
-                videos: adminVideos.length
-              }}
-            />
-
-            <TabsContent value="orders" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminOrders
-                orders={orders}
-                updateOrderStatus={updateOrderStatus}
-                loading={loadingData}
-              />
-            </TabsContent>
-
-            <TabsContent value="messages" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminMessages
-                messages={messages}
-                updateMessageStatus={updateMessageStatus}
-                loading={loadingData}
-              />
-            </TabsContent>
-
-            <TabsContent value="chat" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminChatPanel />
-            </TabsContent>
-
-            <TabsContent value="reviews" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminReviews
-                reviews={reviews}
-                updateReviewApproval={updateReviewApproval}
-                loading={loadingData}
-              />
-            </TabsContent>
-
-            <TabsContent value="leads" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminLeads
-                leads={leads}
-                emailSequences={emailSequences}
-                loading={loadingData}
-                onRefresh={fetchData}
-                onUpdateStatus={updateLeadStatus}
-                onDeleteLead={deleteLead}
-              />
-            </TabsContent>
-
-            <TabsContent value="email-analytics" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminEmailAnalytics emailSequences={emailSequences} />
-            </TabsContent>
-
-            <TabsContent value="videos" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminVideos
-                videos={adminVideos}
-                onVideosChange={fetchData}
-              />
-            </TabsContent>
-
-            <TabsContent value="blog" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminBlog />
-            </TabsContent>
-
-            <TabsContent value="cold-outreach" className="outline-none focus:ring-0 animate-slide-up space-y-8">
-              <AdminColdOutreach />
-              <AdminColdEmailSettings />
-            </TabsContent>
-
-            <TabsContent value="ai-settings" className="outline-none focus:ring-0 animate-slide-up">
-              <AdminAISettings />
-            </TabsContent>
-          </Tabs>
         </div>
-      </div>
-    </Layout>
+      </AdminSidebar>
+    </div>
   );
 }
