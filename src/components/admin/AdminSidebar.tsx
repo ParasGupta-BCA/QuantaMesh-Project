@@ -124,7 +124,10 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                         <div className="flex flex-col">
                             <Link
                                 to="/"
-                                className="flex items-center gap-2 py-4 pl-1"
+                                className={cn(
+                                    "flex items-center py-4",
+                                    open ? "justify-start gap-2 pl-1" : "justify-center"
+                                )}
                             >
                                 <div className="h-7 w-7 rounded-xl bg-primary flex items-center justify-center text-white flex-shrink-0">
                                     <span className="font-bold text-lg select-none">Q</span>
@@ -205,6 +208,10 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                                         </div>
                                     )
                                 }}
+                                className={cn(
+                                    "rounded-xl transition-all duration-200 py-2.5",
+                                    open ? "px-2 justify-start" : "px-0 justify-center"
+                                )}
                             />
                             <div onClick={() => signOut()} className="cursor-pointer group">
                                 <SidebarLink
@@ -213,6 +220,10 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                                         href: "#",
                                         icon: <LogOut className="h-5 w-5 flex-shrink-0 text-neutral-400 group-hover:text-red-500 transition-colors" />
                                     }}
+                                    className={cn(
+                                        "rounded-xl transition-all duration-200 py-2.5",
+                                        open ? "px-2 justify-start" : "px-0 justify-center"
+                                    )}
                                 />
                             </div>
                         </div>
