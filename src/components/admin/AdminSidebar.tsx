@@ -165,7 +165,8 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
                                                 ),
                                             }}
                                             className={cn(
-                                                "rounded-xl transition-all duration-200 px-2 py-2.5 flex-1",
+                                                "rounded-xl transition-all duration-200 py-2.5 flex-1",
+                                                open ? "px-2 justify-start" : "px-0 justify-center",
                                                 isActive
                                                     ? "bg-white dark:bg-neutral-800 shadow-sm border border-neutral-100 dark:border-neutral-700/50"
                                                     : "hover:bg-gray-100 dark:hover:bg-neutral-800/50"
