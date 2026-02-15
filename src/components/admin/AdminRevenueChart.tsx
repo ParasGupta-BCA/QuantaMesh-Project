@@ -30,7 +30,7 @@ interface AdminRevenueChartProps {
 }
 
 export function AdminRevenueChart({ orders }: AdminRevenueChartProps) {
-  const [timeRange, setTimeRange] = useState("30");
+  const [timeRange, setTimeRange] = useState("7");
 
   const chartData = useMemo(() => {
     const days = parseInt(timeRange);
