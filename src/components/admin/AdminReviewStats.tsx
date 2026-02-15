@@ -85,7 +85,7 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
                                 <BarChart
                                     data={data}
                                     layout="vertical"
-                                    margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                                     <XAxis type="number" hide />
