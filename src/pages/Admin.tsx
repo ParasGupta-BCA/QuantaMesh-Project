@@ -24,6 +24,9 @@ import { AdminColdOutreach } from "@/components/admin/AdminColdOutreach";
 import { AdminColdEmailSettings } from "@/components/admin/AdminColdEmailSettings";
 import { AdminRevenueChart } from "@/components/admin/AdminRevenueChart";
 import { AdminRecentActivity } from "@/components/admin/AdminRecentActivity";
+import { AdminOrderDistribution } from "@/components/admin/AdminOrderDistribution";
+import { AdminTopProducts } from "@/components/admin/AdminTopProducts";
+import { AdminLeadsGrowthChart } from "@/components/admin/AdminLeadsGrowthChart";
 import { Order, ContactMessage, Review, Lead } from "@/types/admin";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 
@@ -280,6 +283,12 @@ export default function Admin() {
                         reviews={reviews}
                         leads={leads}
                       />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px]">
+                      <AdminOrderDistribution orders={orders} />
+                      <AdminTopProducts orders={orders} />
+                      <AdminLeadsGrowthChart leads={leads} />
                     </div>
                   </div>
                 )}
