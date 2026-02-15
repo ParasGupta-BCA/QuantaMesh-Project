@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import {
-    LineChart,
-    Line,
+    AreaChart,
+    Area,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -74,43 +74,55 @@ export function AdminCommunicationStats({ messages, emailSequences }: AdminCommu
             <CardContent className="space-y-6">
                 {/* Key Metrics */}
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col p-4 bg-muted/40 rounded-lg border">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                            <Mail className="h-4 w-4" /> Email Open Rate
+                    <div className="flex flex-col p-4 bg-muted/40 rounded-lg border hover:bg-muted/60 transition-colors">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <div className="p-2 bg-primary/10 rounded-md">
+                                <Mail className="h-4 w-4 text-primary" />
+                            </div>
+                            Email Open Rate
                         </div>
                         <div className="text-2xl font-bold">{emailStats.openRate.toFixed(1)}%</div>
-                        <div className="text-xs text-muted-foreground">
-                            {emailStats.totalSent} sent
+                        <div className="text-xs text-muted-foreground mt-1">
+                            {emailStats.totalSent} emails sent
                         </div>
                     </div>
-                    <div className="flex flex-col p-4 bg-muted/40 rounded-lg border">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                            <MessageSquare className="h-4 w-4" /> Recent Messages
+                    <div className="flex flex-col p-4 bg-muted/40 rounded-lg border hover:bg-muted/60 transition-colors">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <div className="p-2 bg-primary/10 rounded-md">
+                                <MessageSquare className="h-4 w-4 text-primary" />
+                            </div>
+                            Recent Messages
                         </div>
                         <div className="text-2xl font-bold">{messages.length}</div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-xs text-muted-foreground mt-1">
                             Total Inquiries
                         </div>
                     </div>
                 </div>
 
                 {/* Message Trend Chart */}
-                <div className="h-[200px]">
+                <div className="h-[250px] w-full">
                     <p className="text-sm font-medium mb-4">Message Volume (14 Days)</p>
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={messageChartData}>
+                        <AreaChart data={messageChartData}>
+                            <defs>
+                                <linearGradient id="colorMessages" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />
                             <XAxis
                                 dataKey="date"
                                 stroke="#888888"
-                                fontSize={10}
+                                fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
                                 minTickGap={30}
                             />
                             <YAxis
                                 stroke="#888888"
-                                fontSize={10}
+                                fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
                                 allowDecimals={false}
@@ -119,14 +131,14 @@ export function AdminCommunicationStats({ messages, emailSequences }: AdminCommu
                                 contentStyle={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
                                 labelStyle={{ color: 'hsl(var(--foreground))' }}
                             />
-                            <Line
+                            <Area
                                 type="monotone"
                                 dataKey="messages"
                                 stroke="#8884d8"
-                                strokeWidth={2}
-                                dot={false}
+                                fillOpacity={1}
+                                fill="url(#colorMessages)"
                             />
-                        </LineChart>
+                        </AreaChart>
                     </ResponsiveContainer>
                 </div>
             </CardContent>
