@@ -73,75 +73,77 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
                     </div>
                 </CardDescription>
             </CardHeader>
-            <CardContent className="h-[300px]">
+            <CardContent className="space-y-6">
                 {totalReviews > 0 ? (
-                    <ResponsiveContainer width="100%" height="220">
-                        <BarChart
-                            data={data}
-                            layout="vertical"
-                            margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                            <XAxis type="number" hide />
-                            <YAxis
-                                dataKey="name"
-                                type="category"
-                                width={60}
-                                tick={{ fontSize: 12 }}
-                                tickLine={false}
-                                axisLine={false}
-                            />
-                            <Tooltip
-                                cursor={{ fill: "transparent" }}
-                                content={({ active, payload }) => {
-                                    if (active && payload && payload.length) {
-                                        return (
-                                            <div className="rounded-lg border bg-background p-2 shadow-sm">
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                                            {payload[0].payload.name}
-                                                        </span>
-                                                        <span className="font-bold text-muted-foreground">
-                                                            {payload[0].value} count
-                                                        </span>
+                    <>
+                        <div className="h-[200px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={data}
+                                    layout="vertical"
+                                    margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                                    <XAxis type="number" hide />
+                                    <YAxis
+                                        dataKey="name"
+                                        type="category"
+                                        width={60}
+                                        tick={{ fontSize: 12 }}
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <Tooltip
+                                        cursor={{ fill: "transparent" }}
+                                        content={({ active, payload }) => {
+                                            if (active && payload && payload.length) {
+                                                return (
+                                                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                                                    {payload[0].payload.name}
+                                                                </span>
+                                                                <span className="font-bold text-muted-foreground">
+                                                                    {payload[0].value} count
+                                                                </span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                }}
-                            />
-                            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
-                                {data.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                ) : (
-                    <div className="h-full flex items-center justify-center text-muted-foreground">
-                        No reviews data available
-                    </div>
-                )}
+                                                );
+                                            }
+                                            return null;
+                                        }}
+                                    />
+                                    <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                                        {data.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
 
-                {totalReviews > 0 && (
-                    <div className="mt-4 grid grid-cols-2 gap-4 border-t pt-4">
-                        <div className="flex flex-col items-center justify-center p-2 bg-green-500/10 rounded-lg">
-                            <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Positive</span>
-                            <span className="text-xl font-bold text-green-500">
-                                {Math.round(((data.find(d => d.name === "5 Stars")?.value || 0) + (data.find(d => d.name === "4 Stars")?.value || 0)) / totalReviews * 100)}%
-                            </span>
-                            <span className="text-xs text-muted-foreground">4 & 5 Stars</span>
+                        <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                            <div className="flex flex-col items-center justify-center p-3 bg-green-500/10 rounded-lg">
+                                <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Positive</span>
+                                <span className="text-2xl font-bold text-green-500">
+                                    {Math.round(((data.find(d => d.name === "5 Stars")?.value || 0) + (data.find(d => d.name === "4 Stars")?.value || 0)) / totalReviews * 100)}%
+                                </span>
+                                <span className="text-xs text-muted-foreground">4 & 5 Stars</span>
+                            </div>
+                            <div className="flex flex-col items-center justify-center p-3 bg-red-500/10 rounded-lg">
+                                <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Negative</span>
+                                <span className="text-2xl font-bold text-red-500">
+                                    {Math.round(((data.find(d => d.name === "1 Star")?.value || 0) + (data.find(d => d.name === "2 Stars")?.value || 0)) / totalReviews * 100)}%
+                                </span>
+                                <span className="text-xs text-muted-foreground">1 & 2 Stars</span>
+                            </div>
                         </div>
-                        <div className="flex flex-col items-center justify-center p-2 bg-red-500/10 rounded-lg">
-                            <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Negative</span>
-                            <span className="text-xl font-bold text-red-500">
-                                {Math.round(((data.find(d => d.name === "1 Star")?.value || 0) + (data.find(d => d.name === "2 Stars")?.value || 0)) / totalReviews * 100)}%
-                            </span>
-                            <span className="text-xs text-muted-foreground">1 & 2 Stars</span>
-                        </div>
+                    </>
+                ) : (
+                    <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                        No reviews data available
                     </div>
                 )}
             </CardContent>
