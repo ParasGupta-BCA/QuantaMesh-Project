@@ -263,7 +263,7 @@ export default function Admin() {
           videos: adminVideos.length
         }}
       >
-        <AdminHeader title={activeTab === 'dashboard' ? 'Dashboard' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')} />
+        <AdminHeader title={activeTab === 'dashboard' ? 'Dashboard - Overview' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1).replace('-', ' ')} />
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide bg-gray-50/50 dark:bg-black/50">
           <div className="mx-auto max-w-[1600px] space-y-6 pb-20">
