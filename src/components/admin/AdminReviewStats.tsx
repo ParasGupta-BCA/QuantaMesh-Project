@@ -17,22 +17,26 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Star } from "lucide-react";
+import { Star, CheckCircle } from "lucide-react";
 
 interface AdminReviewStatsProps {
     reviews: Review[];
 }
 
 export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
-    const { data, averageRating, totalReviews } = useMemo(() => {
+    const { data, averageRating, totalReviews, approvedCount } = useMemo(() => {
         const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         let sum = 0;
+        let approved = 0;
 
         reviews.forEach((review) => {
             const rating = Math.round(review.rating);
             if (rating >= 1 && rating <= 5) {
                 counts[rating as keyof typeof counts]++;
                 sum += rating;
+            }
+            if (review.is_approved) {
+                approved++;
             }
         });
 
@@ -46,7 +50,7 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
 
         const avg = reviews.length > 0 ? sum / reviews.length : 0;
 
-        return { data: chartData, averageRating: avg, totalReviews: reviews.length };
+        return { data: chartData, averageRating: avg, totalReviews: reviews.length, approvedCount: approved };
     }, [reviews]);
 
     return (
@@ -124,20 +128,30 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
                             </ResponsiveContainer>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                        <div className="grid grid-cols-3 gap-4 border-t pt-4">
                             <div className="flex flex-col items-center justify-center p-3 bg-green-500/10 rounded-lg">
-                                <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Positive</span>
-                                <span className="text-2xl font-bold text-green-500">
+                                <span className="text-sm font-medium text-muted-foreground mb-1 text-center">Positive</span>
+                                <span className="text-xl font-bold text-green-500">
                                     {Math.round(((data.find(d => d.name === "5 Stars")?.value || 0) + (data.find(d => d.name === "4 Stars")?.value || 0)) / totalReviews * 100)}%
                                 </span>
                                 <span className="text-xs text-muted-foreground">4 & 5 Stars</span>
                             </div>
                             <div className="flex flex-col items-center justify-center p-3 bg-red-500/10 rounded-lg">
-                                <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Negative</span>
-                                <span className="text-2xl font-bold text-red-500">
+                                <span className="text-sm font-medium text-muted-foreground mb-1 text-center">Negative</span>
+                                <span className="text-xl font-bold text-red-500">
                                     {Math.round(((data.find(d => d.name === "1 Star")?.value || 0) + (data.find(d => d.name === "2 Stars")?.value || 0)) / totalReviews * 100)}%
                                 </span>
                                 <span className="text-xs text-muted-foreground">1 & 2 Stars</span>
+                            </div>
+                            <div className="flex flex-col items-center justify-center p-3 bg-blue-500/10 rounded-lg">
+                                <span className="text-sm font-medium text-muted-foreground mb-1 text-center">Approved</span>
+                                <span className="text-xl font-bold text-blue-500">
+                                    {Math.round((approvedCount / totalReviews) * 100)}%
+                                </span>
+                                <div className="flex items-center gap-1">
+                                    <CheckCircle className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-xs text-muted-foreground">{approvedCount} Reviews</span>
+                                </div>
                             </div>
                         </div>
                     </>
