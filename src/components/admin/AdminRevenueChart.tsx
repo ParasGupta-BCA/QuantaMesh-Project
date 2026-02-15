@@ -64,7 +64,7 @@ export function AdminRevenueChart({ orders }: AdminRevenueChartProps) {
   );
 
   return (
-    <Card className="col-span-1 h-full min-h-[400px]">
+    <Card className="col-span-1 h-full min-h-[400px] min-w-0">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="space-y-1">
           <CardTitle className="text-base font-normal text-muted-foreground">

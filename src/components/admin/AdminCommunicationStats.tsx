@@ -66,7 +66,7 @@ export function AdminCommunicationStats({ messages, emailSequences }: AdminCommu
     }, [messages, emailSequences]);
 
     return (
-        <Card className="col-span-1 h-full min-h-[400px]">
+        <Card className="col-span-1 h-full min-h-[400px] min-w-0">
             <CardHeader>
                 <CardTitle>Communication Insights</CardTitle>
                 <CardDescription>Messages & Email Performance</CardDescription>

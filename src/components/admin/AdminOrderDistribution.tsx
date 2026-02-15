@@ -40,7 +40,7 @@ export function AdminOrderDistribution({ orders }: AdminOrderDistributionProps) 
     }, [orders]);
 
     return (
-        <Card className="col-span-1 h-full min-h-[400px]">
+        <Card className="col-span-1 h-full min-h-[400px] min-w-0">
             <CardHeader>
                 <CardTitle>Order Distribution</CardTitle>
                 <CardDescription>Orders by Category</CardDescription>

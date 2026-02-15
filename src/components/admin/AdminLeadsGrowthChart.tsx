@@ -47,7 +47,7 @@ export function AdminLeadsGrowthChart({ leads }: AdminLeadsGrowthChartProps) {
     }, [leads]);
 
     return (
-        <Card className="col-span-1 h-full min-h-[400px]">
+        <Card className="col-span-1 h-full min-h-[400px] min-w-0">
             <CardHeader>
                 <CardTitle>Leads Growth</CardTitle>
                 <CardDescription>New leads over the last 30 days</CardDescription>
