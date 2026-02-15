@@ -76,7 +76,7 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
             <CardContent className="space-y-6">
                 {totalReviews > 0 ? (
                     <>
-                        <div className="h-[200px] w-full">
+                        <div className="h-[280px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart
                                     data={data}
