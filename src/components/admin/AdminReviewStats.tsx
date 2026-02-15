@@ -61,8 +61,8 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
                                 <Star
                                     key={star}
                                     className={`h-4 w-4 ${star <= Math.round(averageRating)
-                                            ? "text-yellow-400 fill-yellow-400"
-                                            : "text-gray-300"
+                                        ? "text-yellow-400 fill-yellow-400"
+                                        : "text-gray-300"
                                         }`}
                                 />
                             ))}
@@ -75,7 +75,7 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
             </CardHeader>
             <CardContent className="h-[300px]">
                 {totalReviews > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="220">
                         <BarChart
                             data={data}
                             layout="vertical"
@@ -123,6 +123,25 @@ export function AdminReviewStats({ reviews }: AdminReviewStatsProps) {
                 ) : (
                     <div className="h-full flex items-center justify-center text-muted-foreground">
                         No reviews data available
+                    </div>
+                )}
+
+                {totalReviews > 0 && (
+                    <div className="mt-4 grid grid-cols-2 gap-4 border-t pt-4">
+                        <div className="flex flex-col items-center justify-center p-2 bg-green-500/10 rounded-lg">
+                            <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Positive</span>
+                            <span className="text-xl font-bold text-green-500">
+                                {Math.round(((data.find(d => d.name === "5 Stars")?.value || 0) + (data.find(d => d.name === "4 Stars")?.value || 0)) / totalReviews * 100)}%
+                            </span>
+                            <span className="text-xs text-muted-foreground">4 & 5 Stars</span>
+                        </div>
+                        <div className="flex flex-col items-center justify-center p-2 bg-red-500/10 rounded-lg">
+                            <span className="text-sm font-medium text-muted-foreground mb-1">Scale of Negative</span>
+                            <span className="text-xl font-bold text-red-500">
+                                {Math.round(((data.find(d => d.name === "1 Star")?.value || 0) + (data.find(d => d.name === "2 Stars")?.value || 0)) / totalReviews * 100)}%
+                            </span>
+                            <span className="text-xs text-muted-foreground">1 & 2 Stars</span>
+                        </div>
                     </div>
                 )}
             </CardContent>
