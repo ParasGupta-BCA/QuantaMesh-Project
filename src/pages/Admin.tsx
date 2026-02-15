@@ -22,7 +22,9 @@ import { AdminBlog } from "@/components/admin/AdminBlog";
 import { AdminAISettings } from "@/components/admin/AdminAISettings";
 import { AdminColdOutreach } from "@/components/admin/AdminColdOutreach";
 import { AdminColdEmailSettings } from "@/components/admin/AdminColdEmailSettings";
-import { Order, ContactMessage, Review } from "@/types/admin";
+import { AdminRevenueChart } from "@/components/admin/AdminRevenueChart";
+import { AdminRecentActivity } from "@/components/admin/AdminRecentActivity";
+import { Order, ContactMessage, Review, Lead } from "@/types/admin";
 import { getSafeErrorMessage, logError } from "@/lib/errorMessages";
 
 interface AdminVideo {
@@ -37,17 +39,6 @@ interface AdminVideo {
   created_at: string;
 }
 
-interface Lead {
-  id: string;
-  name: string;
-  email: string;
-  source: string;
-  status: string;
-  niche: string | null;
-  notes: string | null;
-  created_at: string;
-  last_contacted_at: string | null;
-}
 
 interface EmailSequence {
   id: string;
@@ -104,7 +95,7 @@ export default function Admin() {
       if (ordersResult.data) setOrders(ordersResult.data);
       if (messagesResult.data) setMessages(messagesResult.data);
       if (reviewsResult.data) setReviews(reviewsResult.data as Review[]);
-      if (leadsResult.data) setLeads(leadsResult.data as Lead[]);
+      if (leadsResult.data) setLeads(leadsResult.data);
       if (emailsResult.data) setEmailSequences(emailsResult.data as EmailSequence[]);
       if (videosResult.data) setAdminVideos(videosResult.data as AdminVideo[]);
     } catch (error) {
@@ -280,16 +271,15 @@ export default function Admin() {
                 {activeTab === 'dashboard' && (
                   <div className="animate-fade-in space-y-6">
                     <AdminStats orders={orders} messages={messages} />
-                    {/* Dashboard Charts Placeholder */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-sm min-h-[300px]">
-                        <h3 className="font-semibold mb-4">Revenue Overview</h3>
-                        <div className="h-full flex items-center justify-center text-muted-foreground text-sm">Chart Placeholder</div>
-                      </div>
-                      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-sm min-h-[300px]">
-                        <h3 className="font-semibold mb-4">Recent Activity</h3>
-                        <div className="h-full flex items-center justify-center text-muted-foreground text-sm">Activity Feed Placeholder</div>
-                      </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[400px]">
+                      <AdminRevenueChart orders={orders} />
+                      <AdminRecentActivity
+                        orders={orders}
+                        messages={messages}
+                        reviews={reviews}
+                        leads={leads}
+                      />
                     </div>
                   </div>
                 )}

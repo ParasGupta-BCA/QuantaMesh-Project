@@ -39,3 +39,15 @@ export interface Review {
   created_at: string;
   updated_at: string;
 }
+
+export interface Lead {
+  id: string;
+  name: string;
+  email: string;
+  source: string;
+  status: string;
+  niche: string | null;
+  notes: string | null;
+  created_at: string;
+  last_contacted_at: string | null;
+}
