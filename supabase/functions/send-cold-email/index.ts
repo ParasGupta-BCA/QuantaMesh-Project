@@ -33,7 +33,7 @@ const DEFAULT_SETTINGS: EmailSettings = {
     { name: "Sanchit Saggi", role: "Co-Founder & Business Strategist" },
   ],
   cta_text: "Let's Talk Growth →",
-  cta_url: "https://quantamesh.lovable.app/contact",
+  cta_url: "https://www.quantamesh.store/contact",
   tagline: "DIGITAL GROWTH PARTNER",
 };
 
@@ -132,7 +132,7 @@ function buildColdEmailHtml(
         <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px;" align="center">
           <tr>
             <td style="width:56px;height:56px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;text-align:center;vertical-align:middle;">
-              <img src="https://quantamesh.lovable.app/logo.png" alt="QuantaMesh" width="40" height="40" style="display:block;margin:0 auto;border-radius:10px;" />
+              <img src="https://www.quantamesh.store/logo.png" alt="QuantaMesh" width="40" height="40" style="display:block;margin:0 auto;border-radius:10px;" />
             </td>
           </tr>
         </table>
@@ -210,10 +210,10 @@ function buildColdEmailHtml(
   <p style="margin:4px 0 0;font-size:15px;font-weight:600;color:#1a1a2e;">The QuantaMesh Team</p>
   <p style="margin:16px 0 0;font-size:11px;color:#cbd5e1;">
     QuantaMesh • ${settings.tagline}<br/>
-    <a href="https://quantamesh.lovable.app" style="color:#6366f1;text-decoration:none;">quantamesh.lovable.app</a>
+    <a href="https://www.quantamesh.store" style="color:#6366f1;text-decoration:none;">www.quantamesh.store</a>
   </p>
   <p style="margin:12px 0 0;font-size:10px;color:#cbd5e1;">
-    Don't want to receive these emails? <a href="https://quantamesh.lovable.app" style="color:#94a3b8;text-decoration:underline;">Unsubscribe</a>
+    Don't want to receive these emails? <a href="https://www.quantamesh.store" style="color:#94a3b8;text-decoration:underline;">Unsubscribe</a>
   </p>
 </td>
 </tr>

@@ -150,7 +150,7 @@ export function AdminColdEmailSettings() {
             </div>
             <div className="space-y-2">
               <Label className="flex items-center gap-2"><Link className="h-4 w-4" /> CTA URL</Label>
-              <Input value={settings.cta_url} onChange={(e) => setSettings({ ...settings, cta_url: e.target.value })} placeholder="https://quantamesh.lovable.app/contact" />
+              <Input value={settings.cta_url} onChange={(e) => setSettings({ ...settings, cta_url: e.target.value })} placeholder="https://www.quantamesh.store/contact" />
             </div>
           </div>
         </CardContent>
