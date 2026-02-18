@@ -78,20 +78,17 @@ export function CTA() {
           <div
             className="absolute z-10 pointer-events-auto"
             style={{
-              right: "-120px",
-              bottom: "-130px",
-              width: "600px",
-              height: "600px",
+              right: "-80px",
+              bottom: "-100px",
+              width: "520px",
+              height: "520px",
             }}
           >
             <Globe3D
               className="h-full w-full"
               markers={globeMarkers}
               config={{
-                atmosphereColor: "#a855f7",
-                atmosphereIntensity: 15,
-                showAtmosphere: true,
-                atmosphereBlur: 3,
+                showAtmosphere: false,
                 bumpScale: 5,
                 autoRotateSpeed: 0.4,
               }}
