@@ -95,7 +95,7 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
     }, [marker.lat, marker.lng, radius]);
 
     const topPosition = useMemo(() => {
-        return latLngToVector3(marker.lat, marker.lng, radius * 1.18);
+        return latLngToVector3(marker.lat, marker.lng, radius * 1.10);
     }, [marker.lat, marker.lng, radius]);
 
     const lineHeight = topPosition.distanceTo(surfacePosition);
@@ -153,7 +153,7 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
                     transform
                     center
                     sprite
-                    distanceFactor={10}
+                    distanceFactor={5}
                     style={{
                         pointerEvents: isVisible ? "auto" : "none",
                         opacity: isVisible ? 1 : 0,
@@ -165,7 +165,7 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
                             "cursor-pointer overflow-hidden rounded-full bg-neutral-900 shadow-lg transition-transform duration-200",
                             hovered && "scale-125 shadow-xl ring-1 ring-white/50",
                         )}
-                        style={{ width: "8px", height: "8px" }}
+                        style={{ width: "28px", height: "28px" }}
                         onMouseEnter={handlePointerEnter}
                         onMouseLeave={handlePointerLeave}
                         onClick={handleClick}
