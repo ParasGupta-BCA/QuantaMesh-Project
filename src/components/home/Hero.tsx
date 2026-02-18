@@ -1,8 +1,51 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Shield, Zap } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, Zap, Smartphone, Film, Globe, Code2 } from "lucide-react";
 import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
 import { MorPankh } from "@/components/MorPankh";
+
+const services = [
+  {
+    icon: Smartphone,
+    title: "App Publishing",
+    description: "Publish your Android & iOS app to Google Play & App Store — fast, compliant, and hassle-free.",
+    color: "from-purple-500/20 to-violet-600/10",
+    border: "border-purple-500/30",
+    iconColor: "text-purple-400",
+    iconBg: "bg-purple-500/10",
+    tag: "$25 one-time",
+  },
+  {
+    icon: Film,
+    title: "CGI Ads",
+    description: "Hyper-realistic 3D CGI video ads that make your brand go viral on social media.",
+    color: "from-pink-500/20 to-rose-600/10",
+    border: "border-pink-500/30",
+    iconColor: "text-pink-400",
+    iconBg: "bg-pink-500/10",
+    tag: "For Brands",
+  },
+  {
+    icon: Globe,
+    title: "Website Development",
+    description: "Modern, fast, and responsive websites that convert visitors into customers.",
+    color: "from-cyan-500/20 to-blue-600/10",
+    border: "border-cyan-500/30",
+    iconColor: "text-cyan-400",
+    iconBg: "bg-cyan-500/10",
+    tag: "Custom Design",
+  },
+  {
+    icon: Code2,
+    title: "App Development",
+    description: "Full-stack mobile & web app development tailored to your business needs.",
+    color: "from-emerald-500/20 to-teal-600/10",
+    border: "border-emerald-500/30",
+    iconColor: "text-emerald-400",
+    iconBg: "bg-emerald-500/10",
+    tag: "End-to-End",
+  },
+];
 
 export function Hero() {
   return (
@@ -29,55 +72,71 @@ export function Hero() {
         <div className="absolute bottom-1/4 right-1/4 w-64 md:w-96 h-64 md:h-96 bg-[hsl(200,95%,55%)]/20 rounded-full blur-[100px] md:blur-[128px] animate-pulse-glow" style={{ animationDelay: "1.5s" }} />
       </div>
 
-      {/* Decorative Elements Removed */}
-
       <div className="container mx-auto py-12 sm:py-16 md:py-20 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto text-center">
+
           {/* Badge */}
           <div className="relative inline-block mb-6 sm:mb-8 animate-fade-in group">
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 ml-6 w-24 h-24 -rotate-12 pointer-events-none transition-transform duration-700 ease-in-out group-hover:rotate-0">
               <MorPankh className="w-full h-full drop-shadow-lg opacity-90" />
             </div>
-
             <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm relative z-10">
               <Sparkles size={14} className="text-primary sm:w-4 sm:h-4" />
-              <span className="text-xs sm:text-sm font-medium text-primary">Professional App Publishing</span>
+              <span className="text-xs sm:text-sm font-medium text-primary">Your All-in-One Digital Partner</span>
             </div>
           </div>
 
           {/* Headline */}
           <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 animate-slide-up leading-tight">
-            <span className="text-foreground block">We Publish Your</span>
-            <span className="gradient-text glow-text block my-1 sm:my-2">Android App</span>
-            <span className="text-foreground block">to Google Play</span>
+            <span className="text-foreground block">We Build, Launch &</span>
+            <span className="gradient-text glow-text block my-1 sm:my-2">Grow Your Brand</span>
+            <span className="text-foreground block">Digitally</span>
           </h1>
-
-          {/* Price */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8 animate-slide-up" style={{ animationDelay: "0.1s" }}>
-            <span className="text-4xl sm:text-5xl md:text-6xl font-bold gradient-text">$25</span>
-            <span className="text-muted-foreground text-sm sm:text-base md:text-lg">one-time fee</span>
-          </div>
 
           {/* Subheadline */}
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-8 sm:mb-10 max-w-xl md:max-w-2xl mx-auto px-2 animate-slide-up leading-relaxed" style={{ animationDelay: "0.2s" }}>
-            Skip the $25 developer fee hassle. We handle everything from metadata optimization to Play Store policy compliance.
+            From publishing your app to creating viral CGI ads, building websites, and developing custom apps — we are your complete digital solution.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 animate-slide-up" style={{ animationDelay: "0.3s" }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-14 animate-slide-up" style={{ animationDelay: "0.3s" }}>
             <Button variant="hero" size="lg" className="w-full sm:w-auto text-base sm:text-lg h-12 sm:h-14 px-6 sm:px-10" asChild>
               <Link to="/order" className="group">
-                Publish My App
+                Get Started
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
             <Button variant="glass" size="lg" className="w-full sm:w-auto h-11 sm:h-12 px-6 sm:px-8" asChild>
-              <Link to="/services">Learn More</Link>
+              <Link to="/services">View All Services</Link>
             </Button>
           </div>
 
+          {/* Service Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-10 sm:mb-14 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+            {services.map((service, index) => (
+              <div
+                key={index}
+                className={`relative group rounded-2xl p-4 sm:p-5 bg-gradient-to-br ${service.color} border ${service.border} backdrop-blur-sm hover:scale-[1.03] transition-all duration-300 text-left cursor-default`}
+              >
+                {/* Tag */}
+                <span className={`absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full ${service.iconBg} ${service.iconColor} border ${service.border}`}>
+                  {service.tag}
+                </span>
+
+                {/* Icon */}
+                <div className={`w-10 h-10 rounded-xl ${service.iconBg} flex items-center justify-center mb-3`}>
+                  <service.icon size={20} className={service.iconColor} />
+                </div>
+
+                {/* Text */}
+                <h3 className="text-sm sm:text-base font-bold text-white mb-1.5">{service.title}</h3>
+                <p className="text-xs sm:text-sm text-white/60 leading-relaxed">{service.description}</p>
+              </div>
+            ))}
+          </div>
+
           {/* Trust Indicators */}
-          <div className="flex flex-col xs:flex-row flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-10 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+          <div className="flex flex-col xs:flex-row flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-10 animate-fade-in" style={{ animationDelay: "0.5s" }}>
             {[
               { icon: Zap, text: "24-48h Delivery" },
               { icon: Shield, text: "Policy Compliant" },
