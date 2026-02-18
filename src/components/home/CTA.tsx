@@ -145,8 +145,8 @@ export function CTA() {
             <div
               className="absolute z-10 pointer-events-auto"
               style={{
-                right: "-120px",
-                bottom: "-140px",
+                right: "-160px",
+                bottom: "-180px",
                 width: "700px",
                 height: "700px",
               }}
