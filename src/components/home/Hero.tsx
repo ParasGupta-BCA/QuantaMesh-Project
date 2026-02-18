@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Shield, Zap, Smartphone, Film, Globe, Code2 } from "lucide-react";
 import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -265,8 +266,13 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      {/* Bottom Progressive Blur */}
+      <ProgressiveBlur
+        position="bottom"
+        backgroundColor="hsl(240 10% 4%)"
+        height="120px"
+        blurAmount="6px"
+      />
     </section>
   );
 }

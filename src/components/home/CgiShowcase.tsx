@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { InstagramReelsViewer } from "./InstagramReelsViewer";
 import { useAdminVideos } from "@/hooks/useAdminVideos";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 
 // Static videos as fallback
 const staticItems = [
@@ -31,7 +32,7 @@ export function CgiShowcase() {
       src: getVideoUrl(video.video_path),
       title: video.title,
     }));
-    
+
     // Show admin videos first, then static ones
     return adminItems.length > 0 ? [...adminItems, ...staticItems] : staticItems;
   }, [adminVideos, getVideoUrl]);
@@ -48,12 +49,28 @@ export function CgiShowcase() {
       {/* Background Ambience */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-black to-black opacity-40 pointer-events-none" />
 
+      {/* Progressive Blur — top */}
+      <ProgressiveBlur
+        position="top"
+        backgroundColor="#000"
+        height="110px"
+        blurAmount="6px"
+      />
+
+      {/* Progressive Blur — bottom */}
+      <ProgressiveBlur
+        position="bottom"
+        backgroundColor="#000"
+        height="110px"
+        blurAmount="6px"
+      />
+
       <div className="container px-4 mx-auto relative z-10">
         <div className="text-center mb-16 space-y-4">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <a 
-              href="https://www.instagram.com/quantamesh/" 
-              target="_blank" 
+            <a
+              href="https://www.instagram.com/quantamesh/"
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 text-white text-sm font-medium hover:opacity-90 transition-opacity"
             >
@@ -76,20 +93,20 @@ export function CgiShowcase() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           {items.map((item, index) => (
-            <VideoCard 
-              key={item.id} 
-              src={item.src} 
+            <VideoCard
+              key={item.id}
+              src={item.src}
               onClick={() => handleVideoClick(index)}
               isMobile={isMobile}
             />
           ))}
         </div>
-        
+
         {/* Instagram CTA */}
         <div className="mt-12 text-center">
-          <a 
-            href="https://www.instagram.com/quantamesh/" 
-            target="_blank" 
+          <a
+            href="https://www.instagram.com/quantamesh/"
+            target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all group"
           >
@@ -107,7 +124,7 @@ export function CgiShowcase() {
       </div>
 
       {/* Instagram Reels Viewer (Mobile Only) */}
-      <InstagramReelsViewer 
+      <InstagramReelsViewer
         videos={items}
         initialIndex={selectedIndex}
         isOpen={reelsOpen}
@@ -185,8 +202,8 @@ function VideoCard({ src, onClick, isMobile }: VideoCardProps) {
     <div
       className={cn(
         "relative group rounded-2xl overflow-hidden aspect-[9/16] bg-zinc-900 border border-white/10 shadow-2xl transition-all duration-500",
-        isMobile 
-          ? "active:scale-[0.98] cursor-pointer" 
+        isMobile
+          ? "active:scale-[0.98] cursor-pointer"
           : "hover:scale-[1.02] hover:border-purple-500/50 hover:shadow-purple-500/20"
       )}
       onMouseEnter={handleMouseEnter}
@@ -209,7 +226,7 @@ function VideoCard({ src, onClick, isMobile }: VideoCardProps) {
       {isMobile && (
         <div className="absolute top-3 right-3 z-10">
           <svg className="w-6 h-6 text-white drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
           </svg>
         </div>
       )}

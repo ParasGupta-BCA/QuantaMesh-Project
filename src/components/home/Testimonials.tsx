@@ -1,6 +1,7 @@
 import { Star, Quote } from "lucide-react";
 import { useApprovedReviews } from "@/hooks/useApprovedReviews";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 
 // Fallback testimonials for when no approved reviews exist
 const fallbackTestimonials = [
@@ -29,16 +30,16 @@ const fallbackTestimonials = [
 
 export function Testimonials() {
   const { reviews, loading } = useApprovedReviews();
-  
+
   // Use real reviews if available, otherwise use fallback
-  const displayReviews = reviews.length > 0 
+  const displayReviews = reviews.length > 0
     ? reviews.slice(0, 6).map(r => ({
-        name: r.customer_name,
-        role: "Verified Customer",
-        content: r.review_text,
-        rating: r.rating,
-        avatar: r.customer_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-      }))
+      name: r.customer_name,
+      role: "Verified Customer",
+      content: r.review_text,
+      rating: r.rating,
+      avatar: r.customer_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    }))
     : fallbackTestimonials;
 
   // Generate JSON-LD for reviews
@@ -49,7 +50,7 @@ export function Testimonials() {
     "url": "https://www.quantamesh.store",
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": displayReviews.length > 0 
+      "ratingValue": displayReviews.length > 0
         ? (displayReviews.reduce((sum, r) => sum + r.rating, 0) / displayReviews.length).toFixed(1)
         : "4.9",
       "reviewCount": reviews.length > 0 ? reviews.length.toString() : "120",
@@ -78,6 +79,22 @@ export function Testimonials() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewsJsonLd) }}
+      />
+
+      {/* Progressive Blur — top */}
+      <ProgressiveBlur
+        position="top"
+        backgroundColor="hsl(240 10% 4%)"
+        height="100px"
+        blurAmount="5px"
+      />
+
+      {/* Progressive Blur — bottom */}
+      <ProgressiveBlur
+        position="bottom"
+        backgroundColor="hsl(240 10% 4%)"
+        height="100px"
+        blurAmount="5px"
       />
 
       {/* Background Effect */}
@@ -120,7 +137,7 @@ export function Testimonials() {
               >
                 {/* Quote Icon */}
                 <Quote size={32} className="text-primary/20 absolute top-4 right-4" />
-                
+
                 {/* Rating */}
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (

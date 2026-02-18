@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Smartphone, Film, Globe, Code2, Check } from "lucide-react";
 import { CardSpotlight } from "@/components/ui/card-spotlight";
+import { ProgressiveBlur } from "@/components/ui/progressive-blur";
 
 const services = [
   {
@@ -88,6 +89,21 @@ const services = [
 export function Benefits() {
   return (
     <section className="py-20 md:py-32 relative">
+      {/* Progressive Blur — top */}
+      <ProgressiveBlur
+        position="top"
+        backgroundColor="hsl(240 10% 4%)"
+        height="90px"
+        blurAmount="5px"
+      />
+
+      {/* Progressive Blur — bottom */}
+      <ProgressiveBlur
+        position="bottom"
+        backgroundColor="hsl(240 10% 4%)"
+        height="90px"
+        blurAmount="5px"
+      />
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-14 md:mb-20">
