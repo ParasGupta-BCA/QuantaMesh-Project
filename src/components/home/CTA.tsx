@@ -96,7 +96,7 @@ export function CTA() {
             className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl border border-white/10"
             style={{
               background: "linear-gradient(135deg, hsl(260 25% 7%) 0%, hsl(270 20% 5%) 100%)",
-              minHeight: "420px",
+              minHeight: "500px",
             }}
           >
             {/* Glow blobs */}
@@ -145,10 +145,10 @@ export function CTA() {
             <div
               className="absolute z-10 pointer-events-auto"
               style={{
-                right: "-80px",
-                bottom: "-100px",
-                width: "520px",
-                height: "520px",
+                right: "-120px",
+                bottom: "-140px",
+                width: "700px",
+                height: "700px",
               }}
             >
               <Globe3D
