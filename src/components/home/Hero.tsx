@@ -22,6 +22,8 @@ const services = [
     tag: "$25 one-time",
     tagColor: "text-purple-300 bg-purple-500/15 border-purple-500/30",
     glow: "shadow-purple-500/20",
+    accentFrom: "#a855f7",
+    accentTo: "#7c3aed",
   },
   {
     icon: Film,
@@ -34,6 +36,8 @@ const services = [
     tag: "For Brands",
     tagColor: "text-pink-300 bg-pink-500/15 border-pink-500/30",
     glow: "shadow-pink-500/20",
+    accentFrom: "#ec4899",
+    accentTo: "#e11d48",
   },
   {
     icon: Globe,
@@ -46,6 +50,8 @@ const services = [
     tag: "Custom Design",
     tagColor: "text-cyan-300 bg-cyan-500/15 border-cyan-500/30",
     glow: "shadow-cyan-500/20",
+    accentFrom: "#22d3ee",
+    accentTo: "#2563eb",
   },
   {
     icon: Code2,
@@ -58,8 +64,11 @@ const services = [
     tag: "End-to-End",
     tagColor: "text-emerald-300 bg-emerald-500/15 border-emerald-500/30",
     glow: "shadow-emerald-500/20",
+    accentFrom: "#10b981",
+    accentTo: "#0d9488",
   },
 ];
+
 
 // Swiper card carousel for mobile
 function MobileServiceCarousel() {
@@ -69,34 +78,75 @@ function MobileServiceCarousel() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.4 }}
       className="flex flex-col items-center w-full mb-10"
+      style={{ paddingBottom: "40px" }}
     >
-      <p className="text-xs text-white/40 mb-5 tracking-wider uppercase">Swipe to explore</p>
+      <p className="text-xs text-white/40 mb-6 tracking-wider uppercase">Swipe to explore</p>
       <Swiper
         effect="cards"
         grabCursor={true}
         loop={true}
-        autoplay={{ delay: 2500, disableOnInteraction: false }}
+        autoplay={{ delay: 2800, disableOnInteraction: false }}
         modules={[EffectCards, Autoplay]}
-        className="w-[260px] h-[200px]"
+        style={{ width: "300px", height: "240px", overflow: "visible" }}
       >
         {services.map((service, index) => (
-          <SwiperSlide key={index} className="rounded-2xl overflow-hidden">
+          <SwiperSlide
+            key={index}
+            style={{ borderRadius: "20px", overflow: "hidden" }}
+          >
+            {/* Solid dark background — prevents bleed-through from stacked cards */}
             <div
-              className={`relative h-full w-full bg-gradient-to-br ${service.color} border ${service.border} backdrop-blur-sm p-5 flex flex-col shadow-xl ${service.glow}`}
+              style={{
+                height: "100%",
+                width: "100%",
+                background: "hsl(260 20% 8%)",
+                borderRadius: "20px",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                position: "relative",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+              }}
             >
+              {/* Colored top accent bar */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "3px",
+                  borderRadius: "20px 20px 0 0",
+                  background: `linear-gradient(90deg, ${service.accentFrom}, ${service.accentTo})`,
+                }}
+              />
+
               {/* Tag */}
-              <span className={`absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${service.tagColor}`}>
+              <span
+                className={`absolute top-4 right-4 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${service.tagColor}`}
+                style={{ lineHeight: "1.4" }}
+              >
                 {service.tag}
               </span>
 
               {/* Icon */}
-              <div className={`w-10 h-10 rounded-xl ${service.iconBg} flex items-center justify-center mb-3`}>
-                <service.icon size={20} className={service.iconColor} />
+              <div
+                className={`${service.iconBg} flex items-center justify-center mb-4`}
+                style={{ width: "44px", height: "44px", borderRadius: "12px", marginTop: "8px" }}
+              >
+                <service.icon size={22} className={service.iconColor} />
               </div>
 
-              {/* Text */}
-              <h3 className="text-base font-bold text-white mb-1.5">{service.title}</h3>
-              <p className="text-xs text-white/60 leading-relaxed">{service.description}</p>
+              {/* Title */}
+              <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>
+                {service.title}
+              </h3>
+
+              {/* Description */}
+              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.55)", lineHeight: "1.6" }}>
+                {service.description}
+              </p>
             </div>
           </SwiperSlide>
         ))}
