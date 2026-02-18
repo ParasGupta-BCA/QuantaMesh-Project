@@ -95,7 +95,7 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
     }, [marker.lat, marker.lng, radius]);
 
     const topPosition = useMemo(() => {
-        return latLngToVector3(marker.lat, marker.lng, radius * 1.10);
+        return latLngToVector3(marker.lat, marker.lng, radius * 1.07);
     }, [marker.lat, marker.lng, radius]);
 
     const lineHeight = topPosition.distanceTo(surfacePosition);
@@ -150,10 +150,7 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
 
             <group ref={imageGroupRef} position={topPosition}>
                 <Html
-                    transform
                     center
-                    sprite
-                    distanceFactor={5}
                     style={{
                         pointerEvents: isVisible ? "auto" : "none",
                         opacity: isVisible ? 1 : 0,
@@ -162,10 +159,10 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
                 >
                     <div
                         className={cn(
-                            "cursor-pointer overflow-hidden rounded-full bg-neutral-900 shadow-lg transition-transform duration-200",
-                            hovered && "scale-125 shadow-xl ring-1 ring-white/50",
+                            "cursor-pointer overflow-hidden rounded-full bg-neutral-900 shadow-md ring-1 ring-white/30 transition-transform duration-200",
+                            hovered && "scale-125 shadow-xl ring-white/70",
                         )}
-                        style={{ width: "28px", height: "28px" }}
+                        style={{ width: "22px", height: "22px" }}
                         onMouseEnter={handlePointerEnter}
                         onMouseLeave={handlePointerLeave}
                         onClick={handleClick}
