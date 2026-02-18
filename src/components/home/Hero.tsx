@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Shield, Zap, Smartphone, Film, Globe, Code2 } from "lucide-react";
 import { DottedGlowBackground } from "@/components/ui/dotted-glow-background";
-import { MorPankh } from "@/components/MorPankh";
+
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCards, Autoplay } from "swiper/modules";
@@ -214,11 +214,8 @@ export function Hero() {
         <div className="max-w-6xl mx-auto text-center">
 
           {/* Badge */}
-          <div className="relative inline-block mb-6 sm:mb-8 animate-fade-in group">
-            <div className="absolute -top-24 left-1/2 -translate-x-1/2 ml-6 w-24 h-24 -rotate-12 pointer-events-none transition-transform duration-700 ease-in-out group-hover:rotate-0">
-              <MorPankh className="w-full h-full drop-shadow-lg opacity-90" />
-            </div>
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm relative z-10">
+          <div className="inline-block mb-6 sm:mb-8 animate-fade-in">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
               <Sparkles size={14} className="text-primary sm:w-4 sm:h-4" />
               <span className="text-xs sm:text-sm font-medium text-primary">Your All-in-One Digital Partner</span>
             </div>
