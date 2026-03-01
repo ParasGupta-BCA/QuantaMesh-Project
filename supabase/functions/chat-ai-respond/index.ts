@@ -121,6 +121,27 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ success: true, skipped: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // Check if a real admin has ever replied in this conversation
+    // If so, AI should not respond — admin has taken over
+    const { data: adminMessages } = await supabase
+      .from("messages")
+      .select("id")
+      .eq("conversation_id", conversationId)
+      .eq("sender_type", "admin")
+      .neq("sender_id", AI_SENDER_ID)
+      .limit(1);
+
+    if (adminMessages && adminMessages.length > 0) {
+      console.log("Admin has replied in this conversation, AI assistant stepping back");
+      // Still send email notifications for new messages
+      if (RESEND_API_KEY) {
+        const clientName = conversation.user_name || "";
+        const clientEmail = conversation.user_email;
+        await sendEmailNotification(RESEND_API_KEY, ADMIN_EMAILS, `💬 New message from ${clientName || clientEmail}`, buildAdminNotificationEmail(clientName, clientEmail, messageContent));
+      }
+      return new Response(JSON.stringify({ success: true, skipped: true, reason: "admin_active" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // Get recent conversation history
     const { data: recentMessages } = await supabase.from("messages").select("content, sender_type").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(20);
     const isFirstMessage = !recentMessages || recentMessages.length <= 1;
