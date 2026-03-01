@@ -6,6 +6,7 @@ const corsHeaders = {
 };
 
 const ADMIN_EMAILS = ["parasgupta4494@gmail.com", "sanchitsaggi07@gmail.com"];
+const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
 
 const escapeHtml = (text: string): string => {
   const htmlEntities: Record<string, string> = {
