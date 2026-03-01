@@ -66,14 +66,16 @@ const DEFAULT_SETTINGS: EmailSettings = {
   tagline: "DIGITAL GROWTH PARTNER",
 };
 
-function buildColdEmailHtml(
+async function buildColdEmailHtml(
   prospect: { client_name: string; job_title: string; company_name: string },
   emailNumber: number,
   prospectId: string,
   settings: EmailSettings,
-): string {
+): Promise<string> {
   const trackingPixelUrl = `${TRACK_BASE}?id=${prospectId}&action=open&source=cold`;
   const clickTrackUrl = `${TRACK_BASE}?id=${prospectId}&action=click&source=cold&redirect=${encodeURIComponent(settings.cta_url)}`;
+  const unsubscribeToken = await generateUnsubscribeToken(prospectId);
+  const unsubscribeUrl = `${UNSUBSCRIBE_BASE}?token=${encodeURIComponent(unsubscribeToken)}&source=cold`;
 
   const greeting = emailNumber <= 1
     ? `I noticed ${prospect.company_name} and wanted to reach out personally.`
