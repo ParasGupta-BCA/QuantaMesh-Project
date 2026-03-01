@@ -241,10 +241,10 @@ async function buildColdEmailHtml(
   <p style="margin:4px 0 0;font-size:15px;font-weight:600;color:#1a1a2e;">The QuantaMesh Team</p>
   <p style="margin:16px 0 0;font-size:11px;color:#cbd5e1;">
     QuantaMesh • ${settings.tagline}<br/>
-    <a href="https://www.quantamesh.store" style="color:#6366f1;text-decoration:none;">www.quantamesh.store</a>
+    <a href="${SITE_URL}" style="color:#6366f1;text-decoration:none;">www.quantamesh.store</a>
   </p>
   <p style="margin:12px 0 0;font-size:10px;color:#cbd5e1;">
-    Don't want to receive these emails? <a href="https://www.quantamesh.store" style="color:#94a3b8;text-decoration:underline;">Unsubscribe</a>
+    Don't want to receive these emails? <a href="${unsubscribeUrl}" style="color:#94a3b8;text-decoration:underline;">Unsubscribe</a>
   </p>
 </td>
 </tr>
