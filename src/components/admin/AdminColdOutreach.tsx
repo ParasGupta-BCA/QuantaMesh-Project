@@ -166,6 +166,9 @@ export function AdminColdOutreach() {
 
   return (
     <div className="space-y-6">
+      {/* Analytics Charts */}
+      <ColdOutreachAnalytics prospects={prospects} />
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-border/50">
