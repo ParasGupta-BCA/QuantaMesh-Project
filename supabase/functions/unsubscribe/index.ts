@@ -151,7 +151,8 @@ function generateHTML(
   status: "success" | "error", 
   action: string,
   errorMessage?: string,
-  token?: string | null
+  token?: string | null,
+  source?: string
 ): string {
   const isSuccess = status === "success";
   const isResubscribe = action === "resubscribe";
@@ -159,8 +160,7 @@ function generateHTML(
   // Build the opposite action URL using the same token
   const baseUrl = `https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/unsubscribe`;
   const oppositeAction = isResubscribe ? "unsubscribe" : "resubscribe";
-  // Preserve the source parameter in the toggle URL
-  const toggleUrl = token ? `${baseUrl}?token=${encodeURIComponent(token)}&action=${oppositeAction}&source=${isResubscribe ? "cold" : "lead"}` : "";
+  const toggleUrl = token ? `${baseUrl}?token=${encodeURIComponent(token)}&action=${oppositeAction}&source=${source || "lead"}` : "";
   
   return `
 <!DOCTYPE html>
