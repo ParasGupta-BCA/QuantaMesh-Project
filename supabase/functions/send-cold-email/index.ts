@@ -9,7 +9,36 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const UNSUBSCRIBE_SECRET = Deno.env.get("UNSUBSCRIBE_SECRET") || SUPABASE_SERVICE_ROLE_KEY;
 const TRACK_BASE = `${SUPABASE_URL}/functions/v1/track-email`;
+const UNSUBSCRIBE_BASE = `${SUPABASE_URL}/functions/v1/unsubscribe`;
+const SITE_URL = "https://www.quantamesh.store";
+
+// Helper to convert ArrayBuffer to hex string
+function bufferToHex(buffer: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+// Generate HMAC-signed unsubscribe token
+async function generateUnsubscribeToken(prospectId: string): Promise<string> {
+  const timestamp = Date.now().toString();
+  const data = `${prospectId}:${timestamp}`;
+  
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(UNSUBSCRIBE_SECRET);
+  const messageData = encoder.encode(data);
+  
+  const key = await crypto.subtle.importKey(
+    "raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  
+  const signature = await crypto.subtle.sign("HMAC", key, messageData);
+  const sig = bufferToHex(signature);
+  
+  return btoa(`${prospectId}:${timestamp}:${sig}`);
+}
 
 interface PortfolioItem { name: string; desc: string; }
 interface TeamMember { name: string; role: string; }
