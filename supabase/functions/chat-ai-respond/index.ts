@@ -198,8 +198,6 @@ ${knowledgeBase}`;
       } catch (e) { console.error("AI generation error:", e); }
     }
 
-    const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
-    const AI_MSG_SENDER_ID = "00000000-0000-0000-0000-000000000000";
     const { error: insertError } = await supabase.from("messages").insert({
       conversation_id: conversationId,
       sender_id: AI_SENDER_ID,
