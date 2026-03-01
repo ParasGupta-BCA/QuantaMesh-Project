@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ColdOutreachAnalytics } from "./ColdOutreachAnalytics";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -165,6 +166,9 @@ export function AdminColdOutreach() {
 
   return (
     <div className="space-y-6">
+      {/* Analytics Charts */}
+      <ColdOutreachAnalytics prospects={prospects} />
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-border/50">

@@ -9,7 +9,36 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const UNSUBSCRIBE_SECRET = Deno.env.get("UNSUBSCRIBE_SECRET") || SUPABASE_SERVICE_ROLE_KEY;
 const TRACK_BASE = `${SUPABASE_URL}/functions/v1/track-email`;
+const UNSUBSCRIBE_BASE = `${SUPABASE_URL}/functions/v1/unsubscribe`;
+const SITE_URL = "https://www.quantamesh.store";
+
+// Helper to convert ArrayBuffer to hex string
+function bufferToHex(buffer: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+// Generate HMAC-signed unsubscribe token
+async function generateUnsubscribeToken(prospectId: string): Promise<string> {
+  const timestamp = Date.now().toString();
+  const data = `${prospectId}:${timestamp}`;
+  
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(UNSUBSCRIBE_SECRET);
+  const messageData = encoder.encode(data);
+  
+  const key = await crypto.subtle.importKey(
+    "raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  
+  const signature = await crypto.subtle.sign("HMAC", key, messageData);
+  const sig = bufferToHex(signature);
+  
+  return btoa(`${prospectId}:${timestamp}:${sig}`);
+}
 
 interface PortfolioItem { name: string; desc: string; }
 interface TeamMember { name: string; role: string; }
@@ -37,14 +66,16 @@ const DEFAULT_SETTINGS: EmailSettings = {
   tagline: "DIGITAL GROWTH PARTNER",
 };
 
-function buildColdEmailHtml(
+async function buildColdEmailHtml(
   prospect: { client_name: string; job_title: string; company_name: string },
   emailNumber: number,
   prospectId: string,
   settings: EmailSettings,
-): string {
+): Promise<string> {
   const trackingPixelUrl = `${TRACK_BASE}?id=${prospectId}&action=open&source=cold`;
   const clickTrackUrl = `${TRACK_BASE}?id=${prospectId}&action=click&source=cold&redirect=${encodeURIComponent(settings.cta_url)}`;
+  const unsubscribeToken = await generateUnsubscribeToken(prospectId);
+  const unsubscribeUrl = `${UNSUBSCRIBE_BASE}?token=${encodeURIComponent(unsubscribeToken)}&source=cold`;
 
   const greeting = emailNumber <= 1
     ? `I noticed ${prospect.company_name} and wanted to reach out personally.`
@@ -210,10 +241,10 @@ function buildColdEmailHtml(
   <p style="margin:4px 0 0;font-size:15px;font-weight:600;color:#1a1a2e;">The QuantaMesh Team</p>
   <p style="margin:16px 0 0;font-size:11px;color:#cbd5e1;">
     QuantaMesh • ${settings.tagline}<br/>
-    <a href="https://www.quantamesh.store" style="color:#6366f1;text-decoration:none;">www.quantamesh.store</a>
+    <a href="${SITE_URL}" style="color:#6366f1;text-decoration:none;">www.quantamesh.store</a>
   </p>
   <p style="margin:12px 0 0;font-size:10px;color:#cbd5e1;">
-    Don't want to receive these emails? <a href="https://www.quantamesh.store" style="color:#94a3b8;text-decoration:underline;">Unsubscribe</a>
+    Don't want to receive these emails? <a href="${unsubscribeUrl}" style="color:#94a3b8;text-decoration:underline;">Unsubscribe</a>
   </p>
 </td>
 </tr>
@@ -273,7 +304,7 @@ serve(async (req) => {
 
     const emailNumber = (prospect.emails_sent || 0) + 1;
     const subject = getSubject(prospect, emailNumber);
-    const html = buildColdEmailHtml(prospect, emailNumber, prospectId, settings);
+    const html = await buildColdEmailHtml(prospect, emailNumber, prospectId, settings);
 
     if (!RESEND_API_KEY) {
       throw new Error("RESEND_API_KEY not configured");

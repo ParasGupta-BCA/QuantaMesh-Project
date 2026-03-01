@@ -84,6 +84,7 @@ serve(async (req) => {
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
   const action = url.searchParams.get("action") || "unsubscribe";
+  const source = url.searchParams.get("source") || "lead"; // "lead" or "cold"
 
   // Validate action parameter
   if (action !== "unsubscribe" && action !== "resubscribe") {
@@ -113,11 +114,12 @@ serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const newStatus = action === "resubscribe" ? "new" : "unsubscribed";
+    const tableName = source === "cold" ? "cold_outreach" : "leads";
+    const newStatus = action === "resubscribe" ? (source === "cold" ? "pending" : "new") : "unsubscribed";
     
-    // Update lead status using verified leadId
+    // Update status using verified ID
     const { error, count } = await supabase
-      .from("leads")
+      .from(tableName)
       .update({ 
         status: newStatus,
         updated_at: new Date().toISOString()
@@ -129,10 +131,10 @@ serve(async (req) => {
       throw error;
     }
 
-    console.log(`${action}: leadId=${tokenData.leadId}, count=${count}`);
+    console.log(`${action}: source=${source}, id=${tokenData.leadId}, count=${count}`);
 
     // Return a styled HTML page
-    return new Response(generateHTML("success", action, undefined, token), {
+    return new Response(generateHTML("success", action, undefined, token, source), {
       status: 200,
       headers: { "Content-Type": "text/html", ...corsHeaders },
     });
@@ -149,7 +151,8 @@ function generateHTML(
   status: "success" | "error", 
   action: string,
   errorMessage?: string,
-  token?: string | null
+  token?: string | null,
+  source?: string
 ): string {
   const isSuccess = status === "success";
   const isResubscribe = action === "resubscribe";
@@ -157,7 +160,7 @@ function generateHTML(
   // Build the opposite action URL using the same token
   const baseUrl = `https://hnnlhddnettfaapyjggx.supabase.co/functions/v1/unsubscribe`;
   const oppositeAction = isResubscribe ? "unsubscribe" : "resubscribe";
-  const toggleUrl = token ? `${baseUrl}?token=${encodeURIComponent(token)}&action=${oppositeAction}` : "";
+  const toggleUrl = token ? `${baseUrl}?token=${encodeURIComponent(token)}&action=${oppositeAction}&source=${source || "lead"}` : "";
   
   return `
 <!DOCTYPE html>
