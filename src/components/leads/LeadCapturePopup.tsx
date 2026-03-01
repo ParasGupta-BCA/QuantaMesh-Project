@@ -27,6 +27,7 @@ const features = [
 
 export function LeadCapturePopup() {
   const [open, setOpen] = useState(false);
+  const [hasTriggered, setHasTriggered] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,47 +42,54 @@ export function LeadCapturePopup() {
     return !dismissed && !submitted;
   }, []);
 
+  const triggerPopup = useCallback(() => {
+    if (!hasTriggered) {
+      setHasTriggered(true);
+      setOpen(true);
+    }
+  }, [hasTriggered]);
+
   // Timer trigger - after 5 seconds
   useEffect(() => {
-    if (!shouldShowPopup()) return;
+    if (!shouldShowPopup() || hasTriggered) return;
     
     const timer = setTimeout(() => {
-      setOpen(true);
+      triggerPopup();
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [shouldShowPopup]);
+  }, [shouldShowPopup, hasTriggered, triggerPopup]);
 
   // Scroll trigger - after scrolling 50%
   useEffect(() => {
-    if (!shouldShowPopup()) return;
+    if (!shouldShowPopup() || hasTriggered) return;
 
     const handleScroll = () => {
       const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
       if (scrollPercent >= 50) {
-        setOpen(true);
+        triggerPopup();
         window.removeEventListener("scroll", handleScroll);
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [shouldShowPopup]);
+  }, [shouldShowPopup, hasTriggered, triggerPopup]);
 
   // Exit intent trigger
   useEffect(() => {
-    if (!shouldShowPopup()) return;
+    if (!shouldShowPopup() || hasTriggered) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0) {
-        setOpen(true);
+        triggerPopup();
         document.removeEventListener("mouseout", handleMouseLeave);
       }
     };
 
     document.addEventListener("mouseout", handleMouseLeave);
     return () => document.removeEventListener("mouseout", handleMouseLeave);
-  }, [shouldShowPopup]);
+  }, [shouldShowPopup, hasTriggered, triggerPopup]);
 
   const handleDismiss = () => {
     setOpen(false);
