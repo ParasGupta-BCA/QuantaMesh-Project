@@ -304,7 +304,7 @@ serve(async (req) => {
 
     const emailNumber = (prospect.emails_sent || 0) + 1;
     const subject = getSubject(prospect, emailNumber);
-    const html = buildColdEmailHtml(prospect, emailNumber, prospectId, settings);
+    const html = await buildColdEmailHtml(prospect, emailNumber, prospectId, settings);
 
     if (!RESEND_API_KEY) {
       throw new Error("RESEND_API_KEY not configured");
