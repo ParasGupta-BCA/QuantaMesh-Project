@@ -134,7 +134,7 @@ serve(async (req) => {
     console.log(`${action}: source=${source}, id=${tokenData.leadId}, count=${count}`);
 
     // Return a styled HTML page
-    return new Response(generateHTML("success", action, undefined, token), {
+    return new Response(generateHTML("success", action, undefined, token, source), {
       status: 200,
       headers: { "Content-Type": "text/html", ...corsHeaders },
     });
