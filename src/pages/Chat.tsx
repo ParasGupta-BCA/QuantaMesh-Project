@@ -17,7 +17,7 @@ import { ReplyPreview } from '@/components/chat/ReplyPreview';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 export default function Chat() {
   const { user, loading: authLoading } = useAuth();
-  const { conversation, messages, loading, sendMessage, markAsRead, uploading, aiTyping } = useChat();
+  const { conversation, messages, loading, sendMessage, markAsRead, uploading, aiTyping, adminActive } = useChat();
   const { toast } = useToast();
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
