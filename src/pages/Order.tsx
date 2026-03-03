@@ -112,7 +112,7 @@ export default function Order() {
   const { user, loading } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("new");
-  const [serviceType, setServiceType] = useState<"publishing" | "cgi">("publishing");
+  const [serviceType, setServiceType] = useState<"publishing" | "cgi" | "website" | "app-dev">("publishing");
   const [showFailedView, setShowFailedView] = useState(false);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
