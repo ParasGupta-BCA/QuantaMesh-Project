@@ -227,6 +227,20 @@ export default function Chat() {
             Chat
           </h1>
           <p className="text-muted-foreground">We're here to help you around the clock.</p>
+          {/* AI/Admin status indicator */}
+          <div className="mt-3 flex items-center justify-center gap-2">
+            {adminActive ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-medium">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <User className="h-3 w-3" /> Human Admin Active
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-medium">
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <Bot className="h-3 w-3" /> AI Assistant Active
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Chat Interface Container */}
