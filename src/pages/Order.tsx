@@ -30,7 +30,9 @@ import {
   Zap,
   Star,
   Sparkles,
-  Copy
+  Copy,
+  Globe,
+  Smartphone
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -112,7 +114,8 @@ export default function Order() {
   const { user, loading } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("new");
-  const [serviceType, setServiceType] = useState<"publishing" | "cgi">("publishing");
+  const [serviceType, setServiceType] = useState<"publishing" | "cgi" | "website" | "app-dev">("publishing");
+  const navigate = useNavigate();
   const [showFailedView, setShowFailedView] = useState(false);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -184,9 +187,10 @@ export default function Order() {
       sessionStorage.removeItem("pendingPayment"); // Clear flag so it doesn't persist
     }
 
-    if (searchParams.get("service") === "cgi") {
-      setServiceType("cgi");
-    }
+    const serviceParam = searchParams.get("service");
+    if (serviceParam === "cgi") setServiceType("cgi");
+    else if (serviceParam === "website") setServiceType("website");
+    else if (serviceParam === "app-dev") setServiceType("app-dev");
   }, [searchParams, user]);
 
   const fetchOrders = async () => {
@@ -531,14 +535,22 @@ export default function Order() {
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 {serviceType === 'publishing' ? (
                   <>Publish Your <span className="gradient-text">App</span></>
-                ) : (
+                ) : serviceType === 'cgi' ? (
                   <>CGI Video <span className="gradient-text">Ads</span></>
+                ) : serviceType === 'website' ? (
+                  <>Website <span className="gradient-text">Development</span></>
+                ) : (
+                  <>App <span className="gradient-text">Development</span></>
                 )}
               </h1>
               <p className="text-muted-foreground">
                 {serviceType === 'publishing'
                   ? "Manage your orders and publish new apps"
-                  : "Request a quote for premium 3D visual effects"}
+                  : serviceType === 'cgi'
+                  ? "Request a quote for premium 3D visual effects"
+                  : serviceType === 'website'
+                  ? "Get a custom website built for your business"
+                  : "Get a full-stack mobile app built from scratch"}
               </p>
             </div>
 
@@ -579,7 +591,7 @@ export default function Order() {
                 )}
 
                 {/* Service Type Switcher */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                   <div
                     onClick={() => setServiceType('publishing')}
                     className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'publishing'
@@ -588,7 +600,7 @@ export default function Order() {
                       }`}
                   >
                     <Package size={24} className={serviceType === 'publishing' ? 'text-primary' : 'text-muted-foreground'} />
-                    <span className={`font-semibold ${serviceType === 'publishing' ? 'text-foreground' : 'text-muted-foreground'}`}>App Publishing</span>
+                    <span className={`font-semibold text-sm ${serviceType === 'publishing' ? 'text-foreground' : 'text-muted-foreground'}`}>App Publishing</span>
                   </div>
                   <div
                     onClick={() => setServiceType('cgi')}
@@ -598,23 +610,63 @@ export default function Order() {
                       }`}
                   >
                     <Zap size={24} className={serviceType === 'cgi' ? 'text-purple-400' : 'text-muted-foreground'} />
-                    <span className={`font-semibold ${serviceType === 'cgi' ? 'text-foreground' : 'text-muted-foreground'}`}>CGI Video Ads</span>
+                    <span className={`font-semibold text-sm ${serviceType === 'cgi' ? 'text-foreground' : 'text-muted-foreground'}`}>CGI Video Ads</span>
+                  </div>
+                  <div
+                    onClick={() => setServiceType('website')}
+                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'website'
+                      ? 'bg-blue-500/10 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                      : 'bg-card/50 border-white/10 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                  >
+                    <Globe size={24} className={serviceType === 'website' ? 'text-blue-400' : 'text-muted-foreground'} />
+                    <span className={`font-semibold text-sm ${serviceType === 'website' ? 'text-foreground' : 'text-muted-foreground'}`}>Website Dev</span>
+                  </div>
+                  <div
+                    onClick={() => setServiceType('app-dev')}
+                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'app-dev'
+                      ? 'bg-emerald-500/10 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                      : 'bg-card/50 border-white/10 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                  >
+                    <Smartphone size={24} className={serviceType === 'app-dev' ? 'text-emerald-400' : 'text-muted-foreground'} />
+                    <span className={`font-semibold text-sm ${serviceType === 'app-dev' ? 'text-foreground' : 'text-muted-foreground'}`}>App Dev</span>
                   </div>
                 </div>
 
-                {serviceType === 'cgi' ? (
-                  /* CGI Custom Flow */
-                  <div className="glass-card rounded-2xl p-6 sm:p-8 text-center animate-fade-in border-purple-500/20 bg-purple-500/5">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                      <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" />
+                {serviceType !== 'publishing' ? (
+                  /* Quote-based services: CGI, Website Dev, App Dev */
+                  <div className={`glass-card rounded-2xl p-6 sm:p-8 text-center animate-fade-in ${
+                    serviceType === 'cgi' ? 'border-purple-500/20 bg-purple-500/5' :
+                    serviceType === 'website' ? 'border-blue-500/20 bg-blue-500/5' :
+                    'border-emerald-500/20 bg-emerald-500/5'
+                  }`}>
+                    <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 ${
+                      serviceType === 'cgi' ? 'bg-purple-500/10' :
+                      serviceType === 'website' ? 'bg-blue-500/10' :
+                      'bg-emerald-500/10'
+                    }`}>
+                      <MessageCircle className={`w-8 h-8 sm:w-10 sm:h-10 ${
+                        serviceType === 'cgi' ? 'text-purple-400' :
+                        serviceType === 'website' ? 'text-blue-400' :
+                        'text-emerald-400'
+                      }`} />
                     </div>
                     <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Let's Talk About Your Vision</h2>
                     <p className="text-muted-foreground mb-6 sm:mb-8 text-base sm:text-lg max-w-xl mx-auto">
-                      Pricing for CGI Video Ads varies based on your specific requirements and complexity.
-                      Please chat with us to discuss the details and place your order directly.
+                      {serviceType === 'cgi'
+                        ? "Pricing for CGI Video Ads varies based on your specific requirements and complexity."
+                        : serviceType === 'website'
+                        ? "Every website project is unique. Share your requirements and we'll provide a tailored quote."
+                        : "App development pricing depends on features, complexity, and platforms. Let's discuss your idea."}
+                      {" "}Please chat with us to discuss the details and place your order directly.
                     </p>
 
-                    <Button asChild size="lg" className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all duration-300 gap-2">
+                    <Button asChild size="lg" className={`w-full sm:w-auto text-white transition-all duration-300 gap-2 ${
+                      serviceType === 'cgi' ? 'bg-purple-600 hover:bg-purple-700 shadow-[0_0_20px_rgba(147,51,234,0.3)]' :
+                      serviceType === 'website' ? 'bg-blue-600 hover:bg-blue-700 shadow-[0_0_20px_rgba(59,130,246,0.3)]' :
+                      'bg-emerald-600 hover:bg-emerald-700 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                    }`}>
                       <Link to="/chat">
                         <MessageCircle size={20} />
                         Chat with Us for Details

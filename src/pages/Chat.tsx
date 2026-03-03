@@ -17,7 +17,7 @@ import { ReplyPreview } from '@/components/chat/ReplyPreview';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 export default function Chat() {
   const { user, loading: authLoading } = useAuth();
-  const { conversation, messages, loading, sendMessage, markAsRead, uploading, aiTyping } = useChat();
+  const { conversation, messages, loading, sendMessage, markAsRead, uploading, aiTyping, adminActive } = useChat();
   const { toast } = useToast();
   const [inputValue, setInputValue] = useState('');
   const [sending, setSending] = useState(false);
@@ -217,8 +217,19 @@ export default function Chat() {
       >
 
         {/* Mobile Header (Hidden on Desktop) */}
-        <div className="md:hidden flex items-center p-4 bg-background/80 backdrop-blur-md border-b sticky top-0 z-10">
+        <div className="md:hidden flex items-center justify-between p-4 bg-background/80 backdrop-blur-md border-b sticky top-0 z-10">
           <h1 className="text-lg font-semibold text-foreground">Chat</h1>
+          {adminActive ? (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              Admin Active
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[10px] font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              AI Assistant
+            </span>
+          )}
         </div>
 
         {/* Desktop Header Description (Hidden on Mobile) */}
@@ -227,6 +238,20 @@ export default function Chat() {
             Chat
           </h1>
           <p className="text-muted-foreground">We're here to help you around the clock.</p>
+          {/* AI/Admin status indicator */}
+          <div className="mt-3 flex items-center justify-center gap-2">
+            {adminActive ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-medium">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <User className="h-3 w-3" /> Human Admin Active
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-medium">
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <Bot className="h-3 w-3" /> AI Assistant Active
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Chat Interface Container */}

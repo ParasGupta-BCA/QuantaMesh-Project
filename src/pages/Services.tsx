@@ -488,14 +488,122 @@ export default function Services() {
         </div>
       </section>
 
+      {/* Website Development Service */}
+      <section className="py-16 md:py-24 bg-card/30 overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] opacity-30 pointer-events-none"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm font-medium mb-6">
+                <Zap size={16} />
+                <span>New Service</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+                Website <span className="gradient-text">Development</span>
+              </h2>
+              <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+                From stunning landing pages to complex web applications and e-commerce stores — we build responsive, high-performance websites tailored to your brand.
+              </p>
+              <div className="space-y-4 mb-8">
+                {["Landing Pages & Portfolio Sites", "Full-Stack Web Applications", "E-Commerce Stores with Payment Integration", "SEO-Optimized & Mobile-First Design", "Custom Dashboards & Admin Panels"].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                      <Check size={14} className="text-blue-400" />
+                    </div>
+                    <span className="text-foreground/90">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="default" size="lg" asChild>
+                  <Link to="/order?service=website">
+                    Get a Quote
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" asChild>
+                  <Link to="/chat">Chat with Expert</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="glass-card rounded-2xl p-8 text-center">
+              <div className="w-20 h-20 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-6">
+                <Shield size={40} className="text-blue-400" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3">Custom Pricing</h3>
+              <p className="text-muted-foreground mb-6">Every project is unique. Chat with us to discuss your requirements and get a tailored quote.</p>
+              <div className="space-y-3 text-sm text-muted-foreground text-left">
+                <div className="flex items-center gap-3"><Clock size={16} className="text-blue-400 shrink-0" /><span>Delivery based on project scope</span></div>
+                <div className="flex items-center gap-3"><RefreshCw size={16} className="text-blue-400 shrink-0" /><span>Revisions included</span></div>
+                <div className="flex items-center gap-3"><Shield size={16} className="text-blue-400 shrink-0" /><span>Post-launch support included</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* App Development Service */}
+      <section className="py-16 md:py-24 overflow-hidden relative">
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-emerald-600/10 rounded-full blur-[100px] opacity-30 pointer-events-none"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1 glass-card rounded-2xl p-8 text-center">
+              <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
+                <Zap size={40} className="text-emerald-400" />
+              </div>
+              <h3 className="text-2xl font-bold mb-3">Custom Pricing</h3>
+              <p className="text-muted-foreground mb-6">We build full-stack mobile apps from scratch. Tell us your idea and we'll provide a detailed quote.</p>
+              <div className="space-y-3 text-sm text-muted-foreground text-left">
+                <div className="flex items-center gap-3"><Clock size={16} className="text-emerald-400 shrink-0" /><span>Timeline based on complexity</span></div>
+                <div className="flex items-center gap-3"><RefreshCw size={16} className="text-emerald-400 shrink-0" /><span>Iterative development with feedback</span></div>
+                <div className="flex items-center gap-3"><Shield size={16} className="text-emerald-400 shrink-0" /><span>Source code ownership included</span></div>
+              </div>
+            </div>
+            <div className="order-1 lg:order-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium mb-6">
+                <Zap size={16} />
+                <span>New Service</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+                App <span className="gradient-text">Development</span>
+              </h2>
+              <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+                Full-stack mobile app development with backend, APIs, databases, and seamless user experiences — from concept to launch.
+              </p>
+              <div className="space-y-4 mb-8">
+                {["Cross-Platform (Android + iOS) Development", "Backend APIs & Database Architecture", "Authentication & User Management", "Push Notifications & Real-Time Features", "App Store Submission & Optimization"].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                      <Check size={14} className="text-emerald-400" />
+                    </div>
+                    <span className="text-foreground/90">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="default" size="lg" asChild>
+                  <Link to="/order?service=app-dev">
+                    Get a Quote
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="lg" asChild>
+                  <Link to="/chat">Chat with Expert</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Get <span className="gradient-text">Published</span>?
+            Ready to Get <span className="gradient-text">Started</span>?
           </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Start the process today and have your app on Google Play in no time.
+            Whether it's app publishing, CGI ads, website development, or app development — we've got you covered.
           </p>
           <Button variant="hero" size="xl" asChild>
             <Link to="/order" className="group">

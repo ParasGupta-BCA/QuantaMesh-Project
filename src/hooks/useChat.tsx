@@ -45,6 +45,7 @@ export function useChat() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [aiTyping, setAiTyping] = useState(false);
+  const [adminActive, setAdminActive] = useState(false);
 
   // Fetch or create conversation for client
   const fetchOrCreateConversation = useCallback(async () => {
@@ -272,6 +273,14 @@ export function useChat() {
     };
   }, [conversation]);
 
+  // Detect if a human admin has replied in the conversation
+  useEffect(() => {
+    const hasHumanAdmin = messages.some(
+      (m) => m.sender_type === 'admin' && m.sender_id !== AI_SENDER_ID
+    );
+    setAdminActive(hasHumanAdmin);
+  }, [messages]);
+
   return {
     conversation,
     messages,
@@ -279,6 +288,7 @@ export function useChat() {
     unreadCount,
     uploading,
     aiTyping,
+    adminActive,
     sendMessage,
     markAsRead,
   };
