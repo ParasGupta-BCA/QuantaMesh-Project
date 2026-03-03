@@ -45,6 +45,7 @@ export function useChat() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [aiTyping, setAiTyping] = useState(false);
+  const [adminActive, setAdminActive] = useState(false);
 
   // Fetch or create conversation for client
   const fetchOrCreateConversation = useCallback(async () => {
