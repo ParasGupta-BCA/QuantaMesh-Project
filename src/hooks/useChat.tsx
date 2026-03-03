@@ -273,6 +273,14 @@ export function useChat() {
     };
   }, [conversation]);
 
+  // Detect if a human admin has replied in the conversation
+  useEffect(() => {
+    const hasHumanAdmin = messages.some(
+      (m) => m.sender_type === 'admin' && m.sender_id !== AI_SENDER_ID
+    );
+    setAdminActive(hasHumanAdmin);
+  }, [messages]);
+
   return {
     conversation,
     messages,
@@ -280,6 +288,7 @@ export function useChat() {
     unreadCount,
     uploading,
     aiTyping,
+    adminActive,
     sendMessage,
     markAsRead,
   };

@@ -190,7 +190,17 @@ export function ClientChatWidget() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">Chat</h3>
-                  <p className="text-xs text-muted-foreground">We typically reply quickly</p>
+                  {adminActive ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-green-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                      Human Admin Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-blue-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                      AI Assistant Active
+                    </span>
+                  )}
                 </div>
               </div>
               <Button
