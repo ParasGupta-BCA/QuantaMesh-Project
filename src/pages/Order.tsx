@@ -583,7 +583,7 @@ export default function Order() {
                 )}
 
                 {/* Service Type Switcher */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                   <div
                     onClick={() => setServiceType('publishing')}
                     className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'publishing'
@@ -592,7 +592,7 @@ export default function Order() {
                       }`}
                   >
                     <Package size={24} className={serviceType === 'publishing' ? 'text-primary' : 'text-muted-foreground'} />
-                    <span className={`font-semibold ${serviceType === 'publishing' ? 'text-foreground' : 'text-muted-foreground'}`}>App Publishing</span>
+                    <span className={`font-semibold text-sm ${serviceType === 'publishing' ? 'text-foreground' : 'text-muted-foreground'}`}>App Publishing</span>
                   </div>
                   <div
                     onClick={() => setServiceType('cgi')}
@@ -602,7 +602,27 @@ export default function Order() {
                       }`}
                   >
                     <Zap size={24} className={serviceType === 'cgi' ? 'text-purple-400' : 'text-muted-foreground'} />
-                    <span className={`font-semibold ${serviceType === 'cgi' ? 'text-foreground' : 'text-muted-foreground'}`}>CGI Video Ads</span>
+                    <span className={`font-semibold text-sm ${serviceType === 'cgi' ? 'text-foreground' : 'text-muted-foreground'}`}>CGI Video Ads</span>
+                  </div>
+                  <div
+                    onClick={() => setServiceType('website')}
+                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'website'
+                      ? 'bg-blue-500/10 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                      : 'bg-card/50 border-white/10 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                  >
+                    <Globe size={24} className={serviceType === 'website' ? 'text-blue-400' : 'text-muted-foreground'} />
+                    <span className={`font-semibold text-sm ${serviceType === 'website' ? 'text-foreground' : 'text-muted-foreground'}`}>Website Dev</span>
+                  </div>
+                  <div
+                    onClick={() => setServiceType('app-dev')}
+                    className={`cursor-pointer rounded-xl p-4 border transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center ${serviceType === 'app-dev'
+                      ? 'bg-emerald-500/10 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                      : 'bg-card/50 border-white/10 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                  >
+                    <Smartphone size={24} className={serviceType === 'app-dev' ? 'text-emerald-400' : 'text-muted-foreground'} />
+                    <span className={`font-semibold text-sm ${serviceType === 'app-dev' ? 'text-foreground' : 'text-muted-foreground'}`}>App Dev</span>
                   </div>
                 </div>
 
