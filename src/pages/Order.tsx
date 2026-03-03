@@ -535,14 +535,22 @@ export default function Order() {
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 {serviceType === 'publishing' ? (
                   <>Publish Your <span className="gradient-text">App</span></>
-                ) : (
+                ) : serviceType === 'cgi' ? (
                   <>CGI Video <span className="gradient-text">Ads</span></>
+                ) : serviceType === 'website' ? (
+                  <>Website <span className="gradient-text">Development</span></>
+                ) : (
+                  <>App <span className="gradient-text">Development</span></>
                 )}
               </h1>
               <p className="text-muted-foreground">
                 {serviceType === 'publishing'
                   ? "Manage your orders and publish new apps"
-                  : "Request a quote for premium 3D visual effects"}
+                  : serviceType === 'cgi'
+                  ? "Request a quote for premium 3D visual effects"
+                  : serviceType === 'website'
+                  ? "Get a custom website built for your business"
+                  : "Get a full-stack mobile app built from scratch"}
               </p>
             </div>
 
