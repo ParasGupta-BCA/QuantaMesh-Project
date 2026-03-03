@@ -184,9 +184,10 @@ export default function Order() {
       sessionStorage.removeItem("pendingPayment"); // Clear flag so it doesn't persist
     }
 
-    if (searchParams.get("service") === "cgi") {
-      setServiceType("cgi");
-    }
+    const serviceParam = searchParams.get("service");
+    if (serviceParam === "cgi") setServiceType("cgi");
+    else if (serviceParam === "website") setServiceType("website");
+    else if (serviceParam === "app-dev") setServiceType("app-dev");
   }, [searchParams, user]);
 
   const fetchOrders = async () => {
