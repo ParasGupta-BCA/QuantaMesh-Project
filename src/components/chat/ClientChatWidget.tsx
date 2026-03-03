@@ -25,7 +25,7 @@ const isImageFile = (type: string) => type?.startsWith('image/');
 
 export function ClientChatWidget() {
   const { user } = useAuth();
-  const { conversation, messages, loading, unreadCount, uploading, aiTyping, sendMessage, markAsRead } = useChat();
+  const { conversation, messages, loading, unreadCount, uploading, aiTyping, adminActive, sendMessage, markAsRead } = useChat();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
