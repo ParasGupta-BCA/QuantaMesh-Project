@@ -634,19 +634,39 @@ export default function Order() {
                   </div>
                 </div>
 
-                {serviceType === 'cgi' ? (
-                  /* CGI Custom Flow */
-                  <div className="glass-card rounded-2xl p-6 sm:p-8 text-center animate-fade-in border-purple-500/20 bg-purple-500/5">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                      <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 text-purple-400" />
+                {serviceType !== 'publishing' ? (
+                  /* Quote-based services: CGI, Website Dev, App Dev */
+                  <div className={`glass-card rounded-2xl p-6 sm:p-8 text-center animate-fade-in ${
+                    serviceType === 'cgi' ? 'border-purple-500/20 bg-purple-500/5' :
+                    serviceType === 'website' ? 'border-blue-500/20 bg-blue-500/5' :
+                    'border-emerald-500/20 bg-emerald-500/5'
+                  }`}>
+                    <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 ${
+                      serviceType === 'cgi' ? 'bg-purple-500/10' :
+                      serviceType === 'website' ? 'bg-blue-500/10' :
+                      'bg-emerald-500/10'
+                    }`}>
+                      <MessageCircle className={`w-8 h-8 sm:w-10 sm:h-10 ${
+                        serviceType === 'cgi' ? 'text-purple-400' :
+                        serviceType === 'website' ? 'text-blue-400' :
+                        'text-emerald-400'
+                      }`} />
                     </div>
                     <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Let's Talk About Your Vision</h2>
                     <p className="text-muted-foreground mb-6 sm:mb-8 text-base sm:text-lg max-w-xl mx-auto">
-                      Pricing for CGI Video Ads varies based on your specific requirements and complexity.
-                      Please chat with us to discuss the details and place your order directly.
+                      {serviceType === 'cgi'
+                        ? "Pricing for CGI Video Ads varies based on your specific requirements and complexity."
+                        : serviceType === 'website'
+                        ? "Every website project is unique. Share your requirements and we'll provide a tailored quote."
+                        : "App development pricing depends on features, complexity, and platforms. Let's discuss your idea."}
+                      {" "}Please chat with us to discuss the details and place your order directly.
                     </p>
 
-                    <Button asChild size="lg" className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)] transition-all duration-300 gap-2">
+                    <Button asChild size="lg" className={`w-full sm:w-auto text-white transition-all duration-300 gap-2 ${
+                      serviceType === 'cgi' ? 'bg-purple-600 hover:bg-purple-700 shadow-[0_0_20px_rgba(147,51,234,0.3)]' :
+                      serviceType === 'website' ? 'bg-blue-600 hover:bg-blue-700 shadow-[0_0_20px_rgba(59,130,246,0.3)]' :
+                      'bg-emerald-600 hover:bg-emerald-700 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                    }`}>
                       <Link to="/chat">
                         <MessageCircle size={20} />
                         Chat with Us for Details
