@@ -13,7 +13,8 @@ import {
     Bot,
     Mail,
     LogOut,
-    Settings
+    Settings,
+    DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -104,6 +105,12 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
             value: "cold-outreach",
             icon: <Mail className="h-5 w-5 flex-shrink-0" />,
             onClick: () => onTabChange("cold-outreach")
+        },
+        {
+            label: "Pricing",
+            value: "service-pricing",
+            icon: <DollarSign className="h-5 w-5 flex-shrink-0" />,
+            onClick: () => onTabChange("service-pricing")
         },
         {
             label: "AI Settings",

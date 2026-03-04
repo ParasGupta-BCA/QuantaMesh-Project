@@ -409,6 +409,8 @@ export type Database = {
           file_url: string | null
           id: string
           is_read: boolean
+          message_type: string | null
+          metadata: Json | null
           reply_to_id: string | null
           sender_id: string
           sender_type: string
@@ -424,6 +426,8 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_read?: boolean
+          message_type?: string | null
+          metadata?: Json | null
           reply_to_id?: string | null
           sender_id: string
           sender_type: string
@@ -439,6 +443,8 @@ export type Database = {
           file_url?: string | null
           id?: string
           is_read?: boolean
+          message_type?: string | null
+          metadata?: Json | null
           reply_to_id?: string | null
           sender_id?: string
           sender_type?: string
@@ -593,6 +599,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      service_pricing: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_order: number | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          package_name: string
+          price: number
+          service_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          package_name: string
+          price?: number
+          service_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_order?: number | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          package_name?: string
+          price?: number
+          service_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

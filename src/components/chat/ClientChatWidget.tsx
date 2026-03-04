@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { FileAttachment } from './FileAttachment';
 import { ReplyPreview } from './ReplyPreview';
 import { TypingIndicator } from './TypingIndicator';
+import { OrderRequestCard } from './OrderRequestCard';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
@@ -263,7 +264,16 @@ export function ClientChatWidget() {
                             />
                           )}
                           <p className="text-sm whitespace-pre-wrap break-words">
-                            {message.content}
+                            {(message as any).message_type === 'order_request' && (message as any).metadata ? (
+                              <OrderRequestCard
+                                data={(message as any).metadata}
+                                messageId={message.id}
+                                conversationId={message.conversation_id}
+                                isAdmin={false}
+                              />
+                            ) : (
+                              message.content
+                            )}
                           </p>
                           {renderFileAttachment(message)}
                           <div className="flex items-center justify-between gap-2 mt-1">

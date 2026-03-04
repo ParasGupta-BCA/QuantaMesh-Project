@@ -29,6 +29,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FileAttachment } from './FileAttachment';
 import { ReplyPreview } from './ReplyPreview';
 import { ReplyTo } from '@/hooks/useChat';
+import { OrderRequestCard } from './OrderRequestCard';
+import { SendOrderRequestDialog } from './SendOrderRequestDialog';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
@@ -110,6 +112,11 @@ export function AdminChatPanel() {
     } finally {
       setSending(false);
     }
+  };
+
+  const handleSendOrderRequest = async (content: string, metadata: any) => {
+    if (!selectedConversation) return;
+    await sendReply(content, undefined, undefined, 'order_request', metadata);
   };
 
   const handleReply = (message: typeof messages[0]) => {
@@ -402,7 +409,16 @@ export function AdminChatPanel() {
                                   variant="message"
                                 />
                               )}
-                              {message.content}
+                              {(message as any).message_type === 'order_request' && (message as any).metadata ? (
+                                <OrderRequestCard
+                                  data={(message as any).metadata}
+                                  messageId={message.id}
+                                  conversationId={message.conversation_id}
+                                  isAdmin={true}
+                                />
+                              ) : (
+                                <>{message.content}</>
+                              )}
                               {renderFileAttachment(message)}
                               {/* Reply button */}
                               <Button
@@ -477,6 +493,10 @@ export function AdminChatPanel() {
                 >
                   <Paperclip className="h-5 w-5" />
                 </Button>
+                <SendOrderRequestDialog
+                  onSend={handleSendOrderRequest}
+                  disabled={sending || uploading || selectedConversation.status === 'closed'}
+                />
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}

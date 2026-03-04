@@ -22,6 +22,7 @@ import { AdminBlog } from "@/components/admin/AdminBlog";
 import { AdminAISettings } from "@/components/admin/AdminAISettings";
 import { AdminColdOutreach } from "@/components/admin/AdminColdOutreach";
 import { AdminColdEmailSettings } from "@/components/admin/AdminColdEmailSettings";
+import { AdminServicePricing } from "@/components/admin/AdminServicePricing";
 import { AdminRevenueChart } from "@/components/admin/AdminRevenueChart";
 import { AdminRecentActivity } from "@/components/admin/AdminRecentActivity";
 import { AdminOrderDistribution } from "@/components/admin/AdminOrderDistribution";
@@ -113,6 +114,27 @@ export default function Admin() {
   useEffect(() => {
     if (isAdmin) {
       fetchData();
+
+      // Real-time subscription for orders
+      const ordersChannel = supabase
+        .channel('admin-orders-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          fetchData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'contact_messages' }, () => {
+          fetchData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => {
+          fetchData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+          fetchData();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(ordersChannel);
+      };
     }
   }, [isAdmin]);
 
@@ -403,6 +425,14 @@ export default function Admin() {
               <div className="animate-slide-up space-y-8">
                 <AdminColdOutreach />
                 <AdminColdEmailSettings />
+              </div>
+            )}
+
+            {activeTab === 'service-pricing' && (
+              <div className="animate-slide-up">
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminServicePricing />
+                </div>
               </div>
             )}
 
