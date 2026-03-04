@@ -150,6 +150,8 @@ export function useAdminChat() {
         content: content || (fileData ? `Shared a file: ${fileData.file_name}` : ''),
         reply_to_id: replyToId || null,
         admin_name: adminName,
+        message_type: messageType || 'text',
+        metadata: metadata || null,
         ...(fileData && {
           file_url: fileData.file_url,
           file_name: fileData.file_name,
