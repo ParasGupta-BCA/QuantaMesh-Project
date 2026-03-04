@@ -409,7 +409,16 @@ export function AdminChatPanel() {
                                   variant="message"
                                 />
                               )}
-                              {message.content}
+                              {(message as any).message_type === 'order_request' && (message as any).metadata ? (
+                                <OrderRequestCard
+                                  data={(message as any).metadata}
+                                  messageId={message.id}
+                                  conversationId={message.conversation_id}
+                                  isAdmin={true}
+                                />
+                              ) : (
+                                <>{message.content}</>
+                              )}
                               {renderFileAttachment(message)}
                               {/* Reply button */}
                               <Button
