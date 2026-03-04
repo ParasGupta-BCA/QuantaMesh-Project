@@ -114,6 +114,27 @@ export default function Admin() {
   useEffect(() => {
     if (isAdmin) {
       fetchData();
+
+      // Real-time subscription for orders
+      const ordersChannel = supabase
+        .channel('admin-orders-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          fetchData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'contact_messages' }, () => {
+          fetchData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'reviews' }, () => {
+          fetchData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+          fetchData();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(ordersChannel);
+      };
     }
   }, [isAdmin]);
 
