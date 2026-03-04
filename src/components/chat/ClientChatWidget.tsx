@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { FileAttachment } from './FileAttachment';
 import { ReplyPreview } from './ReplyPreview';
 import { TypingIndicator } from './TypingIndicator';
+import { OrderRequestCard } from './OrderRequestCard';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
