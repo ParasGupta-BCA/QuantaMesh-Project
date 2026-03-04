@@ -76,7 +76,7 @@ export default function OurStory() {
                                 </div>
                                 <div className="glass-card p-4 rounded-xl text-center">
                                     <Briefcase className="w-8 h-8 text-primary mx-auto mb-2" />
-                                    <p className="font-bold text-xl">100+</p>
+                                    <p className="font-bold text-xl">10+</p>
                                     <p className="text-xs text-muted-foreground">Projects Delivered</p>
                                 </div>
                             </div>
