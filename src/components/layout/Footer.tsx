@@ -58,7 +58,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-6 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-2">
-            <span className="font-bold text-lg">Quanta<span className="text-primary">Mesh</span></span>
+            <span className="font-bold text-lg text-white">Quanta Mesh</span>
           </div>
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 text-xs sm:text-sm text-muted-foreground w-full md:w-auto">
             <span>© {new Date().getFullYear()} Quanta Mesh. All rights reserved.</span>
