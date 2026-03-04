@@ -96,7 +96,7 @@ export function Navbar({ isBannerVisible = false, onOpenChange }: NavbarProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 absolute left-1/2 -translate-x-1/2 bg-background/50 backdrop-blur-sm px-1.5 py-1.5 rounded-full border border-border/40 shadow-sm w-max">
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 absolute left-[45%] xl:left-[48%] -translate-x-1/2 bg-background/50 backdrop-blur-sm px-1.5 py-1.5 rounded-full border border-border/40 shadow-sm w-max">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
