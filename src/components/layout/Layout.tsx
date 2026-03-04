@@ -17,8 +17,8 @@ export function Layout({ children, hideFooter = false, showChatWidget = true, hi
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Hide announcement bar on portfolio page, when explicitly hidden, or when mobile menu is open
-  const shouldShowBanner = isBannerVisible && !hideAnnouncement && location.pathname !== '/portfolio' && !isMobileMenuOpen;
+  // Hide announcement bar on portfolio page, chat page, when explicitly hidden, or when mobile menu is open
+  const shouldShowBanner = isBannerVisible && !hideAnnouncement && location.pathname !== '/portfolio' && location.pathname !== '/chat' && !isMobileMenuOpen;
 
   return (
     <div className="min-h-screen flex flex-col">
