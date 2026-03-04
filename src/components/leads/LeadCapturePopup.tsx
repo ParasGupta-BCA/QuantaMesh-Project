@@ -33,6 +33,7 @@ export function LeadCapturePopup() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -52,7 +53,7 @@ export function LeadCapturePopup() {
   // Timer trigger - after 5 seconds
   useEffect(() => {
     if (!shouldShowPopup() || hasTriggered) return;
-    
+
     const timer = setTimeout(() => {
       triggerPopup();
     }, 5000);
@@ -90,6 +91,40 @@ export function LeadCapturePopup() {
     document.addEventListener("mouseout", handleMouseLeave);
     return () => document.removeEventListener("mouseout", handleMouseLeave);
   }, [shouldShowPopup, hasTriggered, triggerPopup]);
+
+  // Mobile virtual keyboard handling
+  useEffect(() => {
+    if (!isMobile) return;
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+        clearTimeout(timeoutId);
+        setKeyboardOpen(true);
+        // Delay scroll to allow keyboard to finish animating
+        setTimeout(() => {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300);
+      }
+    };
+
+    const handleFocusOut = () => {
+      timeoutId = setTimeout(() => {
+        setKeyboardOpen(false);
+      }, 150);
+    };
+
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+    };
+  }, [isMobile]);
 
   const handleDismiss = () => {
     setOpen(false);
@@ -135,11 +170,11 @@ export function LeadCapturePopup() {
 
       try {
         await supabase.functions.invoke("send-lead-email", {
-          body: { 
+          body: {
             leadId: null,
             email: validation.data.email,
             name: validation.data.name,
-            sequenceType: "welcome" 
+            sequenceType: "welcome"
           },
         });
       } catch (emailError) {
@@ -148,7 +183,7 @@ export function LeadCapturePopup() {
 
       setSubmitted(true);
       localStorage.setItem(POPUP_SUBMITTED_KEY, "true");
-      
+
       toast({
         title: "🎉 Welcome aboard!",
         description: "Check your email for a special surprise!",
@@ -166,7 +201,10 @@ export function LeadCapturePopup() {
   };
 
   const renderPopupContent = () => (
-    <div className="relative overflow-hidden">
+    <div
+      className={`relative w-full transition-all duration-300 ease-in-out ${keyboardOpen && isMobile ? "pb-[40vh] max-h-[85vh] overflow-y-auto" : "overflow-hidden"
+        }`}
+    >
       {/* Custom close button with high z-index */}
       {!isMobile && !submitted && (
         <button
@@ -177,12 +215,12 @@ export function LeadCapturePopup() {
           <X className="h-4 w-4" />
         </button>
       )}
-      
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-primary/20 blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3]
           }}
@@ -190,7 +228,7 @@ export function LeadCapturePopup() {
         />
         <motion.div
           className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full bg-primary/10 blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.2, 0.4, 0.2]
           }}
@@ -219,7 +257,7 @@ export function LeadCapturePopup() {
               >
                 <Gift className="h-8 w-8 sm:h-10 sm:w-10 text-primary-foreground" />
               </motion.div>
-              
+
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -354,7 +392,7 @@ export function LeadCapturePopup() {
                 <CheckCircle2 className="h-10 w-10 text-green-500" />
               </motion.div>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -373,9 +411,9 @@ export function LeadCapturePopup() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Button 
-                onClick={() => setOpen(false)} 
-                variant="outline" 
+              <Button
+                onClick={() => setOpen(false)}
+                variant="outline"
                 className="mt-4 h-12 px-8 border-primary/30 hover:bg-primary/10"
               >
                 Continue Browsing
