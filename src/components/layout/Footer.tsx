@@ -52,7 +52,7 @@ export function Footer() {
 
         {/* Center Massive Text Hover Effect */}
         <div className="h-[6rem] sm:h-[10rem] md:h-[14rem] lg:h-[18rem] flex items-center justify-center w-full mb-6 relative z-10">
-          <TextHoverEffect text="QUANTA" />
+          <TextHoverEffect text="QUANTA MESH" />
         </div>
 
         {/* Bottom Bar */}
