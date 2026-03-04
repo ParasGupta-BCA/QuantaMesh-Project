@@ -314,7 +314,16 @@ export default function Chat() {
                             />
                           )}
                           {renderFileAttachment(message)}
-                          {message.content && !message.content.startsWith('Sent a file:') && message.content}
+                          {(message as any).message_type === 'order_request' && (message as any).metadata ? (
+                            <OrderRequestCard
+                              data={(message as any).metadata}
+                              messageId={message.id}
+                              conversationId={message.conversation_id}
+                              isAdmin={false}
+                            />
+                          ) : (
+                            message.content && !message.content.startsWith('Sent a file:') && message.content
+                          )}
                           {/* Reply button */}
                           <Button
                             variant="ghost"
