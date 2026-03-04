@@ -114,6 +114,11 @@ export function AdminChatPanel() {
     }
   };
 
+  const handleSendOrderRequest = async (content: string, metadata: any) => {
+    if (!selectedConversation) return;
+    await sendReply(content, undefined, undefined, 'order_request', metadata);
+  };
+
   const handleReply = (message: typeof messages[0]) => {
     setReplyTo({
       id: message.id,
