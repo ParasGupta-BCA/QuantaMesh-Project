@@ -3,20 +3,9 @@ import { Users, TrendingUp, ShieldCheck, Star, Award, Briefcase, Zap } from "luc
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { useRef } from "react";
+import { GlowingEffect } from "@/components/ui/glowing-effect";
 
 export default function OurStory() {
-    const cardRef = useRef<HTMLDivElement>(null);
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        cardRef.current.style.setProperty("--mouse-x", `${x}px`);
-        cardRef.current.style.setProperty("--mouse-y", `${y}px`);
-    };
-
     return (
         <Layout>
             {/* Hero Section */}
@@ -60,21 +49,16 @@ export default function OurStory() {
                             transition={{ duration: 0.6 }}
                             className="space-y-6"
                         >
-                            <div
-                                ref={cardRef}
-                                onMouseMove={handleMouseMove}
-                                className="relative rounded-2xl overflow-hidden bg-white/5 shadow-2xl p-[1px] group"
-                            >
-                                {/* Glowing border spotlight */}
-                                <div
-                                    className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                                    style={{
-                                        background: "radial-gradient(600px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(168,85,247,0.6), transparent 40%)"
-                                    }}
+                            <div className="relative h-full rounded-2xl p-[1px]">
+                                <GlowingEffect
+                                    spread={40}
+                                    glow={true}
+                                    disabled={false}
+                                    proximity={64}
+                                    inactiveZone={0.01}
+                                    borderWidth={1}
                                 />
-
-                                <div className="absolute inset-[1px] rounded-2xl bg-card/90 backdrop-blur-xl z-10" />
-                                <div className="relative z-20 p-2 h-full w-full">
+                                <div className="relative z-10 p-2 rounded-2xl bg-card/90 backdrop-blur-xl h-full w-full shadow-2xl overflow-hidden">
                                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-2xl" />
                                     <div className="rounded-xl overflow-hidden relative border border-white/5 bg-black/50 h-full">
                                         <div className="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
