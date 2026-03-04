@@ -165,7 +165,7 @@ export function LeadCapturePopup() {
     }
   };
 
-  const PopupContent = () => (
+  const renderPopupContent = () => (
     <div className="relative overflow-hidden">
       {/* Custom close button with high z-index */}
       {!isMobile && !submitted && (
@@ -392,7 +392,7 @@ export function LeadCapturePopup() {
     return (
       <Drawer open={open} onOpenChange={setOpen} onClose={handleDismiss}>
         <DrawerContent className="border-t border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 max-h-[90vh]">
-          <PopupContent />
+          {renderPopupContent()}
         </DrawerContent>
       </Drawer>
     );
@@ -407,7 +407,7 @@ export function LeadCapturePopup() {
       }
     }}>
       <DialogContent className="sm:max-w-md border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-0 overflow-hidden [&>button]:hidden">
-        <PopupContent />
+        {renderPopupContent()}
       </DialogContent>
     </Dialog>
   );
