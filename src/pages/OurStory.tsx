@@ -73,9 +73,10 @@ export default function OurStory() {
                                     }}
                                 />
 
-                                <div className="relative z-10 p-2 rounded-2xl bg-card/90 backdrop-blur-xl h-full w-full">
+                                <div className="absolute inset-[1px] rounded-2xl bg-card/90 backdrop-blur-xl z-10" />
+                                <div className="relative z-20 p-2 h-full w-full">
                                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-2xl" />
-                                    <div className="rounded-xl overflow-hidden relative border border-white/5 bg-black/50">
+                                    <div className="rounded-xl overflow-hidden relative border border-white/5 bg-black/50 h-full">
                                         <div className="absolute top-4 left-4 z-20 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
                                             <TrendingUp size={14} className="text-green-400" />
                                             <span className="text-xs font-medium text-white shadow-sm">Fiverr Earnings Proof</span>
