@@ -15,6 +15,7 @@ const AI_SENDER_ID = "00000000-0000-0000-0000-000000000000";
 import { FileAttachment } from '@/components/chat/FileAttachment';
 import { ReplyPreview } from '@/components/chat/ReplyPreview';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
+import { OrderRequestCard } from '@/components/chat/OrderRequestCard';
 export default function Chat() {
   const { user, loading: authLoading } = useAuth();
   const { conversation, messages, loading, sendMessage, markAsRead, uploading, aiTyping, adminActive } = useChat();
