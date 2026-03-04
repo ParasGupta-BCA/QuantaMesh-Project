@@ -428,6 +428,14 @@ export default function Admin() {
               </div>
             )}
 
+            {activeTab === 'service-pricing' && (
+              <div className="animate-slide-up">
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminServicePricing />
+                </div>
+              </div>
+            )}
+
             {activeTab === 'ai-settings' && (
               <div className="animate-slide-up">
                 <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">

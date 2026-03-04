@@ -107,6 +107,12 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
             onClick: () => onTabChange("cold-outreach")
         },
         {
+            label: "Pricing",
+            value: "service-pricing",
+            icon: <DollarSign className="h-5 w-5 flex-shrink-0" />,
+            onClick: () => onTabChange("service-pricing")
+        },
+        {
             label: "AI Settings",
             value: "ai-settings",
             icon: <Bot className="h-5 w-5 flex-shrink-0" />,
