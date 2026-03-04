@@ -22,9 +22,9 @@ export default function OurStory() {
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
                             <span className="text-xs font-semibold text-primary uppercase tracking-wider">Meet The Founder</span>
                         </div>
-                        <h1 className="mb-6 flex flex-col items-center justify-center gap-2 md:gap-4">
-                            <span className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">The Journey of</span>
-                            <span className="text-5xl md:text-7xl lg:text-8xl font-extrabold bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent pb-2 tracking-tighter">
+                        <h1 className="mb-6 flex flex-col items-center justify-center gap-1 md:gap-4 px-2">
+                            <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">The Journey of</span>
+                            <span className="text-[2.75rem] leading-none sm:text-5xl md:text-7xl lg:text-8xl font-extrabold bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent pb-2 tracking-tighter whitespace-nowrap">
                                 Paras Gupta
                             </span>
                         </h1>
