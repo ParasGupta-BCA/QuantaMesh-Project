@@ -20,6 +20,7 @@ import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RefundPolicy from "./pages/RefundPolicy";
 import NotFound from "./pages/NotFound";
+import OurStory from "./pages/OurStory";
 import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/our-story" element={<OurStory />} />
               <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
