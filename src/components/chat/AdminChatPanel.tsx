@@ -493,6 +493,10 @@ export function AdminChatPanel() {
                 >
                   <Paperclip className="h-5 w-5" />
                 </Button>
+                <SendOrderRequestDialog
+                  onSend={handleSendOrderRequest}
+                  disabled={sending || uploading || selectedConversation.status === 'closed'}
+                />
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
