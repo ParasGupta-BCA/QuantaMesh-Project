@@ -94,7 +94,7 @@ export default function OurStory() {
                                     For years, I built a strong reputation as a top-rated freelancer on Fiverr, helping countless businesses bring their ideas to life. From intricate web development to complex app deployments, I dedicated myself to delivering excellence and pushing the boundaries of what was possible for my clients.
                                 </p>
                                 <p className="text-muted-foreground leading-relaxed text-lg">
-                                    However, at the end of 2024, my Fiverr account was unexpectedly banned without a clear path to resolution. It was a massive setback, but it forced me to look at the bigger picture.
+                                    However, in 2025, my Fiverr account was unexpectedly banned without a clear path to resolution. It was a massive setback, but it forced me to look at the bigger picture.
                                 </p>
                             </div>
 
