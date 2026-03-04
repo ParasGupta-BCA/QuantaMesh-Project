@@ -69,15 +69,15 @@ export default function OurStory() {
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="glass-card p-4 rounded-xl text-center">
-                                    <Star className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-                                    <p className="font-bold text-xl">Top Rated</p>
-                                    <p className="text-xs text-muted-foreground">Former Status</p>
+                                <div className="glass-card p-6 rounded-xl flex flex-col items-center justify-center text-center group hover:bg-white/5 transition-colors">
+                                    <Star className="w-8 h-8 text-yellow-400 mb-3 group-hover:scale-110 transition-transform duration-300" />
+                                    <p className="font-bold text-2xl mb-1">Top Rated</p>
+                                    <p className="text-sm text-muted-foreground font-medium">Former Status</p>
                                 </div>
-                                <div className="glass-card p-4 rounded-xl text-center">
-                                    <Briefcase className="w-8 h-8 text-primary mx-auto mb-2" />
-                                    <p className="font-bold text-xl">10+</p>
-                                    <p className="text-xs text-muted-foreground">Projects Delivered</p>
+                                <div className="glass-card p-6 rounded-xl flex flex-col items-center justify-center text-center group hover:bg-white/5 transition-colors">
+                                    <Briefcase className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform duration-300" />
+                                    <p className="font-bold text-2xl mb-1">10+</p>
+                                    <p className="text-sm text-muted-foreground font-medium">Projects Delivered</p>
                                 </div>
                             </div>
                         </motion.div>
