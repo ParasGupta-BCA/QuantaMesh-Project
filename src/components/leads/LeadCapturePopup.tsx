@@ -11,9 +11,42 @@ import { z } from "zod";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "motion/react";
 
+const dummyNames = ["test", "dummy", "admin", "user", "john doe", "jane doe", "asdf", "qwer", "abcd"];
+const invalidEmailPrefixes = ["test@", "dummy@", "admin@", "demo@"];
+const invalidDomains = ["example.com", "test.com", "dummy.com", "mailinator.com", "yopmail.com", "tempmail.com", "10minutemail.com"];
+
 const leadSchema = z.object({
-  name: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name too long"),
-  email: z.string().trim().email("Please enter a valid email").max(255, "Email too long"),
+  name: z.string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name too long")
+    .refine((val) => {
+      const lower = val.toLowerCase().trim();
+      if (dummyNames.includes(lower)) return false;
+      if (/^[0-9]+$/.test(lower)) return false; // Contains only numbers
+      if (/(.)\1{4,}/.test(lower)) return false; // 5 or more repeating characters (e.g. aaaaa)
+      return true;
+    }, "Please enter your real name"),
+
+  email: z.string()
+    .trim()
+    .email("Please enter a valid email")
+    .max(255, "Email too long")
+    .refine((val) => {
+      const lower = val.toLowerCase().trim();
+
+      // Check for generic test prefixes
+      if (invalidEmailPrefixes.some(prefix => lower.startsWith(prefix))) return false;
+
+      // Block the exact placeholder
+      if (lower === "john@example.com") return false;
+
+      // Check for test or disposable domains
+      const domain = lower.split("@")[1];
+      if (domain && invalidDomains.some(d => domain.includes(d))) return false;
+
+      return true;
+    }, "Please enter your genuine personal or work email address"),
 });
 
 const POPUP_DISMISSED_KEY = "lead_popup_dismissed";
