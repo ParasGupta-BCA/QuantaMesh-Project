@@ -57,7 +57,7 @@ export default function OurStory() {
                                         src="/fiverr-proof.jpeg"
                                         alt="Paras Gupta's Fiverr Earnings Proof"
                                         loading="lazy"
-                                        className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700 max-h-[600px]"
+                                        className="w-full h-auto transform hover:scale-105 transition-transform duration-700"
                                         onError={(e) => {
                                             // Fallback if image not found
                                             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80';
