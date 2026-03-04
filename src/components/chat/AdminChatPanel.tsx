@@ -29,6 +29,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FileAttachment } from './FileAttachment';
 import { ReplyPreview } from './ReplyPreview';
 import { ReplyTo } from '@/hooks/useChat';
+import { OrderRequestCard } from './OrderRequestCard';
+import { SendOrderRequestDialog } from './SendOrderRequestDialog';
 
 const formatFileSize = (bytes: number) => {
   if (bytes < 1024) return bytes + ' B';
