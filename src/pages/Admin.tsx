@@ -23,6 +23,7 @@ import { AdminAISettings } from "@/components/admin/AdminAISettings";
 import { AdminColdOutreach } from "@/components/admin/AdminColdOutreach";
 import { AdminColdEmailSettings } from "@/components/admin/AdminColdEmailSettings";
 import { AdminServicePricing } from "@/components/admin/AdminServicePricing";
+import { AdminMetaAds } from "@/components/admin/AdminMetaAds";
 import { AdminRevenueChart } from "@/components/admin/AdminRevenueChart";
 import { AdminRecentActivity } from "@/components/admin/AdminRecentActivity";
 import { AdminOrderDistribution } from "@/components/admin/AdminOrderDistribution";
@@ -440,6 +441,14 @@ export default function Admin() {
               <div className="animate-slide-up">
                 <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
                   <AdminAISettings />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'meta-ads' && (
+              <div className="animate-slide-up">
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminMetaAds />
                 </div>
               </div>
             )}

@@ -14,7 +14,8 @@ import {
     Mail,
     LogOut,
     Settings,
-    DollarSign
+    DollarSign,
+    Megaphone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -117,6 +118,12 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
             value: "ai-settings",
             icon: <Bot className="h-5 w-5 flex-shrink-0" />,
             onClick: () => onTabChange("ai-settings")
+        },
+        {
+            label: "Meta Ads",
+            value: "meta-ads",
+            icon: <Megaphone className="h-5 w-5 flex-shrink-0" />,
+            onClick: () => onTabChange("meta-ads")
         },
     ];
 

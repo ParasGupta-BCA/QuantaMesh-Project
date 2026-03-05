@@ -43,12 +43,14 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
   const [sending, setSending] = useState(false);
   const [selectedPackageId, setSelectedPackageId] = useState<string>("");
   const [customMode, setCustomMode] = useState(false);
+  const [paymentLink, setPaymentLink] = useState("");
   const [custom, setCustom] = useState({
     service_type: "website",
     package_name: "",
     description: "",
     price: "",
     features: "",
+    payment_link: "",
   });
 
   useEffect(() => {
@@ -88,6 +90,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           description: custom.description,
           price: parseFloat(custom.price),
           features: custom.features.split("\n").filter((f) => f.trim()),
+          payment_link: custom.payment_link || undefined,
           status: "pending",
         };
       } else {
@@ -103,6 +106,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           description: pkg.description,
           price: pkg.price,
           features: pkg.features,
+          payment_link: paymentLink || undefined,
           status: "pending",
         };
       }
@@ -111,7 +115,8 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
       await onSend(content, orderData);
       setOpen(false);
       setSelectedPackageId("");
-      setCustom({ service_type: "website", package_name: "", description: "", price: "", features: "" });
+      setPaymentLink("");
+      setCustom({ service_type: "website", package_name: "", description: "", price: "", features: "", payment_link: "" });
       toast({ title: "Order request sent!" });
     } catch (error) {
       console.error("Error sending order request:", error);
@@ -239,6 +244,26 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
                   rows={3}
                 />
               </div>
+              <div>
+                <Label className="text-xs">Payment Link (optional)</Label>
+                <Input
+                  value={custom.payment_link}
+                  onChange={(e) => setCustom((p) => ({ ...p, payment_link: e.target.value }))}
+                  placeholder="https://paypal.me/... or UPI link"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Payment link for package mode */}
+          {!customMode && selectedPackageId && (
+            <div>
+              <Label className="text-xs">Payment Link (optional)</Label>
+              <Input
+                value={paymentLink}
+                onChange={(e) => setPaymentLink(e.target.value)}
+                placeholder="https://paypal.me/... or UPI link"
+              />
             </div>
           )}
 

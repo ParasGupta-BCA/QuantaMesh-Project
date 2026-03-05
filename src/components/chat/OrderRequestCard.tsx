@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, DollarSign, Loader2, ShoppingCart } from "lucide-react";
+import { CheckCircle, CreditCard, DollarSign, ExternalLink, Loader2, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,7 @@ interface OrderRequestData {
   price: number;
   description?: string;
   features?: string[];
+  payment_link?: string;
   status?: "pending" | "accepted" | "declined";
 }
 
@@ -32,7 +33,6 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
     if (!user || isAdmin) return;
     setAccepting(true);
     try {
-      // Create order from the request
       const { error: orderError } = await supabase.from("orders").insert({
         user_id: user.id,
         app_name: `${data.package_name} - ${data.service_type}`,
@@ -47,7 +47,6 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
 
       if (orderError) throw orderError;
 
-      // Update the message metadata to mark as accepted
       const { error: msgError } = await supabase
         .from("messages")
         .update({
@@ -57,7 +56,6 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
 
       if (msgError) throw msgError;
 
-      // Send a confirmation message
       const { error: replyError } = await supabase.from("messages").insert({
         conversation_id: conversationId,
         sender_id: user.id,
@@ -114,6 +112,21 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
             ))}
           </ul>
         )}
+
+        {/* Payment link button */}
+        {data.payment_link && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-2 border-primary/30 text-primary hover:bg-primary/10"
+            onClick={() => window.open(data.payment_link, "_blank")}
+          >
+            <CreditCard className="h-4 w-4" />
+            Pay Now
+            <ExternalLink className="h-3 w-3" />
+          </Button>
+        )}
+
         {!isAdmin && status === "pending" && (
           <Button
             onClick={handleAccept}
