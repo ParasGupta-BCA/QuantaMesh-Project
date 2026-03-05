@@ -181,6 +181,72 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
 }
 
 // ============================================================================
+// Network Lines Component
+// ============================================================================
+
+interface NetworkLinesProps {
+    markers: GlobeMarker[];
+    radius: number;
+}
+
+function NetworkLines({ markers, radius }: NetworkLinesProps) {
+    const arcRadius = radius * 1.005;
+
+    // Build all THREE.Line objects once
+    const lines = useMemo(() => {
+        const result: THREE.Line[] = [];
+
+        for (let i = 0; i < markers.length; i++) {
+            for (let j = i + 1; j < markers.length; j++) {
+                const start = latLngToVector3(markers[i].lat, markers[i].lng, arcRadius);
+                const end = latLngToVector3(markers[j].lat, markers[j].lng, arcRadius);
+
+                const points: THREE.Vector3[] = [];
+                const segments = 64;
+                for (let k = 0; k <= segments; k++) {
+                    const t = k / segments;
+                    const point = new THREE.Vector3().lerpVectors(start, end, t);
+                    const bulge = 1 + 0.07 * Math.sin(Math.PI * t);
+                    point.normalize().multiplyScalar(arcRadius * bulge);
+                    points.push(point);
+                }
+
+                const geo = new THREE.BufferGeometry().setFromPoints(points);
+                const idx = result.length;
+                const mat = new THREE.LineDashedMaterial({
+                    color: idx % 3 === 0 ? "#a855f7" : idx % 3 === 1 ? "#6366f1" : "#38bdf8",
+                    linewidth: 1,
+                    dashSize: 0.10,
+                    gapSize: 0.07,
+                    transparent: true,
+                    opacity: 0.5,
+                });
+                const line = new THREE.Line(geo, mat);
+                line.computeLineDistances();
+                result.push(line);
+            }
+        }
+        return result;
+    }, [markers, arcRadius]);
+
+    // Animate dash offset each frame — no new allocations
+    useFrame(({ clock }) => {
+        const t = clock.getElapsedTime();
+        lines.forEach((line, i) => {
+            (line.material as THREE.LineDashedMaterial).dashOffset = -(t * 0.25 + i * 0.35);
+        });
+    });
+
+    return (
+        <group>
+            {lines.map((line, i) => (
+                <primitive key={i} object={line} />
+            ))}
+        </group>
+    );
+}
+
+// ============================================================================
 // Rotating Globe with Markers
 // ============================================================================
 
@@ -234,6 +300,8 @@ function RotatingGlobe({ config, markers, onMarkerClick, onMarkerHover }: Rotati
                     />
                 </mesh>
             )}
+
+            <NetworkLines markers={markers} radius={config.radius} />
 
             {markers.map((marker, index) => (
                 <Marker
