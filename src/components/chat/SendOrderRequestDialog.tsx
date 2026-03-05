@@ -49,6 +49,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
     description: "",
     price: "",
     features: "",
+    payment_link: "",
   });
 
   useEffect(() => {
