@@ -89,6 +89,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           description: custom.description,
           price: parseFloat(custom.price),
           features: custom.features.split("\n").filter((f) => f.trim()),
+          payment_link: custom.payment_link || undefined,
           status: "pending",
         };
       } else {
