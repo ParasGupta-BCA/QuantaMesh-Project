@@ -134,7 +134,7 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
         )}>
             <Sidebar open={open} setOpen={setOpen}>
                 <SidebarBody className="justify-between bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800">
-                    <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden thin-scrollbar pb-2">
+                    <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide pb-2">
                         <div className="flex flex-col">
                             <Link
                                 to="/"
