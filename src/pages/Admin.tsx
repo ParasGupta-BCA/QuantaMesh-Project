@@ -23,6 +23,7 @@ import { AdminAISettings } from "@/components/admin/AdminAISettings";
 import { AdminColdOutreach } from "@/components/admin/AdminColdOutreach";
 import { AdminColdEmailSettings } from "@/components/admin/AdminColdEmailSettings";
 import { AdminServicePricing } from "@/components/admin/AdminServicePricing";
+import { AdminMetaAds } from "@/components/admin/AdminMetaAds";
 import { AdminRevenueChart } from "@/components/admin/AdminRevenueChart";
 import { AdminRecentActivity } from "@/components/admin/AdminRecentActivity";
 import { AdminOrderDistribution } from "@/components/admin/AdminOrderDistribution";
