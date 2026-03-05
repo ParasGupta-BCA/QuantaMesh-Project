@@ -244,6 +244,26 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
                   rows={3}
                 />
               </div>
+              <div>
+                <Label className="text-xs">Payment Link (optional)</Label>
+                <Input
+                  value={custom.payment_link}
+                  onChange={(e) => setCustom((p) => ({ ...p, payment_link: e.target.value }))}
+                  placeholder="https://paypal.me/... or UPI link"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Payment link for package mode */}
+          {!customMode && selectedPackageId && (
+            <div>
+              <Label className="text-xs">Payment Link (optional)</Label>
+              <Input
+                value={paymentLink}
+                onChange={(e) => setPaymentLink(e.target.value)}
+                placeholder="https://paypal.me/... or UPI link"
+              />
             </div>
           )}
 
