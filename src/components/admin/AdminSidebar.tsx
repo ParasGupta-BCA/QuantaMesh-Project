@@ -119,6 +119,12 @@ export function AdminSidebar({ counts, activeTab, onTabChange, children }: Admin
             icon: <Bot className="h-5 w-5 flex-shrink-0" />,
             onClick: () => onTabChange("ai-settings")
         },
+        {
+            label: "Meta Ads",
+            value: "meta-ads",
+            icon: <Megaphone className="h-5 w-5 flex-shrink-0" />,
+            onClick: () => onTabChange("meta-ads")
+        },
     ];
 
     return (

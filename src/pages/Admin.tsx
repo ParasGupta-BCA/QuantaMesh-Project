@@ -444,6 +444,14 @@ export default function Admin() {
                 </div>
               </div>
             )}
+
+            {activeTab === 'meta-ads' && (
+              <div className="animate-slide-up">
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden p-6">
+                  <AdminMetaAds />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </AdminSidebar>
