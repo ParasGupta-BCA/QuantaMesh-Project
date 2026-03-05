@@ -43,6 +43,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
   const [sending, setSending] = useState(false);
   const [selectedPackageId, setSelectedPackageId] = useState<string>("");
   const [customMode, setCustomMode] = useState(false);
+  const [paymentLink, setPaymentLink] = useState("");
   const [custom, setCustom] = useState({
     service_type: "website",
     package_name: "",
