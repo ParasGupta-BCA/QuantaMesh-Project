@@ -14,7 +14,8 @@ import {
     Mail,
     LogOut,
     Settings,
-    DollarSign
+    DollarSign,
+    Megaphone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
