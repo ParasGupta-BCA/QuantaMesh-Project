@@ -180,84 +180,6 @@ function Marker({ marker, radius, defaultSize, onClick, onHover }: MarkerProps) 
     );
 }
 
-// ============================================================================
-// Network Lines Component
-// ============================================================================
-
-interface NetworkLinesProps {
-    markers: GlobeMarker[];
-    radius: number;
-}
-
-function NetworkLines({ markers, radius }: NetworkLinesProps) {
-    const arcRadius = radius * 1.005;
-
-    // Single continuous path: marker[0] → [1] → … → [n-1] → [0]
-    const { line, glowLine } = useMemo(() => {
-        if (markers.length < 2) return { line: null, glowLine: null };
-
-        const allPoints: THREE.Vector3[] = [];
-        const segments = 80;
-
-        for (let i = 0; i < markers.length; i++) {
-            const next = (i + 1) % markers.length;
-            const start = latLngToVector3(markers[i].lat, markers[i].lng, arcRadius);
-            const end = latLngToVector3(markers[next].lat, markers[next].lng, arcRadius);
-
-            for (let k = 0; k <= segments; k++) {
-                const t = k / segments;
-                const point = new THREE.Vector3().lerpVectors(start, end, t);
-                const bulge = 1 + 0.1 * Math.sin(Math.PI * t);
-                point.normalize().multiplyScalar(arcRadius * bulge);
-                allPoints.push(point);
-            }
-        }
-
-        const geo = new THREE.BufferGeometry().setFromPoints(allPoints);
-
-        // Main crisp yellow line
-        const mat = new THREE.LineDashedMaterial({
-            color: "#facc15",
-            linewidth: 1,
-            dashSize: 0.14,
-            gapSize: 0.09,
-            transparent: true,
-            opacity: 0.9,
-        });
-        const mainLine = new THREE.Line(geo, mat);
-        mainLine.computeLineDistances();
-
-        // Soft amber glow layer
-        const glowGeo = geo.clone();
-        const glowMat = new THREE.LineDashedMaterial({
-            color: "#f59e0b",
-            linewidth: 1,
-            dashSize: 0.18,
-            gapSize: 0.09,
-            transparent: true,
-            opacity: 0.22,
-        });
-        const glow = new THREE.Line(glowGeo, glowMat);
-        glow.computeLineDistances();
-
-        return { line: mainLine, glowLine: glow };
-    }, [markers, arcRadius]);
-
-    useFrame(({ clock }) => {
-        const t = clock.getElapsedTime();
-        if (line) (line.material as THREE.LineDashedMaterial).dashOffset = -(t * 0.4);
-        if (glowLine) (glowLine.material as THREE.LineDashedMaterial).dashOffset = -(t * 0.4);
-    });
-
-    if (!line) return null;
-
-    return (
-        <group>
-            {glowLine && <primitive object={glowLine} />}
-            <primitive object={line} />
-        </group>
-    );
-}
 
 // ============================================================================
 // Rotating Globe with Markers
@@ -313,8 +235,6 @@ function RotatingGlobe({ config, markers, onMarkerClick, onMarkerHover }: Rotati
                     />
                 </mesh>
             )}
-
-            <NetworkLines markers={markers} radius={config.radius} />
 
             {markers.map((marker, index) => (
                 <Marker
