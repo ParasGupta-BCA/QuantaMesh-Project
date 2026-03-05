@@ -106,6 +106,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           description: pkg.description,
           price: pkg.price,
           features: pkg.features,
+          payment_link: paymentLink || undefined,
           status: "pending",
         };
       }
