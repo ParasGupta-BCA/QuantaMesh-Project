@@ -113,7 +113,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
       await onSend(content, orderData);
       setOpen(false);
       setSelectedPackageId("");
-      setCustom({ service_type: "website", package_name: "", description: "", price: "", features: "" });
+      setCustom({ service_type: "website", package_name: "", description: "", price: "", features: "", payment_link: "" });
       toast({ title: "Order request sent!" });
     } catch (error) {
       console.error("Error sending order request:", error);
