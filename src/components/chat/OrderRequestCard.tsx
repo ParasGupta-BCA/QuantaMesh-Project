@@ -75,7 +75,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
   };
 
   const handleConfirmPayment = async () => {
-    if (!user) return;
+    if (!user || confirmingPayment || paymentConfirmed) return;
     setConfirmingPayment(true);
     try {
       // Update message metadata to record payment confirmation
