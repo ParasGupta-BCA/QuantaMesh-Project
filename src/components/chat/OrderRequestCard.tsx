@@ -117,7 +117,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
   };
 
   const handleAccept = async () => {
-    if (!user || isAdmin) return;
+    if (!user || isAdmin || accepting || isAccepted) return;
 
     // Guard: If payment link exists, payment must be confirmed first
     if (hasPaymentLink && !paymentConfirmed) {
