@@ -279,7 +279,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
                     size="sm"
                     className="w-full gap-2 border-green-500/30 text-green-500 hover:bg-green-500/10"
                     onClick={handleConfirmPayment}
-                    disabled={confirmingPayment}
+                    disabled={confirmingPayment || paymentConfirmed}
                   >
                     {confirmingPayment ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
