@@ -101,13 +101,15 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           setSending(false);
           return;
         }
+        // Auto-fill payment link from package if admin didn't override
+        const finalPaymentLink = paymentLink || pkg.payment_link || undefined;
         orderData = {
           service_type: pkg.service_type,
           package_name: pkg.package_name,
           description: pkg.description,
           price: pkg.price,
           features: pkg.features,
-          payment_link: paymentLink || undefined,
+          payment_link: finalPaymentLink,
           status: "pending",
         };
       }
