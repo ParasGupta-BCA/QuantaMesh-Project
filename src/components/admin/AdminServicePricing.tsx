@@ -98,6 +98,7 @@ export function AdminServicePricing() {
       description: "",
       price: "",
       features: "",
+      payment_link: "",
       is_active: true,
       display_order: 0,
     });
