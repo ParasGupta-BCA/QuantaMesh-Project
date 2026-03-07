@@ -34,6 +34,7 @@ interface ServicePricing {
   features: string[];
   is_active: boolean;
   display_order: number;
+  payment_link: string | null;
   created_at: string;
 }
 
