@@ -267,6 +267,15 @@ export function AdminServicePricing() {
                   rows={4}
                 />
               </div>
+              <div>
+                <Label>Payment Link (optional)</Label>
+                <Input
+                  value={form.payment_link}
+                  onChange={(e) => setForm((p) => ({ ...p, payment_link: e.target.value }))}
+                  placeholder="https://paypal.me/... or UPI link"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">Auto-fills when sending order requests in chat</p>
+              </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Label>Display Order</Label>
