@@ -609,6 +609,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           package_name: string
+          payment_link: string | null
           price: number
           service_type: string
           updated_at: string | null
@@ -621,6 +622,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           package_name: string
+          payment_link?: string | null
           price?: number
           service_type: string
           updated_at?: string | null
@@ -633,6 +635,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           package_name?: string
+          payment_link?: string | null
           price?: number
           service_type?: string
           updated_at?: string | null

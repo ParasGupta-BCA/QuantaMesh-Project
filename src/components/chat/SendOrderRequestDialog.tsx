@@ -28,6 +28,7 @@ interface ServicePricing {
   description: string | null;
   price: number;
   features: string[];
+  payment_link: string | null;
 }
 
 interface SendOrderRequestDialogProps {
@@ -100,13 +101,15 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           setSending(false);
           return;
         }
+        // Auto-fill payment link from package if admin didn't override
+        const finalPaymentLink = paymentLink || pkg.payment_link || undefined;
         orderData = {
           service_type: pkg.service_type,
           package_name: pkg.package_name,
           description: pkg.description,
           price: pkg.price,
           features: pkg.features,
-          payment_link: paymentLink || undefined,
+          payment_link: finalPaymentLink,
           status: "pending",
         };
       }
@@ -175,11 +178,16 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
                   No packages available. Create one in Service Pricing settings.
                 </p>
               ) : (
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                 <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {packages.map((pkg) => (
                     <div
                       key={pkg.id}
-                      onClick={() => setSelectedPackageId(pkg.id)}
+                      onClick={() => {
+                        setSelectedPackageId(pkg.id);
+                        // Auto-fill payment link from package
+                        if (pkg.payment_link) setPaymentLink(pkg.payment_link);
+                        else setPaymentLink("");
+                      }}
                       className={`p-3 rounded-lg border cursor-pointer transition-all ${
                         selectedPackageId === pkg.id
                           ? "border-primary bg-primary/5"
@@ -191,6 +199,9 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
                         <span className="font-bold text-sm">${Number(pkg.price).toFixed(2)}</span>
                       </div>
                       <p className="text-xs text-muted-foreground capitalize">{pkg.service_type.replace("-", " ")}</p>
+                      {pkg.payment_link && (
+                        <p className="text-[10px] text-muted-foreground/60 truncate mt-1">🔗 Payment link saved</p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -258,7 +269,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           {/* Payment link for package mode */}
           {!customMode && selectedPackageId && (
             <div>
-              <Label className="text-xs">Payment Link (optional)</Label>
+              <Label className="text-xs">Payment Link {packages.find(p => p.id === selectedPackageId)?.payment_link ? "(auto-filled from package)" : "(optional)"}</Label>
               <Input
                 value={paymentLink}
                 onChange={(e) => setPaymentLink(e.target.value)}

@@ -34,6 +34,7 @@ interface ServicePricing {
   features: string[];
   is_active: boolean;
   display_order: number;
+  payment_link: string | null;
   created_at: string;
 }
 
@@ -58,6 +59,7 @@ export function AdminServicePricing() {
     description: "",
     price: "",
     features: "",
+    payment_link: "",
     is_active: true,
     display_order: 0,
   });
@@ -96,6 +98,7 @@ export function AdminServicePricing() {
       description: "",
       price: "",
       features: "",
+      payment_link: "",
       is_active: true,
       display_order: 0,
     });
@@ -110,6 +113,7 @@ export function AdminServicePricing() {
       description: p.description || "",
       price: String(p.price),
       features: p.features.join("\n"),
+      payment_link: p.payment_link || "",
       is_active: p.is_active,
       display_order: p.display_order,
     });
@@ -129,6 +133,7 @@ export function AdminServicePricing() {
         description: form.description || null,
         price: parseFloat(form.price),
         features: form.features.split("\n").filter((f) => f.trim()),
+        payment_link: form.payment_link || null,
         is_active: form.is_active,
         display_order: form.display_order,
       };
@@ -262,6 +267,15 @@ export function AdminServicePricing() {
                   rows={4}
                 />
               </div>
+              <div>
+                <Label>Payment Link (optional)</Label>
+                <Input
+                  value={form.payment_link}
+                  onChange={(e) => setForm((p) => ({ ...p, payment_link: e.target.value }))}
+                  placeholder="https://paypal.me/... or UPI link"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">Auto-fills when sending order requests in chat</p>
+              </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Label>Display Order</Label>
@@ -317,6 +331,9 @@ export function AdminServicePricing() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-2xl font-bold">${Number(p.price).toFixed(2)}</div>
+                {p.payment_link && (
+                  <p className="text-[10px] text-muted-foreground truncate">🔗 {p.payment_link}</p>
+                )}
                 {p.features.length > 0 && (
                   <ul className="space-y-1">
                     {p.features.map((f, i) => (
