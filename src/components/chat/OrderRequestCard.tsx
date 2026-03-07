@@ -75,7 +75,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
   };
 
   const handleConfirmPayment = async () => {
-    if (!user) return;
+    if (!user || confirmingPayment || paymentConfirmed) return;
     setConfirmingPayment(true);
     try {
       // Update message metadata to record payment confirmation
@@ -117,7 +117,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
   };
 
   const handleAccept = async () => {
-    if (!user || isAdmin) return;
+    if (!user || isAdmin || accepting || isAccepted) return;
 
     // Guard: If payment link exists, payment must be confirmed first
     if (hasPaymentLink && !paymentConfirmed) {
@@ -279,7 +279,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
                     size="sm"
                     className="w-full gap-2 border-green-500/30 text-green-500 hover:bg-green-500/10"
                     onClick={handleConfirmPayment}
-                    disabled={confirmingPayment}
+                    disabled={confirmingPayment || paymentConfirmed}
                   >
                     {confirmingPayment ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -312,7 +312,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
             {/* Step 3: Accept & Place Order */}
             <Button
               onClick={canAccept ? handleAccept : handleAccept}
-              disabled={accepting || !canAccept}
+              disabled={accepting || !canAccept || isAccepted}
               className="w-full gap-2"
               size="sm"
               title={!canAccept ? "Complete payment first" : "Accept this order request"}
