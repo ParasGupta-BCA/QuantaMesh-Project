@@ -28,6 +28,7 @@ interface ServicePricing {
   description: string | null;
   price: number;
   features: string[];
+  payment_link: string | null;
 }
 
 interface SendOrderRequestDialogProps {
