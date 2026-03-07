@@ -178,11 +178,16 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
                   No packages available. Create one in Service Pricing settings.
                 </p>
               ) : (
-                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                 <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {packages.map((pkg) => (
                     <div
                       key={pkg.id}
-                      onClick={() => setSelectedPackageId(pkg.id)}
+                      onClick={() => {
+                        setSelectedPackageId(pkg.id);
+                        // Auto-fill payment link from package
+                        if (pkg.payment_link) setPaymentLink(pkg.payment_link);
+                        else setPaymentLink("");
+                      }}
                       className={`p-3 rounded-lg border cursor-pointer transition-all ${
                         selectedPackageId === pkg.id
                           ? "border-primary bg-primary/5"
@@ -194,6 +199,9 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
                         <span className="font-bold text-sm">${Number(pkg.price).toFixed(2)}</span>
                       </div>
                       <p className="text-xs text-muted-foreground capitalize">{pkg.service_type.replace("-", " ")}</p>
+                      {pkg.payment_link && (
+                        <p className="text-[10px] text-muted-foreground/60 truncate mt-1">🔗 Payment link saved</p>
+                      )}
                     </div>
                   ))}
                 </div>
