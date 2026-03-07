@@ -113,6 +113,7 @@ export function AdminServicePricing() {
       description: p.description || "",
       price: String(p.price),
       features: p.features.join("\n"),
+      payment_link: p.payment_link || "",
       is_active: p.is_active,
       display_order: p.display_order,
     });
