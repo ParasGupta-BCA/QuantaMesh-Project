@@ -1,0 +1,1 @@
+ALTER TABLE public.service_pricing ADD COLUMN payment_link text DEFAULT NULL;
