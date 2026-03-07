@@ -269,7 +269,7 @@ export function SendOrderRequestDialog({ onSend, disabled }: SendOrderRequestDia
           {/* Payment link for package mode */}
           {!customMode && selectedPackageId && (
             <div>
-              <Label className="text-xs">Payment Link (optional)</Label>
+              <Label className="text-xs">Payment Link {packages.find(p => p.id === selectedPackageId)?.payment_link ? "(auto-filled from package)" : "(optional)"}</Label>
               <Input
                 value={paymentLink}
                 onChange={(e) => setPaymentLink(e.target.value)}
