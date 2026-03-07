@@ -331,6 +331,9 @@ export function AdminServicePricing() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-2xl font-bold">${Number(p.price).toFixed(2)}</div>
+                {p.payment_link && (
+                  <p className="text-[10px] text-muted-foreground truncate">🔗 {p.payment_link}</p>
+                )}
                 {p.features.length > 0 && (
                   <ul className="space-y-1">
                     {p.features.map((f, i) => (
