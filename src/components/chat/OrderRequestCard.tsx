@@ -312,7 +312,7 @@ export function OrderRequestCard({ data, messageId, conversationId, isAdmin }: O
             {/* Step 3: Accept & Place Order */}
             <Button
               onClick={canAccept ? handleAccept : handleAccept}
-              disabled={accepting || !canAccept}
+              disabled={accepting || !canAccept || isAccepted}
               className="w-full gap-2"
               size="sm"
               title={!canAccept ? "Complete payment first" : "Accept this order request"}
