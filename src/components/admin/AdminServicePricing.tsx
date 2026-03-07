@@ -133,6 +133,7 @@ export function AdminServicePricing() {
         description: form.description || null,
         price: parseFloat(form.price),
         features: form.features.split("\n").filter((f) => f.trim()),
+        payment_link: form.payment_link || null,
         is_active: form.is_active,
         display_order: form.display_order,
       };
